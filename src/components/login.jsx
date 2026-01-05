@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../src/assets/logo.jpg"
+import logo from "../assets/images/logo.jpg"
 
 
 
