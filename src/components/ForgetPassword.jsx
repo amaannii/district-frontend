@@ -1,4 +1,5 @@
-import React from "react";
+import logo from "../assets/images/logo.jpg"
+
 
 const ForgetPassword = () => {
   return (
@@ -6,11 +7,11 @@ const ForgetPassword = () => {
       {/* Header */}
       <header className="flex items-center justify-between px-10 py-6">
         <div className="flex items-center gap-2 font-bold text-lg">
-          <img src="" alt="" />
+          <img className="w-[172px] h-[129px]" src={logo} alt="" />
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="bg-black text-white px-5 py-2 rounded-lg">
+          <button className="bg-black text-white px-5 py-2 rounded-lg w-[50px]">
             login
           </button>
           <a href="#" className="text-lime-500 font-medium">
