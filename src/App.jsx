@@ -9,15 +9,15 @@ function App() {
   return (
     <>
 
-      <Home/>
+    <Home/>
 
 
-
+{/* 
 
     <ForgetPassword/>
 
      <Login/>
-     <Signup/>
+     <Signup/> */}
 
 </>
 
