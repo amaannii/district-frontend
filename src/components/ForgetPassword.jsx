@@ -14,7 +14,8 @@ const ForgetPassword = () => {
 
         <div className="flex items-center gap-4">
           <button className="bg-black text-white px-5 py-2  rounded-lg w-[50px]">
-
+            </button>
+</div>
         <div className="flex items-center gap-4 ">
           <button className="bg-black play-regular  text-white px-5 py-2 rounded-lg w-[120px] h-[30px] items-center flex justify-center">
 
