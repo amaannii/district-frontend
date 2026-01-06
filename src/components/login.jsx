@@ -13,10 +13,10 @@ const Login = () => {
       </div>
 
       
-      <div className="hidden md:flex w-[990px] bg-gray-300 items-center justify-center" />
+ 
 
       <div className="flex w-full md:w-1/2 items-center justify-center bg-white">
-        <div className="w-[360px]">
+        <div className="w-[360px]"> 
           <img
             src={logo}
             alt="DistriX"
@@ -24,11 +24,11 @@ const Login = () => {
           />
           <div className="mb-4">
             <label className="block text-sm text-gray-600 mb-1">
-              Username or Email
+               Email
             </label>
             <input
               type="text"
-              placeholder="Enter username or email"
+              placeholder="email"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
             />
           </div>
