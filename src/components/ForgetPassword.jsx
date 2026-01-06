@@ -11,8 +11,13 @@ const ForgetPassword = () => {
           <img className="w-[172px] h-[129px]" src={logo} alt="" />
         </div>
 
+
+        <div className="flex items-center gap-4">
+          <button className="bg-black text-white px-5 py-2  rounded-lg w-[50px]">
+
         <div className="flex items-center gap-4 ">
           <button className="bg-black play-regular  text-white px-5 py-2 rounded-lg w-[120px] h-[30px] items-center flex justify-center">
+
             login
           </button>
           <a href="#" className="text-[#879F00] font-medium">
