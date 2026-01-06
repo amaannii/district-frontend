@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import logo from "../assets/images/logo.jpg";
+import login from "../assets/images/login.jpg";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="flex h-screen w-full">
+
+      <div className="hidden md:flex w-[800px] bg-gray-300 items-center justify-center h-full ">
+        <img className="h-full w-full" src={login} alt="" />
+      </div>
+
       
       <div className="hidden md:flex w-[990px] bg-gray-300 items-center justify-center" />
+
       <div className="flex w-full md:w-1/2 items-center justify-center bg-white">
         <div className="w-[360px]">
           <img
@@ -64,7 +71,6 @@ const Login = () => {
               Sign up
             </span>
           </p>
-
         </div>
       </div>
     </div>
