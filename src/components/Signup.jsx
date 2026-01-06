@@ -4,8 +4,8 @@ import logoo from "../assets/images/logoo.jpg";
 const Signup = () => {
   return (
     <div className="h-screen w-full flex items-center justify-center bg-white">
-      <div className="w-[420px]">
-        <div className="bg-black rounded-md px-6 py-6 text-white h-[85vh] max-h-[640px] flex flex-col justify-between">
+      <div className="w-[440px]">
+        <div className="bg-black rounded-md px-16 py-6 text-white h-[85vh] max-h-[640px] flex flex-col justify-between">
           <div>
             <div className="flex justify-center">
               <img
@@ -20,11 +20,11 @@ const Signup = () => {
             <div className="space-y-2">
               <div>
                 <label className="text-[11px] text-gray-400">
-                  number or email
+                 email
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter number or email"
+                  placeholder="email"
                   className="w-full mt-1 h-9 rounded-md bg-white px-3 text-xs text-black outline-none"
                 />
               </div>
@@ -64,9 +64,9 @@ const Signup = () => {
             </div>
           </div>
           <div>
-            <div className="border-t border-gray-700 my-3" />
+            <div className="border-t border-gray-700 my-3 " />
 
-            <button className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black cursor-pointer">
+            <button className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black cursor-pointer hover:bg-lime-300">
               Sign up
             </button>
 
@@ -81,7 +81,7 @@ const Signup = () => {
           </div>
         </div>
         <div className="mt-3 bg-black rounded-md py-2 text-center text-xs text-gray-300 h-[60px] flex items-center justify-center">
-          Have an account?{" "}
+          Have an account?   {" "}
           <span className="text-lime-500 cursor-pointer">
             Log in
           </span>
