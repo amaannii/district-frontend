@@ -1,10 +1,24 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logoo from "../assets/images/logoo.jpg";
 
 const Signup = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const otpRefs = useRef([]);
+  const [timeLeft, setTimeLeft] = useState(60); // 1 minute in seconds
+
+  useEffect(() => {
+    if (timeLeft === 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+  const seconds = String(timeLeft % 60).padStart(2, "0");
 
   const handleOtpChange = (e, index) => {
     if (!/^\d?$/.test(e.target.value)) return;
@@ -83,7 +97,7 @@ const Signup = () => {
 
       {/* ================= OTP MODAL ================= */}
       {showOtpModal && (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20">
+        <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
           <div className="w-[420px] bg-black rounded-xl p-8 text-white shadow-xl">
             
             <h2 className="text-center text-2xl font-semibold mb-6">
@@ -109,9 +123,11 @@ const Signup = () => {
             {/* Timer */}
             <div className="flex justify-between text-sm mb-6">
               <span>
-                Remaining time :
-                <span className="text-lime-500 ml-1">00:55s</span>
-              </span>
+      Remaining time :
+      <span className="text-lime-500 ml-1">
+        {minutes}:{seconds}s
+      </span>
+    </span>
               <span className="text-lime-500 cursor-pointer">
                 Didn’t get the code ? Resend
               </span>
