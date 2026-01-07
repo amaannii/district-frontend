@@ -1,9 +1,15 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logoo from "../assets/images/logoo.jpg";
+import axios from 'axios'
 
 const Signup = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+  const [name, setname] = useState("");
+  const [username, setusername] = useState("");
+
   const otpRefs = useRef([]);
 
   const handleOtpChange = (e, index) => {
@@ -20,13 +26,27 @@ const Signup = () => {
     }
   };
 
+  const sendotp = async () => {
+
+    console.log("ahsgcahs");
+    
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/send-otp",
+      { email } // ✅ MUST be object
+    );
+
+    console.log(res.data);
+    setShowOtpModal(true); // ✅ open OTP modal after success
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-white play-regular">
-
       {/* ================= SIGNUP CARD ================= */}
       <div className="w-[440px] z-10">
         <div className="bg-black rounded-md px-16 py-6 text-white h-[85vh] max-h-[640px] flex flex-col justify-between">
-          
           <div>
             {/* Logo */}
             <div className="flex justify-center">
@@ -43,10 +63,27 @@ const Signup = () => {
 
             {/* Inputs */}
             <div className="space-y-2">
-              <Input label="email" placeholder="email" />
-              <Input label="password" type="password" placeholder="Enter password" />
-              <Input label="full name" placeholder="Enter full name" />
-              <Input label="username" placeholder="Enter username" />
+              <input
+                onChange={(e) => setemail(e.target.value)}
+                label="email"
+                placeholder="email"
+              />
+              <input
+                onChange={(e) => setpassword(e.target.value)}
+                label="password"
+                type="password"
+                placeholder="Enter password"
+              />
+              <input
+                onChange={(e) => setname(e.target.value)}
+                label="full name"
+                placeholder="Enter full name"
+              />
+              <input
+                onChange={(e) => setusername(e.target.value)}
+                label="username"
+                placeholder="Enter username"
+              />
             </div>
           </div>
 
@@ -55,7 +92,8 @@ const Signup = () => {
             <div className="border-t border-gray-700 my-3" />
 
             <button
-              onClick={() => setShowOtpModal(true)}
+            type="button"   
+              onClick={sendotp}
               className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-300 transition"
             >
               Sign up
@@ -85,7 +123,6 @@ const Signup = () => {
       {showOtpModal && (
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20">
           <div className="w-[420px] bg-black rounded-xl p-8 text-white shadow-xl">
-            
             <h2 className="text-center text-2xl font-semibold mb-6">
               otp verification
             </h2>
