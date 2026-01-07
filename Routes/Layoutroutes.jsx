@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Home from "../src/components/Home"
-import Login from "../src/components/login"
 import Signup from "../src/components/Signup"
 import ForgetPassword from "../src/components/ForgetPassword"
+import Login from "../src/components/login"
 
 function Layoutroutes() {
   return (

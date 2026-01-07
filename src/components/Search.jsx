@@ -5,7 +5,7 @@ import search from "../assets/images/download search.png";
 
 function Search() {
   return (
-    <div className="h-screen w-full bg-black text-white flex">
+    <div className="h-screen w-full bg-black text-white flex play-regular ">
 
       {/* Sidebar */}
       <div className="w-[260px] border-r border-gray-800 p-6 flex flex-col">

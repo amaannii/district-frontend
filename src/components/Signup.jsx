@@ -1,9 +1,10 @@
 import React from "react";
 import logoo from "../assets/images/logoo.jpg";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-white">
+    <div className="h-screen w-full flex items-center justify-center bg-white play-regular ">
       <div className="w-[440px]">
         <div className="bg-black rounded-md px-16 py-6 text-white h-[85vh] max-h-[640px] flex flex-col justify-between">
           <div>
@@ -82,9 +83,12 @@ const Signup = () => {
         </div>
         <div className="mt-3 bg-black rounded-md py-2 text-center text-xs text-gray-300 h-[60px] flex items-center justify-center">
           Have an account?   {" "}
-          <span className="text-lime-500 cursor-pointer">
+          <Link to='/'>
+           <span className="text-lime-500 cursor-pointer">
             Log in
           </span>
+          </Link>
+         
         </div>
 
       </div>

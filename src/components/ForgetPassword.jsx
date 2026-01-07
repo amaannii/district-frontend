@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.jpg";
 import lock from "../assets/images/Vector.png";
 
@@ -11,12 +12,16 @@ const ForgetPassword = () => {
         </div>
 
         <div className="flex items-center gap-10 ">
+          <Link to='/'>
           <button className="bg-black play-regular  text-white px-5 py-2 rounded-lg w-[120px] h-[30px] items-center flex justify-center">
             login
           </button>
+          </Link>
+          <Link to='/signup'>
           <a href="#" className="text-[#879F00] font-medium">
             Sign up
           </a>
+          </Link>
         </div>
       </header>
 
