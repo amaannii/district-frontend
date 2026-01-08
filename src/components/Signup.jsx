@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logoo from "../assets/images/logoo.jpg";
-import axios from 'axios'
+import axios from "axios";
 
 const Signup = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -11,21 +11,23 @@ const Signup = () => {
   const [username, setusername] = useState("");
 
   const otpRefs = useRef([]);
-  const [timeLeft, setTimeLeft] = useState(60); // 1 minute in seconds
+  const [timeLeft, setTimeLeft] = useState(60);
 
+  /* ================= TIMER ================= */
   useEffect(() => {
-    if (timeLeft === 0) return;
+    if (!showOtpModal || timeLeft === 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [showOtpModal, timeLeft]);
 
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
   const seconds = String(timeLeft % 60).padStart(2, "0");
 
+  /* ================= OTP HANDLERS ================= */
   const handleOtpChange = (e, index) => {
     if (!/^\d?$/.test(e.target.value)) return;
 
@@ -40,22 +42,23 @@ const Signup = () => {
     }
   };
 
+  /* ================= SEND OTP ================= */
   const sendotp = async () => {
+    if (!email || !password || !name || !username) {
+      alert("All fields are required");
+      return;
+    }
 
-    console.log("ahsgcahs");
-    
-  try {
-    const res = await axios.post(
-      "http://localhost:3001/user/send-otp",
-      { email } // ✅ MUST be object
-    );
+    try {
+      await axios.post("http://localhost:3001/user/send-otp", { email });
+      setTimeLeft(60);
+      setShowOtpModal(true);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to send OTP");
+    }
+  };
 
-    console.log(res.data);
-    setShowOtpModal(true); // ✅ open OTP modal after success
-  } catch (error) {
-    console.error(error);
-  }
-};
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-white play-regular">
       {/* ================= SIGNUP CARD ================= */}
@@ -76,39 +79,49 @@ const Signup = () => {
             </p>
 
             {/* Inputs */}
-            <div className="space-y-2">
+            <div className="space-y-3 w-full">
               <input
+                type="text"
+                placeholder="Number or email"
+                value={email}
                 onChange={(e) => setemail(e.target.value)}
-                label="email"
-                placeholder="email"
+                className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
               />
+
               <input
-                onChange={(e) => setpassword(e.target.value)}
-                label="password"
                 type="password"
-                placeholder="Enter password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setpassword(e.target.value)}
+                className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
               />
+
               <input
+                type="text"
+                placeholder="Full name"
+                value={name}
                 onChange={(e) => setname(e.target.value)}
-                label="full name"
-                placeholder="Enter full name"
+                className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
               />
+
               <input
+                type="text"
+                placeholder="Username"
+                value={username}
                 onChange={(e) => setusername(e.target.value)}
-                label="username"
-                placeholder="Enter username"
+                className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
               />
             </div>
           </div>
 
           {/* Actions */}
           <div>
-            <div className="border-t border-gray-700 my-3" />
+            <div className="border-t border-gray-700 my-4" />
 
             <button
-            type="button"   
+              type="button"
               onClick={sendotp}
-              className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-300 transition"
+              className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-400 transition"
             >
               Sign up
             </button>
@@ -119,7 +132,7 @@ const Signup = () => {
                 alt="google"
                 className="w-4"
               />
-              Log in with google
+              Log in with Google
             </button>
           </div>
         </div>
@@ -138,10 +151,9 @@ const Signup = () => {
         <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
           <div className="w-[420px] bg-black rounded-xl p-8 text-white shadow-xl">
             <h2 className="text-center text-2xl font-semibold mb-6">
-              otp verification
+              OTP Verification
             </h2>
 
-            {/* OTP Inputs */}
             <div className="flex justify-center gap-4 mb-4">
               {[0, 1, 2, 3, 4].map((index) => (
                 <input
@@ -157,29 +169,30 @@ const Signup = () => {
               ))}
             </div>
 
-            {/* Timer */}
             <div className="flex justify-between text-sm mb-6">
               <span>
-      Remaining time :
-      <span className="text-lime-500 ml-1">
-        {minutes}:{seconds}s
-      </span>
-    </span>
-              <span className="text-lime-500 cursor-pointer">
-                Didn’t get the code ? Resend
+                Remaining time :
+                <span className="text-lime-500 ml-1">
+                  {minutes}:{seconds}s
+                </span>
+              </span>
+              <span
+                onClick={sendotp}
+                className="text-lime-500 cursor-pointer"
+              >
+                Resend
               </span>
             </div>
 
-            {/* Buttons */}
-            <button className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white">
-              verify
+            <button className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white cursor-pointer">
+              Verify
             </button>
 
             <button
               onClick={() => setShowOtpModal(false)}
-              className="mt-4 w-full rounded-full border border-gray-600 py-3 text-lime-500"
+              className="mt-4 w-full rounded-full border border-gray-600 py-3 text-lime-500 cursor-pointer"
             >
-              cancel
+              Cancel
             </button>
           </div>
         </div>
@@ -187,17 +200,5 @@ const Signup = () => {
     </div>
   );
 };
-
-/* ================= REUSABLE INPUT ================= */
-const Input = ({ label, type = "text", placeholder }) => (
-  <div>
-    <label className="text-[11px] text-gray-400">{label}</label>
-    <input
-      type={type}
-      placeholder={placeholder}
-      className="w-full mt-1 h-9 rounded-md bg-white px-3 text-xs text-black outline-none"
-    />
-  </div>
-);
 
 export default Signup;
