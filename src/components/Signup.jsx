@@ -150,7 +150,7 @@ const verifyotp = async () => {
               onClick={sendotp}
               className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-300 transition"
             >
-              Sign up
+              Sign up up
             </button>
 
             <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-gray-300">
