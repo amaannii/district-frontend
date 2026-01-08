@@ -31,7 +31,7 @@ const [otp, setOtp] = useState(null);
   /* ================= OTP HANDLERS ================= */
   const handleOtpChange = (e, index) => {
     if (!/^\d?$/.test(e.target.value)) return;
-=======
+
 const handleOtpChange = (e, index) => {
   const value = e.target.value;
 
