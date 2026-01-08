@@ -82,18 +82,16 @@ const handleOtpKeyDown = (e, index) => {
 
   /* ================= SEND OTP ================= */
   const sendotp = async () => {
-    if (!email || !password || !name || !username) {
-      alert("All fields are required");
-      return;
-    }
-
+    console.log("ahsgcahs");
     try {
-      await axios.post("http://localhost:3001/user/send-otp", { email });
-      setTimeLeft(60);
-      setShowOtpModal(true);
+      const res = await axios.post(
+        "http://localhost:3001/user/send-otp",
+        { email } // ✅ MUST be object
+      );
+      console.log(res.data);
+      setShowOtpModal(true); // ✅ open OTP modal after success
     } catch (error) {
       console.error(error);
-      alert("Failed to send OTP");
     }
   };
 
