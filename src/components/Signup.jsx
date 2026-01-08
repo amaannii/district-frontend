@@ -80,20 +80,7 @@ const handleOtpKeyDown = (e, index) => {
   };
 
 
-  /* ================= SEND OTP ================= */
-  const sendotp = async () => {
-    console.log("ahsgcahs");
-    try {
-      const res = await axios.post(
-        "http://localhost:3001/user/send-otp",
-        { email } // ✅ MUST be object
-      );
-      console.log(res.data);
-      setShowOtpModal(true); // ✅ open OTP modal after success
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
 
 
 
@@ -253,7 +240,7 @@ const verifyotp = async () => {
               <span className="text-lime-500 cursor-pointer">
                 Didn’t get the code ? Resend
               </span>
-            </div>
+             </button>
 
             {/* Buttons */}
             <button
@@ -275,6 +262,6 @@ const verifyotp = async () => {
       )}
     </div>
   );
-};
+};}
 
 export default Signup;
