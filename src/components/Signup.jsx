@@ -156,7 +156,7 @@ const Signup = () => {
               onClick={sendotp}
               className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-400 transition"
             >
-              Sign up up
+              Sign up 
             </button>
 
             <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-gray-300">
@@ -178,99 +178,66 @@ const Signup = () => {
           </Link>
         </div>
       </div>
+      {showOtpModal && (
+  <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
+    <div className="w-[420px] bg-black rounded-xl p-8 text-white shadow-xl">
+      <h2 className="text-center text-2xl font-semibold mb-6">
+        OTP Verification
+      </h2>
 
+      {/* OTP INPUTS */}
+      <div className="flex justify-center gap-4 mb-6">
+        {[0, 1, 2, 3, 4].map((index) => (
+          <input
+            key={index}
+            ref={(el) => (otpRefs.current[index] = el)}
+            type="text"
+            maxLength={1}
+            inputMode="numeric"
+            className="h-12 w-12 rounded-md border border-gray-500 bg-transparent text-center text-lg outline-none focus:border-lime-500"
+            onChange={(e) => handleOtpChange(e, index)}
+            onKeyDown={(e) => handleOtpKeyDown(e, index)}
+          />
+        ))}
+      </div>
 
+      {/* TIMER + RESEND */}
+      <div className="flex justify-between text-sm mb-4">
+        <span>
+          Remaining time :
+          <span className="text-lime-500 ml-1">
+            {minutes}:{seconds}s
+          </span>
+        </span>
 
-        {/* ================= OTP MODAL ================= */}
-        {showOtpModal && (
-          <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div className="w-[420px] bg-black rounded-xl p-8 text-white shadow-xl">
-              <h2 className="text-center text-2xl font-semibold mb-6">
-                OTP Verification
-              </h2>
+        <span
+          onClick={sendotp}
+          className="text-lime-500 cursor-pointer"
+        >
+          Resend
+        </span>
+      </div>
 
-              <div className="flex justify-center gap-4 mb-4">
-                {[0, 1, 2, 3, 4].map((index) => (
-                  <input
-                    key={index}
-                    ref={(el) => (otpRefs.current[index] = el)}
-                    type="text"
-                    maxLength={1}
-                    inputMode="numeric"
-                    className="h-12 w-12 rounded-md border border-gray-500 bg-transparent text-center text-lg outline-none focus:border-lime-500"
-                    onChange={(e) => handleOtpChange(e, index)}
-                    onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                  />
-                ))}
-              </div>
+      <div className="border-t border-gray-700 my-4" />
 
-              <div className="flex justify-between text-sm mb-6">
-                <span>
-                  Remaining time :
-                  <span className="text-lime-500 ml-1">
-                    {minutes}:{seconds}s
-                  </span>
-                </span>
-
-              <span onClick={sendotp} className="text-white cursor-pointer">
-  Didn’t get the code?{" "}
-  <span className="text-lime-500 hover:underline">
-    Resend
-  </span>
-</span>
-
-              </div>
-
-              {/* <button className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white cursor-pointer">
-                Verify
-                <span className="text-lime-500 cursor-pointer">
-                  Didn’t get the code ? Resend
-                </span>
-              </button> */}
-
-              {/* Buttons */}
-              <button
-                onClick={verifyotp}
-                className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white"
-              >
-                verify
-              </button>
-
-              <button
-                onClick={() => setShowOtpModal(false)}
-                className="mt-4 w-full rounded-full border border-gray-600 py-3 text-lime-500 cursor-pointer"
-              >
-                Cancel
-              </button>
-
-            </div>
-
-            <button className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white cursor-pointer">
-              Verify
-              <span className="text-lime-500 cursor-pointer">
-                Didn’t get the code ? Resend
-              </span>
-            </button>
-
-            {/* Buttons */}
-            <button
-              onClick={verifyotp}
-              className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white"
-            >
-              verify
-            </button>
-
-            <button
-              onClick={() => setShowOtpModal(false)}
-              className="mt-4 w-full rounded-full border border-gray-600 py-3 text-lime-500 cursor-pointer"
-            >
-              Cancel
-            </button>
-          </div>
-        
-      )}
+      {/* VERIFY BUTTON */}
+      <button
+        type="button"
+        onClick={verifyotp}
+        className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-400 transition"
+      >
+        Verify OTP
+      </button>
     </div>
-  );
+  </div>
+)}
+
+    </div>
+  )
+
+
+
+ 
 };
 
 export default Signup;
