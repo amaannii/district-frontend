@@ -180,6 +180,29 @@ const Signup = () => {
             </div>
           </div>
 
+
+          {/* Actions */}
+          <div>
+            <div className="border-t border-gray-700 my-4" />
+
+            <button
+              type="button"
+              onClick={sendotp}
+              className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-400 transition"
+            >
+              Sign up 
+            </button>
+
+            <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-gray-300">
+              <img
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                alt="google"
+                className="w-4"
+              />
+              Log in with Google
+            </button>
+          </div>
+        </div>
           {/* Login Link */}
           <div className="mt-3 bg-black rounded-md py-2 text-center text-xs text-gray-300 h-[60px] flex items-center justify-center">
             Have an account?
