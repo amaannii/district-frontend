@@ -77,20 +77,30 @@ const Signup = () => {
     };
 
     const verifyotp = async () => {
-      console.log(otpRefs);
+  if (!otp || otp.toString().length !== 5) {
+    alert("Enter valid OTP");
+    return;
+  }
 
-      try {
-        const res = await axios.post("http://localhost:3001/user/verify-otp", {
-          email,
-          otp, // ✅ send OTP
-        });
-
-        console.log(res.data.message);
-        setShowOtpModal(false); // close OTP modal
-      } catch (error) {
-        console.error(error.response?.data?.message);
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/verify-otp",
+      {
+        email,
+        otp: otp.toString(),
+        password,
+        name,
+        username,
       }
-    };
+    );
+
+    console.log(res.data.message);
+    setShowOtpModal(false);
+  } catch (error) {
+    console.error(error.response?.data?.message);
+  }
+};
+
 
     return (
       <div className="relative min-h-screen w-full flex items-center justify-center bg-white play-regular">
@@ -156,7 +166,7 @@ const Signup = () => {
                 onClick={sendotp}
                 className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-400 transition"
               >
-                Sign up up
+                Sign up 
               </button>
 
               <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-gray-300">
@@ -181,7 +191,7 @@ const Signup = () => {
 
         {/* ================= OTP MODAL ================= */}
         {showOtpModal && (
-          <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
             <div className="w-[420px] bg-black rounded-xl p-8 text-white shadow-xl">
               <h2 className="text-center text-2xl font-semibold mb-6">
                 OTP Verification
@@ -210,20 +220,21 @@ const Signup = () => {
                   </span>
                 </span>
 
-                <span
-                  onClick={sendotp}
-                  className="text-lime-500 cursor-pointer"
-                >
-                  Resend
-                </span>
+              <span onClick={sendotp} className="text-white cursor-pointer">
+  Didn’t get the code?{" "}
+  <span className="text-lime-500 hover:underline">
+    Resend
+  </span>
+</span>
+
               </div>
 
-              <button className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white cursor-pointer">
+              {/* <button className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white cursor-pointer">
                 Verify
                 <span className="text-lime-500 cursor-pointer">
                   Didn’t get the code ? Resend
                 </span>
-              </button>
+              </button> */}
 
               {/* Buttons */}
               <button
