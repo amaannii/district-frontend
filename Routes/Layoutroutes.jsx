@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Home from "../src/components/Home"
+import Home from "./components/Home"
 import Signup from "../src/components/Signup"
 import ForgetPassword from "../src/components/ForgetPassword"
 import Login from "../src/components/login"
@@ -9,7 +9,7 @@ function Layoutroutes() {
     <>
     <BrowserRouter>
     <Routes>
-        <Route path="/home" element={<Home/>} />
+        <Route path="/Home" element={<Home/>} />
         <Route path="/" element={<Login/>} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="/forgetten" element={<ForgetPassword/>} />

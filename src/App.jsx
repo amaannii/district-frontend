@@ -1,18 +1,11 @@
-import Layoutroutes from "../Routes/Layoutroutes";
-import "./App.css";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
+import "./index.css";
+import Sidebar from "./components/Sidebar";
+import Feed from "./components/Feed";
 
-
-function App() {
-  return (
-    <>
-
-
-      <Layoutroutes/>
-
-
-    </>
-  );
-
-}
-
-export default App;
+ReactDOM.createRoot(document.getElementById("root")).render(
+  
+);
