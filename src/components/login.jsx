@@ -11,19 +11,16 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-
   /* ================= VALIDATION ================= */
   const validateLogin = () => {
     let newErrors = {};
 
-    // Email validation
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "Enter a valid email address";
     }
 
-    // Password validation
     if (!password) {
       newErrors.password = "Password is required";
     }
@@ -34,50 +31,59 @@ const Login = () => {
 
   /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
-  if (!validateLogin()) return;
+    if (!validateLogin()) return;
 
-  try {
-    const response = await axios.post(
-      "http://localhost:3001/user/login",
-      {
-        email,
-        password,
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/user/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      if (response.data.success === true) {
+        console.log("Login success");
+      } else {
+        console.log("Invalid credentials");
       }
-    );
-
-    if (response.data.success === true) {
-      console.log("Login success");
-    } else {
-      console.log("Invalid credentials");
+    } catch (error) {
+      console.error(
+        error.response?.data?.message || "Server error"
+      );
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error(
-      error.response?.data?.message || "Server error"
-    );
-  }finally {
-    setLoading(false); // ✅ stop loading (always runs)
-  }
-};
+  };
 
   return (
-    <div className="flex min-h-screen w-full play-regular">
+    <div className="flex h-screen w-full overflow-hidden play-regular">
       {/* LEFT IMAGE */}
-      <div className="hidden md:flex w-[990px] bg-gray-300 items-center justify-center">
-        <img className="h-full w-full object-cover" src={login} alt="login" />
+      <div className="hidden lg:flex w-1/2 h-full bg-gray-300">
+        <img
+          className="h-full w-full object-cover"
+          src={login}
+          alt="login"
+        />
       </div>
 
       {/* RIGHT FORM */}
-      <div className="flex w-full md:w-1/2 items-center justify-center bg-white">
-        <div className="w-[360px]">
+      <div className="flex w-full lg:w-1/2 h-full items-center justify-center bg-white px-4">
+        <div className="w-full max-w-[360px]">
+          {/* LOGO */}
           <img
             src={logo}
             alt="DistriX"
-            className="w-40 mx-auto mb-8 h-[130px]"
+            className="w-36 mx-auto mb-8 h-[120px] object-contain"
           />
 
           {/* EMAIL */}
           <div className="mb-4">
-            <label className="block text-sm text-gray-600 mb-1">Email</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Email
+            </label>
             <input
               type="text"
               placeholder="email"
@@ -89,13 +95,17 @@ const Login = () => {
               className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
             />
             {errors.email && (
-              <p className="text-red-500 text-[10px] mt-1">{errors.email}</p>
+              <p className="text-red-500 text-[10px] mt-1">
+                {errors.email}
+              </p>
             )}
           </div>
 
           {/* PASSWORD */}
           <div className="mb-2">
-            <label className="block text-sm text-gray-600 mb-1">Password</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -110,7 +120,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-black"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -122,20 +132,21 @@ const Login = () => {
             )}
           </div>
 
+          {/* FORGOT */}
           <Link to="/forgetten">
-            <div className="text-sm text-gray-500 mb-6 cursor-pointer">
+            <p className="text-sm text-gray-500 mb-6 cursor-pointer">
               Forgotten password?
-            </div>
+            </p>
           </Link>
 
           {/* LOGIN BUTTON */}
-         <button
-  onClick={handleSubmit}
-  disabled={loading}
-  className="w-full rounded-lg bg-black py-3 text-white text-lg disabled:opacity-50"
->
-  {loading ? "Logging in..." : "Login"}
-</button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full rounded-lg bg-black py-3 text-white text-lg disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
 
           {/* GOOGLE */}
           <button className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition">
@@ -147,6 +158,7 @@ const Login = () => {
             <span>Log in with Google</span>
           </button>
 
+          {/* SIGNUP */}
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link to="/signup">
