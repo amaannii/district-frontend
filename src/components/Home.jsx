@@ -1,10 +1,8 @@
-import React from "react";
-import logoo from "../assets/images/logoo.jpg";
-import home from "../assets/images/icons8-home-24.png";
-import search from "../assets/images/download search.png";
+import React from 'react'
 
-export default function Home() {
+function Home() {
   return (
+
 
      <>
    
@@ -13,3 +11,5 @@ export default function Home() {
  
   );
 }
+
+export default Home

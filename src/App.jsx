@@ -1,3 +1,4 @@
+
 import Layoutroutes from "../Routes/Layoutroutes";
 import "./App.css";
 
@@ -8,7 +9,6 @@ function App() {
 
 
       <Layoutroutes/>
-      jjj
 
 
     </>
@@ -17,3 +17,4 @@ function App() {
 }
 
 export default App;
+
