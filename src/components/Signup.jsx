@@ -12,6 +12,7 @@ const Signup = () => {
   const [otp, setOtp] = useState(null);
   const otpRefs = useRef([]);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [errors, setErrors] = useState({});
 
   /* ================= TIMER ================= */
   useEffect(() => {
@@ -47,6 +48,42 @@ const resetOtpInputs = () => {
 };
 
 
+
+
+
+const validateForm = () => {
+  let newErrors = {};
+  if (!email) {
+    newErrors.email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    newErrors.email = "Enter a valid email address";
+  }
+
+  // Username validation
+  if (!username) {
+    newErrors.username = "Username is required";
+  } else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+    newErrors.username =
+      "Username must be 3-20 characters and contain only letters, numbers, or _";
+  }
+
+  // Password validation
+  if (!password) {
+    newErrors.password = "Password is required";
+  } else if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)
+  ) {
+    newErrors.password =
+      "Password must be 8+ chars with uppercase, lowercase, number & special char";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
+
+
   /* ================= OTP HANDLERS ================= */
 
   const handleOtpChange = (e, index) => {
@@ -71,19 +108,21 @@ const resetOtpInputs = () => {
     }
   };
 
-  const sendotp = async () => {
-    console.log("ahsgcahs");
-    try {
-      const res = await axios.post(
-        "http://localhost:3001/user/send-otp",
-        { email } // ✅ MUST be object
-      );
-      console.log(res.data);
-      setShowOtpModal(true); // ✅ open OTP modal after success
-    } catch (error) {
-      console.error(error);
-    }
-  };
+ const sendotp = async () => {
+  if (!validateForm()) return;
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/send-otp",
+      { email }
+    );
+    setShowOtpModal(true);
+    setTimeLeft(60);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
  const verifyotp = async () => {
   if (!otp || otp.length !== 5) {
@@ -129,7 +168,8 @@ const resetOtpInputs = () => {
     <div className="relative min-h-screen w-full flex items-center justify-center bg-white play-regular">
       {/* ================= SIGNUP CARD ================= */}
       <div className="w-[440px] z-10">
-        <div className="bg-black rounded-md px-16 py-6 text-white h-[85vh] max-h-[640px] flex flex-col justify-between">
+       <div className="bg-black rounded-md px-16 py-6 text-white min-h-[640px] flex flex-col justify-between">
+
           <div>
             {/* Logo */}
             <div className="flex justify-center">
@@ -152,25 +192,39 @@ const resetOtpInputs = () => {
                   Email or Phone
                 </label>
                 <input
-                  type="text"
-                  placeholder="Number or email"
-                  value={email}
-                  onChange={(e) => setemail(e.target.value)}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
-                />
+  type="text"
+  placeholder="Email"
+  value={email}
+  onChange={(e) => {
+    setemail(e.target.value);
+    setErrors({ ...errors, email: "" });
+  }}
+  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+/>
+{errors.email && (
+  <p className="text-red-500 text-[10px] mt-1">{errors.email}</p>
+)}
+
               </div>
 
               <div>
                 <label className="block text-[11px] text-gray-300 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setpassword(e.target.value)}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
-                />
+               <input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => {
+    setpassword(e.target.value);
+    setErrors({ ...errors, password: "" });
+  }}
+  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+/>
+{errors.password && (
+  <p className="text-red-500 text-[10px] mt-1">{errors.password}</p>
+)}
+
               </div>
 
               <div>
@@ -190,13 +244,20 @@ const resetOtpInputs = () => {
                 <label className="block text-[11px] text-gray-300 mb-1">
                   Username
                 </label>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setusername(e.target.value)}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
-                />
+               <input
+  type="text"
+  placeholder="Username"
+  value={username}
+  onChange={(e) => {
+    setusername(e.target.value);
+    setErrors({ ...errors, username: "" });
+  }}
+  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+/>
+{errors.username && (
+  <p className="text-red-500 text-[10px] mt-1">{errors.username}</p>
+)}
+
               </div>
             </div>
           </div>
