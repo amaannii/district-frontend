@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoo from "../assets/images/logoo.jpg";
 import axios from "axios";
 
@@ -13,6 +13,9 @@ const Signup = () => {
   const otpRefs = useRef([]);
   const [timeLeft, setTimeLeft] = useState(60);
 
+
+
+  const navigate = useNavigate();
   /* ================= TIMER ================= */
   useEffect(() => {
     if (!showOtpModal || timeLeft <= 0) return;
@@ -115,7 +118,14 @@ const resetOtpInputs = () => {
         username,
         name
       })
-    }
+      
+        if(response.data.success==true){
+        navigate("/")
+      }
+    
+    }  
+    
+  
 
     alert(res.data.message);
     setShowOtpModal(false);
