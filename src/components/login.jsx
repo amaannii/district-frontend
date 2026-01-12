@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.jpg";
 import login from "../assets/images/login.jpg";
+import axios from "axios";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
 
   /* ================= VALIDATION ================= */
   const validateLogin = () => {
@@ -30,12 +33,31 @@ const Login = () => {
   };
 
   /* ================= SUBMIT ================= */
-  const handleSubmit = () => {
-    if (!validateLogin()) return;
+  const handleSubmit = async () => {
+  if (!validateLogin()) return;
 
-    // 🔗 API call here
-    console.log("Login success");
-  };
+  try {
+    const response = await axios.post(
+      "http://localhost:3001/user/login",
+      {
+        email,
+        password,
+      }
+    );
+
+    if (response.data.success === true) {
+      console.log("Login success");
+    } else {
+      console.log("Invalid credentials");
+    }
+  } catch (error) {
+    console.error(
+      error.response?.data?.message || "Server error"
+    );
+  }finally {
+    setLoading(false); // ✅ stop loading (always runs)
+  }
+};
 
   return (
     <div className="flex min-h-screen w-full play-regular">
@@ -107,12 +129,13 @@ const Login = () => {
           </Link>
 
           {/* LOGIN BUTTON */}
-          <button
-            onClick={handleSubmit}
-            className="w-full rounded-lg bg-black py-3 text-white text-lg hover:opacity-90 transition"
-          >
-            Login
-          </button>
+         <button
+  onClick={handleSubmit}
+  disabled={loading}
+  className="w-full rounded-lg bg-black py-3 text-white text-lg disabled:opacity-50"
+>
+  {loading ? "Logging in..." : "Login"}
+</button>
 
           {/* GOOGLE */}
           <button className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition">
