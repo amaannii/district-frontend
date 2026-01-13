@@ -4,6 +4,7 @@ import logo from "../assets/images/logo.jpg";
 import login from "../assets/images/login.jpg";
 import axios from "axios";
 
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setemail] = useState("");
@@ -146,7 +147,7 @@ const Login = () => {
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link to="/signup">
-              <span className="text-green-500 cursor-pointer hover:underline">
+              <span className="text-[#879F00]  cursor-pointer hover:underline">
                 Sign up
               </span>
             </Link>

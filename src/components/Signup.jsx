@@ -295,7 +295,7 @@ const Signup = () => {
 
           Have an account?
           <Link to="/">
-            <span className="text-lime-500 ml-1 cursor-pointer">Log in</span>
+            <span className="text-[#879F00]  ml-1 cursor-pointer">Log in</span>
           </Link>
         </div>
       </div>
@@ -316,7 +316,7 @@ const Signup = () => {
                   type="text"
                   maxLength={1}
                   inputMode="numeric"
-                  className="h-12 w-12 rounded-md border border-gray-500 bg-transparent text-center text-lg outline-none focus:border-lime-500"
+                  className="h-12 w-12 rounded-md border border-gray-500 bg-transparent text-center text-lg outline-none focus:border-[#879F00] "
                   onChange={(e) => handleOtpChange(e, index)}
                   onKeyDown={(e) => handleOtpKeyDown(e, index)}
                 />
@@ -326,7 +326,7 @@ const Signup = () => {
             <div className="flex justify-between text-sm mb-6">
               <span>
                 Remaining time :
-                <span className="text-lime-500 ml-1">
+                <span className="text-[#879F00]  ml-1">
                   {minutes}:{seconds}s
                 </span>
               </span>
@@ -337,7 +337,7 @@ const Signup = () => {
                   onClick={timeLeft === 0 ? resendOtp : null}
                   className={`cursor-pointer ${
                     timeLeft === 0
-                      ? "text-lime-500 hover:underline"
+                      ? "text-[#879F00]  hover:underline"
                       : "text-gray-500 cursor-not-allowed"
                   }`}
                 >
@@ -356,14 +356,14 @@ const Signup = () => {
             {/* Buttons */}
             <button
               onClick={verifyotp}
-              className="w-full rounded-full bg-lime-600 py-3 text-lg font-medium text-white"
+              className="w-full rounded-full bg-[#879F00]  py-3 text-lg font-medium text-white"
             >
               verify
             </button>
 
             <button
               onClick={() => setShowOtpModal(false)}
-              className="mt-4 w-full rounded-full border border-gray-600 py-3 text-lime-500 cursor-pointer"
+              className="mt-4 w-full rounded-full border border-gray-600 py-3 text-[#879F00]  cursor-pointer"
             >
               Cancel
             </button>
