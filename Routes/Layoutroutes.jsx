@@ -3,6 +3,7 @@ import Home from "../src/components/Home"
 import Signup from "../src/components/Signup"
 import ForgetPassword from "../src/components/ForgetPassword"
 import Login from "../src/components/login"
+import Explore from "../src/components/Explore"
 
 function Layoutroutes() {
   return (
@@ -10,6 +11,7 @@ function Layoutroutes() {
     <BrowserRouter>
     <Routes>
         <Route path="/Home" element={<Home/>} />
+        <Route path="/Explore" element={<Explore/>} />
         <Route path="/" element={<Login/>} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="/forgetten" element={<ForgetPassword/>} />
