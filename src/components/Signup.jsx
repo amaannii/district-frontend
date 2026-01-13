@@ -14,8 +14,6 @@ const Signup = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [errors, setErrors] = useState({});
 
-
-
   const navigate = useNavigate();
   /* ================= TIMER ================= */
   useEffect(() => {
@@ -32,60 +30,53 @@ const Signup = () => {
   const seconds = String(timeLeft % 60).padStart(2, "0");
 
   const resendOtp = async () => {
-  try {
-    await axios.post("http://localhost:3001/user/send-otp", { email });
+    try {
+      await axios.post("http://localhost:3001/user/send-otp", { email });
 
-    setTimeLeft(60);          // ⏱ reset timer
-    resetOtpInputs();        // 🔢 clear inputs
-    otpRefs.current[0]?.focus();
-  } catch (error) {
-    console.error(error);
-  }
-};
+      setTimeLeft(60); // ⏱ reset timer
+      resetOtpInputs(); // 🔢 clear inputs
+      otpRefs.current[0]?.focus();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-const resetOtpInputs = () => {
-  setOtp("");
-  otpRefs.current.forEach((input) => {
-    if (input) input.value = "";
-  });
-};
+  const resetOtpInputs = () => {
+    setOtp("");
+    otpRefs.current.forEach((input) => {
+      if (input) input.value = "";
+    });
+  };
 
+  const validateForm = () => {
+    let newErrors = {};
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Enter a valid email address";
+    }
 
+    // Username validation
+    if (!username) {
+      newErrors.username = "Username is required";
+    } else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+      newErrors.username =
+        "Username must be 3-20 characters and contain only letters, numbers, or _";
+    }
 
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)
+    ) {
+      newErrors.password =
+        "Password must be 8+ chars with uppercase, lowercase, number & special char";
+    }
 
-
-const validateForm = () => {
-  let newErrors = {};
-  if (!email) {
-    newErrors.email = "Email is required";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    newErrors.email = "Enter a valid email address";
-  }
-
-  // Username validation
-  if (!username) {
-    newErrors.username = "Username is required";
-  } else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-    newErrors.username =
-      "Username must be 3-20 characters and contain only letters, numbers, or _";
-  }
-
-  // Password validation
-  if (!password) {
-    newErrors.password = "Password is required";
-  } else if (
-    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)
-  ) {
-    newErrors.password =
-      "Password must be 8+ chars with uppercase, lowercase, number & special char";
-  }
-
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
-
-
-
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   /* ================= OTP HANDLERS ================= */
 
@@ -111,75 +102,65 @@ const validateForm = () => {
     }
   };
 
- const sendotp = async () => {
-  if (!validateForm()) return;
+  const sendotp = async () => {
+    if (!validateForm()) return;
 
-  try {
-    const res = await axios.post(
-      "http://localhost:3001/user/send-otp",
-      { email }
-    );
-    setShowOtpModal(true);
-    setTimeLeft(60);
-  } catch (error) {
-    console.error(error);
-  }
-};
+    try {
+      const res = await axios.post("http://localhost:3001/user/send-otp", {
+        email,
+      });
+      setShowOtpModal(true);
+      setTimeLeft(60);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  const verifyotp = async () => {
+    if (!otp || otp.length !== 5) {
+      alert("Enter valid OTP");
+      return;
+    }
 
- const verifyotp = async () => {
-  if (!otp || otp.length !== 5) {
-    alert("Enter valid OTP");
-    return;
-  }
+    if (timeLeft === 0) {
+      alert("OTP expired. Please resend.");
+      return;
+    }
 
-  if (timeLeft === 0) {
-    alert("OTP expired. Please resend.");
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      "http://localhost:3001/user/verify-otp",
-      {
+    try {
+      const res = await axios.post("http://localhost:3001/user/verify-otp", {
         email,
         otp,
         password,
         name,
         username,
+      });
+
+      if (res.data.status == true) {
+        const response = await axios.post("http://localhost:3001/user/signup", {
+          email,
+          password,
+          username,
+          name,
+        });
+
+        if (response.data.success == true) {
+          navigate("/");
+        }
       }
-    );
 
-    if(res.data.status==true){
-     const response= await axios.post("http://localhost:3001/user/signup",{
-        email,
-        password,
-        username,
-        name
-      })
-      
-        if(response.data.success==true){
-        navigate("/")
-      }
-    
-    }  
-    
-  
-
-    alert(res.data.message);
-    setShowOtpModal(false);
-  } catch (error) {
-    alert(error.response?.data?.message || "Invalid OTP");
-  }
-};
-
+      alert(res.data.message);
+      setShowOtpModal(false);
+    } catch (error) {
+      alert(error.response?.data?.message || "Invalid OTP");
+    }
+  };
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-white play-regular">
       {/* ================= SIGNUP CARD ================= */}
       <div className="w-[440px] z-10">
-       <div className="bg-black rounded-md px-16 py-6 text-white min-h-[640px] flex flex-col justify-between">
-
+        <div className="bg-black rounded-md px-16 py-6 text-white min-h-[640px] flex flex-col justify-between">
           <div>
             {/* Logo */}
             <div className="flex justify-center">
@@ -202,39 +183,41 @@ const validateForm = () => {
                   Email or Phone
                 </label>
                 <input
-  type="text"
-  placeholder="Email"
-  value={email}
-  onChange={(e) => {
-    setemail(e.target.value);
-    setErrors({ ...errors, email: "" });
-  }}
-  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
-/>
-{errors.email && (
-  <p className="text-red-500 text-[10px] mt-1">{errors.email}</p>
-)}
-
+                  type="text"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => {
+                    setemail(e.target.value);
+                    setErrors({ ...errors, email: "" });
+                  }}
+                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-[10px] mt-1">
+                    {errors.email}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-[11px] text-gray-300 mb-1">
                   Password
                 </label>
-               <input
-  type="password"
-  placeholder="Password"
-  value={password}
-  onChange={(e) => {
-    setpassword(e.target.value);
-    setErrors({ ...errors, password: "" });
-  }}
-  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
-/>
-{errors.password && (
-  <p className="text-red-500 text-[10px] mt-1">{errors.password}</p>
-)}
-
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => {
+                    setpassword(e.target.value);
+                    setErrors({ ...errors, password: "" });
+                  }}
+                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-[10px] mt-1">
+                    {errors.password}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -254,20 +237,21 @@ const validateForm = () => {
                 <label className="block text-[11px] text-gray-300 mb-1">
                   Username
                 </label>
-               <input
-  type="text"
-  placeholder="Username"
-  value={username}
-  onChange={(e) => {
-    setusername(e.target.value);
-    setErrors({ ...errors, username: "" });
-  }}
-  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
-/>
-{errors.username && (
-  <p className="text-red-500 text-[10px] mt-1">{errors.username}</p>
-)}
-
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => {
+                    setusername(e.target.value);
+                    setErrors({ ...errors, username: "" });
+                  }}
+                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+                />
+                {errors.username && (
+                  <p className="text-red-500 text-[10px] mt-1">
+                    {errors.username}
+                  </p>
+                )}
               </div>
             </div>
           </div>

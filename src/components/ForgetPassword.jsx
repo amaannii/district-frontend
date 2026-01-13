@@ -1,26 +1,51 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.jpg";
 import lock from "../assets/images/Vector.png";
+import { useRef, useState } from "react";
+import axios from "axios"
 
 const ForgetPassword = () => {
+  const [email, setemail] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", ""]);
+const otpRefs = useRef([]);
+
+  const maskEmail = (email) => {
+    if (!email.includes("@")) return email;
+    const [name, domain] = email.split("@");
+    return `${name[0]}***${name[name.length - 1]}@${domain}`;
+  };
+
+  const handleSendotp = async() => {
+     try {
+      const res = await axios.post("http://localhost:3001/user/send-otp", {
+        email,
+      });
+      setShowSuccess(true);
+    } catch (error) {
+      console.error(error);
+    }
+    
+  };
+
   return (
     <div className="min-h-screen bg-white play-regular ">
       {/* Header */}
-      <header className="flex items-center justify-between px-10 h-[70px]">
+      <header className="flex items-center  justify-between px-10 h-[70px]">
         <div className="flex items-center gap-2 font-bold text-lg">
           <img className="w-[170px] h-[79px]" src={logo} alt="" />
         </div>
 
         <div className="flex items-center gap-10 ">
-          <Link to='/'>
-          <button className="bg-black play-regular  text-white px-5 py-2 rounded-lg w-[120px] h-[30px] items-center flex justify-center">
-            login
-          </button>
+          <Link to="/">
+            <button className="bg-black play-regular  text-white px-5 py-2 rounded-lg w-[120px] h-[30px] items-center flex justify-center">
+              login
+            </button>
           </Link>
-          <Link to='/signup'>
-          <a href="#" className="text-[#879F00] font-medium">
-            Sign up
-          </a>
+          <Link to="/signup">
+            <a href="#" className="text-[#879F00] font-medium">
+              Sign up
+            </a>
           </Link>
         </div>
       </header>
@@ -42,10 +67,18 @@ const ForgetPassword = () => {
             <input
               type="text"
               placeholder="Email, Phone, or Username"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
               className="w-full play-regular text-sm px-4 py-3 rounded-lg text-black mb-4 outline-none bg-white h-[44px]"
             />
 
-            <button className="w-full bg-[#879F00] opacity-50 transition py-3 rounded-lg mb-6 play-regular h-[44px]">
+            <button
+              onClick={handleSendotp}
+              className={`w-full bg-[#879F00] transition py-3 rounded-lg mb-6 play-regular h-[44px]
+    ${email ? "opacity-100" : "opacity-50"}
+  `}
+              disabled={!email}
+            >
               Send login link
             </button>
 
@@ -56,9 +89,9 @@ const ForgetPassword = () => {
               <div className="flex-1 h-px bg-gray-600"></div>
             </div>
 
-            <a href="#" className="block text-sm mb-8">
+            <div href="#" className="block text-sm mb-8">
               Create new account
-            </a>
+            </div>
           </div>
 
           {/* Bottom */}
@@ -67,6 +100,71 @@ const ForgetPassword = () => {
           </div>
         </div>
       </div>
+
+      {showSuccess && (
+  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+    <div className="bg-black text-white w-[420px] rounded-xl p-8 text-center shadow-xl">
+      <h2 className="text-2xl font-semibold mb-3">
+        OTP Verification
+      </h2>
+
+      <p className="text-gray-400 text-sm mb-6">
+        We’ve sent a 6-digit OTP to
+        <span className="text-white font-medium">
+          {" "}{maskEmail(email)}
+        </span>
+      </p>
+
+      {/* OTP Inputs */}
+    <div className="flex justify-center gap-3 mb-6">
+  {otp.map((digit, index) => (
+    <input
+      key={index}
+      ref={(el) => (otpRefs.current[index] = el)}
+      type="text"
+      inputMode="numeric"
+      maxLength={1}
+      value={digit}
+      onChange={(e) => {
+        const val = e.target.value;
+        if (!/^\d?$/.test(val)) return;
+
+        const newOtp = [...otp];
+        newOtp[index] = val;
+        setOtp(newOtp);
+
+        if (val && index < otp.length - 1) {
+          otpRefs.current[index + 1]?.focus();
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
+          otpRefs.current[index - 1]?.focus();
+        }
+      }}
+      className="w-12 h-12 text-center text-lg rounded-lg bg-amber-50 text-black outline-none"
+    />
+  ))}
+</div>
+
+     
+
+      {/* Verify Button */}
+      <button className="w-full bg-[#879F00] py-3 rounded-lg font-medium mb-4">
+        Verify OTP
+      </button>
+
+      {/* Resend */}
+      <p className="text-sm text-gray-400">
+        Didn’t receive the OTP?
+        <span className="text-[#879F00] cursor-pointer ml-1">
+          Resend
+        </span>
+      </p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
