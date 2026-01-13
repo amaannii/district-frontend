@@ -59,7 +59,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden play-regular">
+    <div className="flex h-screen w-full overflow-hidden play-regular relative">
       {/* LEFT IMAGE */}
       <div className="hidden md:flex w-1/2 h-full bg-gray-300">
         <img
