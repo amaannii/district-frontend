@@ -1,6 +1,7 @@
 
 import Layoutroutes from "../Routes/Layoutroutes";
 import "./App.css";
+import Users from "./pages/Users";
 
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
 
 
       <Layoutroutes/>
+      <Users/>
 
 
     </>
