@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoo from "../assets/images/logoo.jpg";
+import logo from "../assets/images/logo.jpg";
+import login from "../assets/images/login.jpg";
 import axios from "axios";
 
 const Signup = () => {
@@ -157,21 +159,29 @@ const Signup = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-white play-regular">
+    <div className="relative min-h-screen w-full flex  bg-white play-regular overflow-hidden">
+       <div className="hidden lg:flex w-[60%] h-screen relative">
+
+        <img className="h-full w-full object-cover" src={login} alt="" />
+
+       </div>
+
+       
       {/* ================= SIGNUP CARD ================= */}
-      <div className="w-[440px] z-10">
-        <div className="bg-black rounded-md px-16 py-6 text-white min-h-[640px] flex flex-col justify-between">
+      <div className="w-[440px] ">
+       <div className="w-full max-w-md px-6 sm:px-10 py-6 text-black flex flex-col justify-between min-h-[83vh] sm:min-h-[610px] overflow-hidden">
+
           <div>
             {/* Logo */}
             <div className="flex justify-center">
               <img
-                src={logoo}
+                src={logo}
                 alt="DistriX"
                 className="w-[130px] h-[110px] object-contain"
               />
             </div>
 
-            <p className="text-center text-xs text-gray-300 mb-4">
+            <p className="text-center text-xs text-black mb-4">
               Sign up to see videos and photos from your friends
             </p>
 
@@ -179,7 +189,7 @@ const Signup = () => {
             {/* Inputs */}
             <div className="space-y-3 w-full">
               <div>
-                <label className="block text-[11px] text-gray-300 mb-1">
+                <label className="block text-[11px] text-black mb-1">
                   Email or Phone
                 </label>
                 <input
@@ -190,7 +200,7 @@ const Signup = () => {
                     setemail(e.target.value);
                     setErrors({ ...errors, email: "" });
                   }}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+                  className="w-full h-10 rounded-md bg-gray-200 px-3 text-xs text-black"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-[10px] mt-1">
@@ -200,7 +210,7 @@ const Signup = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] text-gray-300 mb-1">
+                <label className="block text-[11px] text-black mb-1">
                   Password
                 </label>
                 <input
@@ -211,7 +221,7 @@ const Signup = () => {
                     setpassword(e.target.value);
                     setErrors({ ...errors, password: "" });
                   }}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+                  className="w-full h-10 rounded-md bg-gray-200 px-3 text-xs text-black"
                 />
                 {errors.password && (
                   <p className="text-red-500 text-[10px] mt-1">
@@ -221,7 +231,7 @@ const Signup = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] text-gray-300 mb-1">
+                <label className="block text-[11px] text-black mb-1">
                   Full Name
                 </label>
                 <input
@@ -229,12 +239,12 @@ const Signup = () => {
                   placeholder="Full name"
                   value={name}
                   onChange={(e) => setname(e.target.value)}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black outline-none placeholder-gray-400"
+                  className="w-full h-10 rounded-md bg-gray-200 px-3 text-xs text-black outline-none placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-gray-300 mb-1">
+                <label className="block text-[11px] text-black mb-1">
                   Username
                 </label>
                 <input
@@ -245,7 +255,7 @@ const Signup = () => {
                     setusername(e.target.value);
                     setErrors({ ...errors, username: "" });
                   }}
-                  className="w-full h-10 rounded-md bg-white px-3 text-xs text-black"
+                  className="w-full h-10 rounded-md bg-gray-200 px-3 text-xs text-black"
                 />
                 {errors.username && (
                   <p className="text-red-500 text-[10px] mt-1">
@@ -263,12 +273,12 @@ const Signup = () => {
             <button
               type="button"
               onClick={sendotp}
-              className="w-full h-9 bg-lime-600 rounded-md text-xs font-semibold text-black hover:bg-lime-400 transition"
+              className="w-full h-9 bg-black rounded-md text-xs font-semibold text-white hover:bg-gray-900 transition"
             >
               Sign up
             </button>
 
-            <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-gray-300">
+            <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-black">
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                 alt="google"
@@ -280,7 +290,9 @@ const Signup = () => {
         </div>
 
         {/* Login Link */}
-        <div className="mt-3 bg-black rounded-md py-2 text-center text-xs text-gray-300 h-[60px] flex items-center justify-center">
+       <div className="border border-gray-700 rounded-md py-3 text-center text-xs text-black flex items-center justify-center w-[300px] mx-auto">
+
+
           Have an account?
           <Link to="/">
             <span className="text-lime-500 ml-1 cursor-pointer">Log in</span>
