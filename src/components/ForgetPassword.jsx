@@ -102,10 +102,10 @@ const ForgetPassword = () => {
 
             <input
               type="text"
-              placeholder="Email, Phone, or Username"
+              placeholder="Enter your Email"
               value={email}
               onChange={(e) => setemail(e.target.value)}
-              className="w-full h-[44px] px-4 rounded-lg text-black mb-4 outline-none"
+              className="w-full h-[44px] px-4 rounded-lg bg-white text-black mb-4 outline-none"
             />
 
             <button
@@ -171,7 +171,7 @@ const ForgetPassword = () => {
                       otpRefs.current[index - 1]?.focus();
                     }
                   }}
-                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg rounded-lg bg-amber-50 text-black"
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg rounded-lg bg-white text-black"
                 />
               ))}
             </div>
@@ -204,7 +204,7 @@ const ForgetPassword = () => {
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full h-[44px] px-4 mb-4 rounded-lg text-black"
+              className="w-full h-[44px] px-4 mb-4 bg-white rounded-lg text-black"
             />
 
             <input
@@ -212,7 +212,7 @@ const ForgetPassword = () => {
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-[44px] px-4 mb-6 rounded-lg text-black"
+              className="w-full h-[44px] bg-white px-4 mb-6 rounded-lg text-black"
             />
 
             <button
