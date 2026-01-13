@@ -29,30 +29,26 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
     if (!validateLogin()) return;
 
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/user/login",
-        {
-          email,
-          password,
-        }
-      );
+      const { data } = await axios.post("http://localhost:3001/user/login", {
+        email,
+        password,
+      });
 
-      if (response.data.success === true) {
-        console.log("Login success");
+      console.log("Response:", data);
+
+      if (data.success) {
+        navigate("/home");
       } else {
-        console.log("Invalid credentials");
+        alert(data.message || "Invalid credentials");
       }
     } catch (error) {
-      console.error(
-        error.response?.data?.message || "Server error"
-      );
+      alert(error.response?.data?.message || "Server error");
     } finally {
       setLoading(false);
     }
@@ -62,11 +58,7 @@ const Login = () => {
     <div className="flex h-screen w-full overflow-hidden play-regular">
       {/* LEFT IMAGE */}
       <div className="hidden md:flex w-1/2 h-full bg-gray-300">
-        <img
-          className="h-full w-full object-cover"
-          src={login}
-          alt="login"
-        />
+        <img className="h-full w-full object-cover" src={login} alt="login" />
       </div>
 
       {/* RIGHT FORM */}
@@ -81,9 +73,7 @@ const Login = () => {
 
           {/* EMAIL */}
           <div className="mb-4">
-            <label className="block text-sm text-gray-600 mb-1">
-              Email
-            </label>
+            <label className="block text-sm text-gray-600 mb-1">Email</label>
             <input
               type="text"
               placeholder="email"
@@ -95,17 +85,13 @@ const Login = () => {
               className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
             />
             {errors.email && (
-              <p className="text-red-500 text-[10px] mt-1">
-                {errors.email}
-              </p>
+              <p className="text-red-500 text-[10px] mt-1">{errors.email}</p>
             )}
           </div>
 
           {/* PASSWORD */}
           <div className="mb-2">
-            <label className="block text-sm text-gray-600 mb-1">
-              Password
-            </label>
+            <label className="block text-sm text-gray-600 mb-1">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -126,9 +112,7 @@ const Login = () => {
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-[10px] mt-1">
-                {errors.password}
-              </p>
+              <p className="text-red-500 text-[10px] mt-1">{errors.password}</p>
             )}
           </div>
 
