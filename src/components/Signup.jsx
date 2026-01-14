@@ -4,6 +4,9 @@ import logoo from "../assets/images/logoo.jpg";
 import logo from "../assets/images/logo.jpg";
 import login from "../assets/images/login.jpg";
 import axios from "axios";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleprovider } from "../confiq/firebase";
+import Googlelogin from "./auth/Googlelogin";
 
 const Signup = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -158,9 +161,11 @@ const Signup = () => {
     }
   };
 
+
+
   return (
     <div className="relative min-h-screen w-full flex  bg-white play-regular overflow-hidden">
-       <div className="hidden lg:flex w-[60%] h-screen relative">
+       <div className="hidden lg:flex w-1/2 h-screen relative">
 
         <img className="h-full w-full object-cover" src={login} alt="" />
 
@@ -278,14 +283,15 @@ const Signup = () => {
               Sign up
             </button>
 
-            <button className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-black">
+            {/* <button onClick={handleGoogleLogin} className="w-full mt-3 flex items-center justify-center gap-2 text-xs text-black">
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                 alt="google"
                 className="w-4"
               />
               Log in with Google
-            </button>
+            </button> */}
+            <Googlelogin/>
           </div>
         </div>
 
