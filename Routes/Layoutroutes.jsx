@@ -5,6 +5,8 @@ import ForgetPassword from "../src/components/ForgetPassword"
 import Login from "../src/components/login"
 import Explore from "../src/components/Explore"
 import Sidebar from "../src/components/Sidebar"
+import Search from "../src/components/Search"
+import Notificationlist from "../src/components/Notificationlist"
 
 function Layoutroutes() {
   return (
@@ -17,6 +19,8 @@ function Layoutroutes() {
         <Route path="/" element={<Login/>} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="/forgetten" element={<ForgetPassword/>} />
+        <Route path="/search" element={<Search/>} />
+        <Route path="/notification" element={<Notificationlist/>} />
     </Routes>
     </BrowserRouter>
     
