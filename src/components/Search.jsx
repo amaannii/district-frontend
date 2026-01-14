@@ -3,100 +3,118 @@ import logoo from "../assets/images/logoo.jpg";
 import home from "../assets/images/icons8-home-24.png";
 import search from "../assets/images/download search.png";
 
+import { useState } from "react";
+
 function Search() {
+  const users = [
+    {
+      id: 1,
+      name: "Lunor",
+      username: "lunor.sab",
+      status: "connected",
+      image: "https://i.pravatar.cc/150?img=1",
+      bio: "Frontend Developer",
+    },
+    {
+      id: 2,
+      name: "Feylo",
+      username: "feylo",
+      status: "connected",
+      image: "https://i.pravatar.cc/150?img=2",
+      bio: "React Developer",
+    },
+    {
+      id: 3,
+      name: "Yuvoh",
+      username: "yuvoh",
+      status: "connected",
+      image: "https://i.pravatar.cc/150?img=3",
+      bio: "UI Designer",
+    },
+    {
+      id: 4,
+      name: "Kavro",
+      username: "kavro",
+      status: "connected",
+      image: "https://i.pravatar.cc/150?img=4",
+      bio: "Backend Developer",
+    },
+  ];
+
+  const [search, setSearch] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="h-screen w-full bg-black text-white flex play-regular ">
-
-      {/* Sidebar */}
-      <div className="w-[260px] border-r border-gray-800 p-6 flex flex-col">
-       <div className="flex justify-center">
-                     <img
-                       src={logoo}
-                       alt="DistriX"
-                       className="w-[130px] object-contain h-[110px]"
-                     />
-                   </div>
-
-        <div className="space-y-6 text-sm">
-            <img src={home} alt="" />
-          <Menu  text="HOME" />
-          <img src={search} alt="" />
-          <Menu text="SEARCH" />
-          <Menu text="EXPLORE" />
-          <Menu text="MESSAGES" />
-          <Menu text="NOTIFICATION" />
-          <Menu text="CREATE" />
-          <Menu text="PROFILE" />
-        </div>
-
-        <div className="mt-auto">
-          <Menu text="MORE" />
-        </div>
-      </div>
-
-      {/* Search Panel */}
-      <div className="w-[420px] border-r border-gray-800 p-6">
-        <h2 className="text-xl font-semibold mb-4">Search</h2>
+    <div className="flex h-screen bg-black text-white">
+      {/* LEFT SIDE - SEARCH */}
+      <div className="w-[350px] p-4 border-r border-gray-700">
+        <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
         <input
           type="text"
-          placeholder="Search"
-          className="w-full px-4 py-2 rounded-md text-black text-sm outline-none"
+          placeholder="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-2 rounded bg-white text-black mb-4"
         />
 
-        <div className="flex justify-between items-center mt-6 mb-4">
-          <span className="text-sm text-gray-400">Recent</span>
-          <span className="text-xs text-lime-500 cursor-pointer">
+        <div className="flex justify-between mb-2">
+          <span className="text-sm">Recent</span>
+          <span
+            className="text-green-500 text-sm cursor-pointer"
+            onClick={() => setSearch("")}
+          >
             Clear all
           </span>
         </div>
 
-        <div className="space-y-4">
-          {["Liam", "Feyo", "Yuva", "Kavi", "Liya"].map((name) => (
-            <div
-              key={name}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gray-600" />
-                <div>
-                  <p className="text-sm">{name}</p>
-                  <p className="text-xs text-gray-500">
-                    {name}.connected
-                  </p>
-                </div>
-              </div>
-              <span className="text-gray-500 cursor-pointer">×</span>
+        {filteredUsers.map((user) => (
+          <div
+            key={user.id}
+            onClick={() => setSelectedUser(user)}
+            className="flex items-center gap-3 py-3 cursor-pointer hover:bg-gray-800 rounded"
+          >
+            <img
+              src={user.image}
+              alt={user.name}
+              className="w-10 h-10 rounded-full"
+            />
+            <div>
+              <p className="font-medium">{user.name}</p>
+              <p className="text-xs text-gray-400">
+                {user.username}.{user.status}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
-      {/* Feed */}
-      <div className="flex-1 flex flex-col items-center py-6">
-        <div className="flex gap-5 mb-6">
-          {["story_1", "vacation", "vibing"].map((s) => (
-            <div key={s} className="flex flex-col items-center">
-              <div className="w-14 h-14 rounded-full bg-gray-600" />
-              <span className="text-[10px] mt-1">{s}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="w-[420px]">
-          <div className="h-[480px] bg-gray-700 flex items-center justify-center">
-            <span className="text-gray-400">Post Image</span>
+      {/* RIGHT SIDE - PROFILE */}
+      <div className="flex-1 flex items-center justify-center">
+        {selectedUser ? (
+          <div className="text-center">
+            <img
+              src={selectedUser.image}
+              className="w-28 h-28 rounded-full mx-auto mb-4"
+              alt=""
+            />
+            <h2 className="text-2xl font-semibold">
+              {selectedUser.name}
+            </h2>
+            <p className="text-gray-400">@{selectedUser.username}</p>
+            <p className="mt-3">{selectedUser.bio}</p>
           </div>
-        </div>
+        ) : (
+          <p className="text-gray-500">Search and select a user</p>
+        )}
       </div>
     </div>
   );
 }
 
-const Menu = ({ text }) => (
-  <div className="cursor-pointer hover:text-lime-500 transition">
-    {text}
-  </div>
-);
-
 export default Search;
+
