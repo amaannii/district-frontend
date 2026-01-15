@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 import Googlelogin from "./auth/Googlelogin";
 
-
-
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setemail] = useState("");
@@ -16,8 +14,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   /* ================= VALIDATION ================= */
   const validateLogin = () => {
@@ -43,6 +40,8 @@ const Login = () => {
     setLoading(true);
 
     try {
+   
+
       const { data } = await axios.post("http://localhost:3001/user/login", {
         email,
         password,
@@ -61,10 +60,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-
- 
-
 
   return (
     <div className="flex h-screen w-full overflow-hidden play-regular relative">
@@ -144,8 +139,8 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
 
-{/* GOOGLE */}
-{/* <button
+          {/* GOOGLE */}
+          {/* <button
   onClick={handleGoogleLogin}
   className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition"
 >
@@ -156,7 +151,7 @@ const Login = () => {
   />
   <span>Log in with Google</span>
 </button> */}
-<Googlelogin/>
+          <Googlelogin />
 
           {/* SIGNUP */}
           <p className="mt-6 text-center text-sm text-gray-600">
