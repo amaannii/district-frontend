@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logoo from "../assets/images/logoo.jpg"; // Your white logo image
 import home from "../assets/images/icons8-home-24.png";
 import search from "../assets/images/download search.png";
-import explore from "../assets/images/icons8-explore-24.png";
+import explore from "../assets/images/icons8-explore-48.png";
 import message from "../assets/images/icons8-send-24.png";
 import notification from "../assets/images/icons8-notification-64.png";
 import create from "../assets/images/icons8-create-24.png";

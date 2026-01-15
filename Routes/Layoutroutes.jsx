@@ -10,6 +10,7 @@ import Notificationlist from "../src/components/Notificationlist"
 import CompleteProfile from "../src/components/CompleteProfile"
 import AdminLogin from "../src/pages/admin/Adminlogin"
 import Admindashboard from "../src/pages/admin/Admindashboard"
+import Protectedroute from "./Protectedroute"
 
 function Layoutroutes() {
   return (
@@ -26,7 +27,12 @@ function Layoutroutes() {
         <Route path="/notification" element={<Notificationlist/>} />
         <Route path="/completeprofile" element={<CompleteProfile/>} />
         <Route path="/adminlogin" element={<AdminLogin/>} />
-        <Route path="/admindashboard" element={<Admindashboard/>} />
+        <Route path="/admindashboard" element={
+          <Protectedroute>
+
+            <Admindashboard/>
+          </Protectedroute>
+          } />
     </Routes>
     </BrowserRouter>
     

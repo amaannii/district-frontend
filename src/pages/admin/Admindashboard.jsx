@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   ];
 
   const handleLogout = () => {
+    localStorage.removeItem("adminToken");
     navigate("/adminlogin");
   };
 
