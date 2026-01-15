@@ -3,15 +3,14 @@ import { auth, googleprovider } from "../../confiq/firebase.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 function Googlelogin() {
-
- const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleprovider);
       const user = result.user;
+      localStorage.setItem("googleEmail", user.email);
 
       console.log("Google User:", user);
 
@@ -19,9 +18,15 @@ function Googlelogin() {
         name: user.displayName,
         email: user.email,
       });
+      if (res.data.status == true) {
+        navigate("/completeprofile");
+      } else {
+      }
 
-      if (res.data.success) {
+      if (res.data.success == true) {
         navigate("/home");
+      } else {
+        alert("gtgfgtf");
       }
     } catch (error) {
       console.error("Google Login Error:", error);
