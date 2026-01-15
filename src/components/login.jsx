@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.jpg";
 import login from "../assets/images/login.jpg";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+import Googlelogin from "./auth/Googlelogin";
+
 
 
 const Login = () => {
@@ -11,6 +15,9 @@ const Login = () => {
   const [password, setpassword] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+
+  const navigate=useNavigate()
 
   /* ================= VALIDATION ================= */
   const validateLogin = () => {
@@ -54,6 +61,10 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+
+ 
+
 
   return (
     <div className="flex h-screen w-full overflow-hidden play-regular relative">
@@ -133,15 +144,19 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {/* GOOGLE */}
-          <button className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition">
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="google"
-              className="w-5"
-            />
-            <span>Log in with Google</span>
-          </button>
+{/* GOOGLE */}
+{/* <button
+  onClick={handleGoogleLogin}
+  className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition"
+>
+  <img
+    src="https://www.svgrepo.com/show/475656/google-color.svg"
+    alt="google"
+    className="w-5"
+  />
+  <span>Log in with Google</span>
+</button> */}
+<Googlelogin/>
 
           {/* SIGNUP */}
           <p className="mt-6 text-center text-sm text-gray-600">
