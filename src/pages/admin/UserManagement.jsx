@@ -19,12 +19,26 @@ export default function UserManagement() {
     }
   };
 
-  const toggleBlockUser = async (id) => {
+const toggleBlockUser = async (id) => {
+  try {
+    const token = localStorage.getItem("adminToken");
+
     await axios.patch(
-      `http://localhost:3001/admin/users/${id}/block`
+      `http://localhost:3001/admin/users/${id}/block`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
+
     fetchUsers();
-  };
+  } catch (error) {
+    console.error("Failed to block/unblock user");
+  }
+};
+
 
   return (
     <>
