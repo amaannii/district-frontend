@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Sidebar from "./Sidebar";
 
 
 const Notificationlist = () => {
@@ -138,7 +139,8 @@ const handleDelete = async (id) => {
   );
 
  return (
-  <div className="min-h-screen bg-black flex justify-center py-6">
+  <div className="min-h-screen bg-black flex py-6">
+    <Sidebar/>
     <div className="w-full max-w-md px-4">
       <h1 className="text-2xl font-semibold mb-6 text-white">Notification</h1>
 
