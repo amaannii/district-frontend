@@ -161,21 +161,22 @@ const Signup = () => {
     }
   };
 
-
+  const deleteotp=()=>{
+    axios.post("http://localhost:3001/user/delete-otp",{email})
+    .then(()=>{
+       setShowOtpModal(false)
+    })
+  }
 
   return (
     <div className="relative min-h-screen w-full flex  bg-white play-regular overflow-hidden">
-       <div className="hidden lg:flex w-1/2 h-screen relative">
-
+      <div className="hidden lg:flex w-1/2 h-screen relative">
         <img className="h-full w-full object-cover" src={login} alt="" />
+      </div>
 
-       </div>
-
-       
       {/* ================= SIGNUP CARD ================= */}
       <div className="w-[440px] ">
-       <div className="w-full max-w-md px-6 sm:px-10 py-6 text-black flex flex-col justify-between min-h-[83vh] sm:min-h-[610px] overflow-hidden">
-
+        <div className="w-full max-w-md px-6 sm:px-10 py-6 text-black flex flex-col justify-between min-h-[83vh] sm:min-h-[610px] overflow-hidden">
           <div>
             {/* Logo */}
             <div className="flex justify-center">
@@ -291,14 +292,12 @@ const Signup = () => {
               />
               Log in with Google
             </button> */}
-            <Googlelogin/>
+            <Googlelogin />
           </div>
         </div>
 
         {/* Login Link */}
-       <div className="border border-gray-700 rounded-md py-3 text-center text-xs text-black flex items-center justify-center w-[300px] mx-auto">
-
-
+        <div className="border border-gray-700 rounded-md py-3 text-center text-xs text-black flex items-center justify-center w-[300px] mx-auto">
           Have an account?
           <Link to="/">
             <span className="text-[#879F00]  ml-1 cursor-pointer">Log in</span>
@@ -368,7 +367,10 @@ const Signup = () => {
             </button>
 
             <button
-              onClick={() => setShowOtpModal(false)}
+              onClick={() => {
+                deleteotp()
+                setShowOtpModal(false);
+              }}
               className="mt-4 w-full rounded-full border border-gray-600 py-3 text-[#879F00]  cursor-pointer"
             >
               Cancel

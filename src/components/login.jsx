@@ -40,8 +40,6 @@ const Login = () => {
     setLoading(true);
 
     try {
-   
-
       const { data } = await axios.post("http://localhost:3001/user/login", {
         email,
         password,
@@ -50,6 +48,9 @@ const Login = () => {
       console.log("Response:", data);
 
       if (data.success) {
+        localStorage.setItem("userToken", data.token);
+        localStorage.setItem("role", data.role);
+
         navigate("/home");
       } else {
         alert(data.message || "Invalid credentials");
