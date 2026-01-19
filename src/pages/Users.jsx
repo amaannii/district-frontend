@@ -48,11 +48,14 @@ const Users = () => {
             <p>
               <strong>Role:</strong> {selectedUser.role}
             </p>
+          
           </>
         )}
       </div>
     </div>
+    
   );
 };
 
 export default Users;
+

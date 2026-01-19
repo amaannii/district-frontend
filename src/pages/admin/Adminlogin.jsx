@@ -18,7 +18,8 @@ export default function AdminLogin() {
     
     
     if (res.data.success === true) {
-      console.log(email,password);
+      localStorage.setItem("adminToken", res.data.token);
+      localStorage.setItem("role", res.data.role);
 
       navigate("/admindashboard");
     } else {
