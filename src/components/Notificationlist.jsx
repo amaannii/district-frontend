@@ -139,10 +139,10 @@ const handleDelete = async (id) => {
   );
 
  return (
-  <div className="min-h-screen bg-black flex py-6">
+  <div className="min-h-screen bg-black flex py-6 play-regular">
     <Sidebar/>
     <div className="w-full max-w-md px-4">
-      <h1 className="text-2xl font-semibold mb-6 text-white">Notification</h1>
+      <h1 className="text-2xl font-semibold mb-6 text-white play-regular">Notification</h1>
 
       {/* THIS WEEK */}
       {groupByTime("week").length > 0 && (

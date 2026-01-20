@@ -6,7 +6,7 @@ function Create() {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="relative w-full h-full text-white">
+    <div className="relative w-full h-full text-white play-regular">
       {/* Home UI */}
       <Home />
 
