@@ -1,10 +1,12 @@
-import { Users, Bell, LayoutDashboard, LogOut } from "lucide-react";
+import { Users, Bell, LayoutDashboard, LogOut,  AreaChart } from "lucide-react";
 
 export default function AdminSidebar({ active, setActive, onLogout }) {
   const menuItems = [
     { id: "/dashboard", name: "Dashboard", icon: <LayoutDashboard size={20} /> },
     { id: "/users", name: "User Management", icon: <Users size={20} /> },
     { id: "/messages", name: "Message Alerts", icon: <Bell size={20} /> },
+    { id: "/chatroom", name: "Chat Rooms", icon: <AreaChart size={20} /> },
+    
   ];
 
   return (
