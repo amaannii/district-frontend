@@ -36,7 +36,7 @@ function Explore() {
   };
 
   return (
-    <div className="h-screen w-full bg-black flex text-white">
+    <div className="h-screen w-full bg-black flex text-white play-regular">
       {/* Sidebar */}
       <Sidebar />
 

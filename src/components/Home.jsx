@@ -12,7 +12,7 @@ import profile3 from "../assets/images/images (1).jpeg";
 
 function Home() {
   return (
-    <div className="flex bg-black h-screen text-white">
+    <div className="flex bg-black h-screen text-white play-regular">
       <Sidebar />
 
       {/* CENTER FEED */}

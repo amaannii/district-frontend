@@ -50,7 +50,7 @@ function Search() {
   );
 
   return (
-    <div className="flex h-screen bg-black text-white">
+    <div className="flex h-screen bg-black text-white play-regular">
       {/* LEFT SIDE - SEARCH */}
       <Sidebar/>
       <div className="w-[350px] p-4 border-r border-gray-700">

@@ -16,7 +16,7 @@ function Sidebar() {
 
   return (
     <aside
-      className={`h-screen bg-black text-white border-r border-gray-800 flex flex-col py-4 transition-all duration-300
+      className={`h-screen bg-black text-white play-regular border-r border-gray-800 flex flex-col py-4 transition-all duration-300
         ${collapsed ? "w-[80px]" : "w-[260px]"}
       `}
     >

@@ -15,6 +15,8 @@ import MainContent from "../src/pages/admin/MainContent";
 import Admindashboard from "../src/pages/admin/Admindashboard";
 import Create from "../src/components/Create";
 import Messages from "../src/components/Messages";
+import Chatroom from "../src/components/Chatroom";
+import Profile from "../src/components/Profile";
 
 function Layoutroutes() {
   return (
@@ -54,7 +56,11 @@ function Layoutroutes() {
           <Route path="/completeprofile" element={<CompleteProfile />} />
           <Route path="/adminlogin" element={<AdminLogin />} />
           <Route path="/create" element={<Create/>} />
-          <Route path="/messages" element={<Messages/>} />
+      <Route path="/messages" element={<Messages/>} />
+        <Route path="/Chat/:state" element={<Chatroom/>} />
+        <Route path="/profile" element={<Profile/>} />
+
+
 
           <Route
             path="/admindashboard"
