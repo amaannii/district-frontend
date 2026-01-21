@@ -17,6 +17,7 @@ import Create from "../src/components/Create";
 import Messages from "../src/components/Messages";
 import Chatroom from "../src/components/Chatroom";
 import Profile from "../src/components/Profile";
+import More from "../src/components/More";
 
 function Layoutroutes() {
   return (
@@ -59,6 +60,7 @@ function Layoutroutes() {
       <Route path="/messages" element={<Messages/>} />
         <Route path="/Chat/:state" element={<Chatroom/>} />
         <Route path="/profile" element={<Profile/>} />
+        <Route path="/more" element={<More/>} />
 
 
 
