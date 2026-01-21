@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import uploadIcon from "../../../assets/images/icons8-gallery-48.png";
 import Home from "./Home";
-import uploadIcon from "../assets/images/icons8-gallery-48.png";
 
 function Create() {
-  const [isOpen, setIsOpen] = useState(true);
-
+     const [isOpen, setIsOpen] = useState(true);
   return (
-    <div className="relative w-full h-full text-white play-regular">
+    <>
+     <div className="relative w-full h-full text-white play-regular">
       {/* Home UI */}
       <Home />
 
@@ -18,7 +18,7 @@ function Create() {
           <div className="bg-[#0f0f0f] w-[420px] rounded-2xl shadow-2xl relative">
             
             {/* Header */}
-            <div className="border-b border-gray-700 text-center py-3 font-semibold bg-lime-400 rounded-t-2xl">
+            <div className="border-b border-gray-700 text-center py-3 font-semibold bg-[#879F00] rounded-t-2xl">
               Create new post
             </div>
 
@@ -35,7 +35,7 @@ function Create() {
               <div className="border-2 border-dashed border-gray-600 rounded-lg w-full h-64 flex flex-col items-center justify-center hover:border-gray-400 transition">
                 <img src={uploadIcon} alt="upload" className="h-14 w-14 mb-4" />
                 <p className="text-gray-400 mb-4">Drag photos here</p>
-                <button className="bg-lime-600 px-4 py-2 rounded hover:bg-lime-700">
+                <button className="bg-[#879F00] px-4 py-2 rounded hover:bg-[#879F00]">
                   Select from computer
                 </button>
               </div>
@@ -45,7 +45,8 @@ function Create() {
         </div>
       )}
     </div>
-  );
+    </>
+  )
 }
 
-export default Create;
+export default Create

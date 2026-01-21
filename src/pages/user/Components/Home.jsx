@@ -1,50 +1,37 @@
-import React, { useState } from "react";
-import Sidebar from "./Sidebar";
-import post from "../assets/images/old car_.jpeg";
-import heart from "../assets/images/icons8-heart-24.png";
-import comment from "../assets/images/icons8-comment-50.png";
-import send from "../assets/images/icons8-sent-50.png";
-import bookmark from "../assets/images/icons8-bookmark-30.png";
-import profile from "../assets/images/p1.jpg";
-import profile1 from "../assets/images/download.jpeg";
-import profile2 from "../assets/images/images.jpeg";
-import profile3 from "../assets/images/images (1).jpeg";
+import React  from 'react'
+import post from "../../../assets/images/icons8-heart-24.png";
+import heart from "../../../assets/images/icons8-heart-24.png";
+import comment from "../../../assets/images/icons8-comment-50.png";
+import send from "../../../assets/images/icons8-sent-50.png";
+import bookmark from "../../../assets/images/icons8-bookmark-30.png";
+import profile from "../../../assets/images/p1.jpg";
+import profile1 from "../../../assets/images/download.jpeg";
+import profile2 from "../../../assets/images/images.jpeg";
+import profile3 from "../../../assets/images/images (1).jpeg";
+import { useState } from "react";
 
 function Home() {
-  const [liked, setLiked] = useState(false);
+    const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showPostView, setShowPostView] = useState(false);
+   const [showAccount, setShowAccount] = useState(false);
 
   const postData = {
     id: 1,
     image: post,
+    username: "akshay__",
+    profileImg: profile,
+    posts: [post, post, post],
   };
 
-  /* ❤️ LIKE */
-  const handleLike = () => {
-    setLiked(!liked);
-  };
+  const handleLike = () => setLiked(!liked);
 
-  /* 🔖 SAVE */
   const handleSave = () => {
     setSaved(!saved);
-
-    let savedPosts = JSON.parse(localStorage.getItem("savedPosts")) || [];
-
-    if (!saved) {
-      savedPosts.push(postData);
-    } else {
-      savedPosts = savedPosts.filter((p) => p.id !== postData.id);
-    }
-
-    localStorage.setItem("savedPosts", JSON.stringify(savedPosts));
   };
-
   return (
-    <div className="flex bg-black h-screen text-white play-regular">
-      <Sidebar />
-
-      <div className="flex-1 flex justify-center overflow-y-auto">
-        <div className="w-full max-w-2xl flex flex-col">
+    <>
+     <div className="w-full max-w-2xl flex flex-col">
 
           {/* STORIES */}
           <div className="h-[130px] flex items-center justify-between px-6 border-b border-neutral-800">
@@ -126,9 +113,9 @@ function Home() {
           </div>
 
         </div>
-      </div>
-    </div>
-  );
+
+    </>
+  )
 }
 
-export default Home;
+export default Home

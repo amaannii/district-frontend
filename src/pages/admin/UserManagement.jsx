@@ -42,21 +42,20 @@ const toggleBlockUser = async (id) => {
 
   return (
     <>
-      <h2 className="text-2xl font-semibold mb-6">User Management</h2>
+      <h2 className="text-2xl font-semibold mb-6 ">User Management</h2>
 
-      <div className="bg-black border border-gray-800 rounded-2xl overflow-hidden">
-        <div className="grid grid-cols-5 px-6 py-4 text-sm text-gray-400 border-b border-gray-800">
+      <div className="bg-black border border-gray-800 rounded-2xl overflow-hidden ">
+        <div className="grid grid-cols-4 px-6 py-4 text-sm text-gray-400 border-b border-gray-800">
           <span>User</span>
           <span>Email</span>
-          <span>Status</span>
+          <span className="w-full flex justify-end">Status</span>
           <span className="text-center">Action</span>
-          <span></span>
         </div>
 
         {users.map((user) => (
           <div
             key={user._id}
-            className="grid grid-cols-5 items-center px-6 py-4 border-b border-gray-800 hover:bg-[#1f1f1f]"
+            className="grid grid-cols-4 items-center px-6 py-4 border-b border-gray-800 hover:bg-[#1f1f1f]"
           >
             {/* USER NAME */}
             <div className="flex items-center gap-3">
@@ -70,6 +69,7 @@ const toggleBlockUser = async (id) => {
             </div>
 
             <span className="text-gray-400">{user.email}</span>
+                <span className="w-full flex justify-end">
 
             <span
               className={`text-xs px-3 py-1 rounded-full w-fit ${
@@ -80,6 +80,7 @@ const toggleBlockUser = async (id) => {
             >
               {user.isBlocked ? "Blocked" : "Active"}
             </span>
+                </span>
 
             <div className="text-center">
               <button
