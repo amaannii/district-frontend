@@ -161,22 +161,21 @@ const Signup = () => {
     }
   };
 
-  const deleteotp=()=>{
-    axios.post("http://localhost:3001/user/delete-otp",{email})
-    .then(()=>{
-       setShowOtpModal(false)
-    })
-  }
+  const deleteotp = () => {
+    axios.post("http://localhost:3001/user/delete-otp", { email }).then(() => {
+      setShowOtpModal(false);
+    });
+  };
 
   return (
-    <div className="relative min-h-screen w-full flex  bg-white play-regular overflow-hidden">
+    <div className="relative min-h-screen  flex  bg-white play-regular overflow-hidden">
       <div className="hidden lg:flex w-1/2 h-screen relative">
         <img className="h-full w-full object-cover" src={login} alt="" />
       </div>
 
       {/* ================= SIGNUP CARD ================= */}
-      <div className="w-[440px] ">
-        <div className="w-full max-w-md px-6 sm:px-10 py-6 text-black flex flex-col justify-between min-h-[83vh] sm:min-h-[610px] overflow-hidden">
+      <div className="w-1/2 flex justify-center">
+        <div className="w-full px-6 text-black flex flex-col items-center min-h-[83vh] sm:min-h-[610px] overflow-hidden">
           <div>
             {/* Logo */}
             <div className="flex justify-center">
@@ -193,7 +192,7 @@ const Signup = () => {
 
             {/* Inputs */}
             {/* Inputs */}
-            <div className="space-y-3 w-full">
+            <div className="space-y-3 w-[360px] mx-auto">
               <div>
                 <label className="block text-[11px] text-black mb-1">
                   Email or Phone
@@ -274,12 +273,12 @@ const Signup = () => {
 
           {/* Actions */}
           <div>
-            <div className="border-t border-gray-700 my-4" />
+            <div className="border-t border-gray-700 my-4 w-[360px]" />
 
             <button
               type="button"
               onClick={sendotp}
-              className="w-full h-9 bg-black rounded-md text-xs font-semibold text-white hover:bg-gray-900 transition"
+              className="w-[360px] h-9 bg-black rounded-md text-xs font-semibold text-white hover:bg-gray-900 transition"
             >
               Sign up
             </button>
@@ -292,17 +291,21 @@ const Signup = () => {
               />
               Log in with Google
             </button> */}
-            <Googlelogin />
+            <div className="w-[360px] mt-3 mb-6 flex justify-center">
+              <Googlelogin />
+            </div>
+          </div>
+          <div className="border w-[360px]  border-gray-700 rounded-md py-3 text-center text-xs text-black flex justify-center mx-auto">
+            Have an account?
+            <Link to="/">
+              <span className="text-[#879F00]  ml-1 cursor-pointer">
+                Log in
+              </span>
+            </Link>
           </div>
         </div>
 
         {/* Login Link */}
-        <div className="border border-gray-700 rounded-md py-3 text-center text-xs text-black flex items-center justify-center w-[300px] mx-auto">
-          Have an account?
-          <Link to="/">
-            <span className="text-[#879F00]  ml-1 cursor-pointer">Log in</span>
-          </Link>
-        </div>
       </div>
 
       {/* ================= OTP MODAL ================= */}
@@ -368,7 +371,7 @@ const Signup = () => {
 
             <button
               onClick={() => {
-                deleteotp()
+                deleteotp();
                 setShowOtpModal(false);
               }}
               className="mt-4 w-full rounded-full border border-gray-600 py-3 text-[#879F00]  cursor-pointer"

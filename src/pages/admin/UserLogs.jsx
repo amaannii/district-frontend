@@ -10,10 +10,8 @@ function UserLogs() {
   useEffect(() => {
     const fetchLoginLogs = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:3001/admin/login-logs"
-        );
-        setLogs(res.data);
+        const res = await axios.get("http://localhost:3001/admin/login-logs");
+        setLogs(res.data.logs);
       } catch (error) {
         console.error("Failed to fetch login logs", error);
       }
@@ -22,12 +20,9 @@ function UserLogs() {
     fetchLoginLogs();
   }, []);
 
-  
   return (
     <div className="p-6 h-[100vh] overflow-scroll">
-      <h2 className="text-2xl font-semibold mb-6">
-        Login Activity Logs
-      </h2>
+      <h2 className="text-2xl font-semibold mb-6">Login Activity Logs</h2>
 
       <div className="bg-black border border-gray-800 rounded-2xl overflow-hidden">
         <table className="w-full text-left">
@@ -38,6 +33,7 @@ function UserLogs() {
               <th className="px-6 py-4">Name</th>
               <th className="px-6 py-4">Email</th>
               <th className="px-6 py-4">Time</th>
+              <th className="px-6 py-4">Log</th>
               <th className="px-6 py-4 text-center">Action</th>
             </tr>
           </thead>
@@ -48,9 +44,7 @@ function UserLogs() {
                 key={log._id}
                 className="border-t border-gray-800 hover:bg-gray-900"
               >
-                <td className="px-6 py-4 text-gray-400">
-                  {index + 1}
-                </td>
+                <td className="px-6 py-4 text-gray-400">{index + 1}</td>
 
                 <td className="px-6 py-4">
                   <span
@@ -64,18 +58,14 @@ function UserLogs() {
                   </span>
                 </td>
 
-                <td className="px-6 py-4 font-medium">
-                  {log.userName}
-                </td>
+                <td className="px-6 py-4 font-medium">{log.userName}</td>
 
-                <td className="px-6 py-4 text-gray-300">
-                  {log.email}
-                </td>
+                <td className="px-6 py-4 text-gray-300">{log.email}</td>
 
                 <td className="px-6 py-4 text-gray-500">
                   {new Date(log.time).toLocaleString()}
                 </td>
-
+                <td className="px-6 py-4 text-gray-300">{log.log}</td>
                 <td className="px-6 py-4 flex justify-center">
                   <button
                     onClick={() => setSelectedLog(log)}
@@ -94,17 +84,35 @@ function UserLogs() {
       {selectedLog && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-black border border-gray-800 rounded-2xl w-full max-w-md p-6">
-            <h3 className="text-xl font-semibold mb-4">
-              Login Details
-            </h3>
+            <h3 className="text-xl font-semibold mb-4">Login Details</h3>
 
             <div className="space-y-3 text-sm">
-              <p><span className="text-gray-400">Role:</span> {selectedLog.role}</p>
-              <p><span className="text-gray-400">Name:</span> {selectedLog.userName}</p>
-              <p><span className="text-gray-400">Email:</span> {selectedLog.email}</p>
-              <p><span className="text-gray-400">Time:</span> {new Date(selectedLog.time).toLocaleString()}</p>
-              <p><span className="text-gray-400">IP:</span> {selectedLog.ip}</p>
-              <p><span className="text-gray-400">Device:</span> {selectedLog.device}</p>
+              <p>
+                <span className="text-gray-400">Role:</span> {selectedLog.role}
+              </p>
+              <p>
+                <span className="text-gray-400">Name:</span>{" "}
+                {selectedLog.userName}
+              </p>
+              <p>
+                <span className="text-gray-400">Email:</span>{" "}
+                {selectedLog.email}
+              </p>
+              <p>
+                <span className="text-gray-400">Time:</span>{" "}
+                {new Date(selectedLog.time).toLocaleString()}
+              </p>
+              <p>
+                <span className="text-gray-400">Activity:</span>{" "}
+                {selectedLog.log}{" "}
+              </p>
+              <p>
+                <span className="text-gray-400">IP:</span> {selectedLog.ip}
+              </p>
+              <p>
+                <span className="text-gray-400">Device:</span>{" "}
+                {selectedLog.device}
+              </p>
             </div>
 
             <div className="flex justify-end mt-6">

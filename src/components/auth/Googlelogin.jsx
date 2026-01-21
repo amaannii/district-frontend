@@ -38,7 +38,7 @@ function Googlelogin() {
     <>
       <button
         onClick={handleGoogleLogin}
-        className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition"
+        className="w-[360px] mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition"
       >
         <img
           src="https://www.svgrepo.com/show/475656/google-color.svg"
