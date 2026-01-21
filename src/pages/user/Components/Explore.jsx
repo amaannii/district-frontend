@@ -1,15 +1,14 @@
-import React, { useState } from "react";
-import Sidebar from "./Sidebar";
 
-import post1 from "../assets/images/download (3).jpeg";
-import post2 from "../assets/images/download (4).jpeg";
-import post3 from "../assets/images/download (5).jpeg";
-import post4 from "../assets/images/download (7).jpeg";
-import post5 from "../assets/images/download (8).jpeg";
-import post6 from "../assets/images/download (9).jpeg";
-import post7 from "../assets/images/download (10).jpeg";
-import post8 from "../assets/images/yeslydimate.jpeg";
-import post9 from "../assets/images/rome.jpeg";
+import post1 from "../../../assets/images/download (3).jpeg";
+import post2 from "../../../assets/images/download (4).jpeg";
+import post3 from "../../../assets/images/download (5).jpeg";
+import post4 from "../../../assets/images/download (7).jpeg";
+import post5 from "../../../assets/images/download (8).jpeg";
+import post6 from "../../../assets/images/download (9).jpeg";
+import post7 from "../../../assets/images/download (10).jpeg";
+import post8 from "../../../assets/images/yeslydimate.jpeg";
+import post9 from "../../../assets/images/rome.jpeg";
+import { useState } from "react";
 
 function Explore() {
   const posts = [post1, post2, post3, post4, post5, post6, post7, post8, post9];
@@ -36,12 +35,9 @@ function Explore() {
   };
 
   return (
-    <div className="h-screen w-full bg-black flex text-white play-regular">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Explore Grid */}
-      <div className="flex-1 p-4 overflow-y-auto">
+    <>
+     <div className="h-screen w-full bg-black flex text-white play-regular">
+     <div className="flex-1 p-4 overflow-y-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {posts.map((post, index) => (
             <div
@@ -63,19 +59,16 @@ function Explore() {
       {selectedIndex !== null && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-          onClick={closeModal}
-        >
+          onClick={closeModal} >
           <button
             className="absolute top-5 right-5 text-white text-3xl font-bold"
-            onClick={closeModal}
-          >
+            onClick={closeModal}   >
             &times;
           </button>
 
           <button
             className="absolute left-5 text-white text-3xl font-bold"
-            onClick={showPrev}
-          >
+            onClick={showPrev} >
             &#10094;
           </button>
 
@@ -83,8 +76,7 @@ function Explore() {
             src={posts[selectedIndex]}
             alt="selected"
             className="max-w-full max-h-full rounded-md shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          />
+            onClick={(e) => e.stopPropagation()} />
 
           <button
             className="absolute right-5 text-white text-3xl font-bold"
@@ -93,9 +85,11 @@ function Explore() {
             &#10095;
           </button>
         </div>
-      )}
+    )}
     </div>
-  );
+        
+    </>
+  )
 }
 
-export default Explore;
+export default Explore

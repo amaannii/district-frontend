@@ -1,13 +1,8 @@
-import React from "react";
-import logoo from "../assets/images/logoo.jpg";
-import home from "../assets/images/icons8-home-24.png";
-import search from "../assets/images/download search.png";
-
-import { useState } from "react";
-import Sidebar from "./Sidebar";
+import React, { useState } from 'react'
 
 function Search() {
-  const users = [
+
+     const users = [
     {
       id: 1,
       name: "Lunor",
@@ -41,7 +36,7 @@ function Search() {
       bio: "Backend Developer",
     },
   ];
-
+  
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -49,10 +44,9 @@ function Search() {
     user.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
-    <div className="flex h-screen bg-black text-white play-regular">
-      {/* LEFT SIDE - SEARCH */}
-      <Sidebar/>
+  return ( 
+   <>
+   
       <div className="w-[350px] p-4 border-r border-gray-700">
         <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
@@ -114,9 +108,8 @@ function Search() {
           <p className="text-gray-500">Search and select a user</p>
         )}
       </div>
-    </div>
-  );
+   </>
+  )
 }
 
-export default Search;
-
+export default Search
