@@ -26,7 +26,7 @@ function More() {
 
           {/* LOGOUT */}
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/")}
             className="w-full text-left px-3 py-2 rounded hover:bg-gray-800 transition text-red-400"
           >
              Log out
