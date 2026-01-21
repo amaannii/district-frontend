@@ -5,7 +5,7 @@ function Userprotectedroute({children}) {
   const token = localStorage.getItem("userToken");
   const role = localStorage.getItem("role");
   if (token) {
-    if (role == "user") {
+    if (role == "User") {
       return children;
     } else {
       return <Navigate to="/" />;

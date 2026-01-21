@@ -19,7 +19,7 @@ const districts = [
 
 export default function ChatRoom() {
   return (
-    <div className="min-h-screen  p-6">
+    <div className="min-h-screen h-[100vh] overflow-scroll p-6">
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}

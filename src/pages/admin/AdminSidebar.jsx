@@ -1,16 +1,18 @@
-import { Users, Bell, LayoutDashboard, LogOut,  AreaChart } from "lucide-react";
+import { Users, LayoutDashboard, LogOut,  AreaChart, FileText, User } from "lucide-react";
+
 
 export default function AdminSidebar({ active, setActive, onLogout }) {
   const menuItems = [
     { id: "/dashboard", name: "Dashboard", icon: <LayoutDashboard size={20} /> },
     { id: "/users", name: "User Management", icon: <Users size={20} /> },
-    { id: "/messages", name: "Message Alerts", icon: <Bell size={20} /> },
+    { id: "/userlogs", name: "UserLogs", icon: <User size={20} /> },
     { id: "/chatroom", name: "Chat Rooms", icon: <AreaChart size={20} /> },
+    { id: "/reports", name: "Reports", icon: <FileText size={20} /> },
     
   ];
-
+ 
   return (
-    <aside className="w-64 bg-black border-r border-gray-800 text-white flex flex-col">
+    <aside className="w-64 h-[100vh] bg-black border-r border-gray-800 text-white flex flex-col">
       {/* Logo */}
       <div className="h-20 flex items-center justify-center border-b border-gray-800">
         <h1 className="text-xl font-semibold tracking-wide">Admin Panel</h1>

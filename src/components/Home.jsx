@@ -1,12 +1,10 @@
 import React from "react";
 import Sidebar from "./Sidebar";
-
 import post from "../assets/images/old car_.jpeg";
 import heart from "../assets/images/icons8-heart-24.png";
 import comment from "../assets/images/icons8-comment-50.png";
 import send from "../assets/images/icons8-sent-50.png";
 import bookmark from "../assets/images/icons8-bookmark-30.png";
-
 import profile from "../assets/images/p1.jpg";
 import profile1 from "../assets/images/download.jpeg";
 import profile2 from "../assets/images/images.jpeg";
