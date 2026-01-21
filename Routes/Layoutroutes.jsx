@@ -11,11 +11,8 @@ import CompleteProfile from "../src/components/CompleteProfile";
 import AdminLogin from "../src/pages/admin/Adminlogin";
 import Protectedroute from "./Protectedroute";
 import Userprotectedroute from "./Userprotectedroute";
-import AdminLayout from "../src/pages/admin/MainContent";
-import DashboardHome from "../src/pages/admin/DashboardHome";
 import MainContent from "../src/pages/admin/MainContent";
 import Admindashboard from "../src/pages/admin/Admindashboard";
-import UserManagement from "../src/pages/admin/UserManagement";
 import Create from "../src/components/Create";
 import Messages from "../src/components/Messages";
 
@@ -25,7 +22,7 @@ function Layoutroutes() {
       <BrowserRouter>
         <Routes>
           <Route
-            path="/Home"
+            path="/home"
             element={
               <Userprotectedroute>
                 <Home />

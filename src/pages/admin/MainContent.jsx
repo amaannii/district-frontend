@@ -1,5 +1,7 @@
 import Chatroom from "./Chatroom";
 import DashboardHome from "./DashboardHome";
+import Reports from "./Reports";
+import UserLogs from "./UserLogs";
 import UserManagement from "./UserManagement";
 
 export default function MainContent({ active }) {
@@ -8,7 +10,8 @@ export default function MainContent({ active }) {
       {active === "/dashboard" && <DashboardHome />}
       {active === "/users" && <UserManagement/>}
       {active === "/chatroom" && <Chatroom/>}
-      {/* {active === "/messages" && <MessageAlerts/>} */}
+      {active === "/reports" && <Reports/>}
+      {active === "/userlogs" && <UserLogs/>}
     </main>
   );
 }
