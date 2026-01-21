@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import Sidebar from "./Sidebar";
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
-
-const Notificationlist = () => {
-  const navigate = useNavigate();
+function Notification() {
+     const navigate = useNavigate();
   const [notifications, setNotifications] = useState([  
   {
     "_id": "1",
@@ -138,9 +136,10 @@ const handleDelete = async (id) => {
     </div>
   );
 
- return (
+  return (
+  <>
   <div className="min-h-screen bg-black flex py-6 play-regular">
-    <Sidebar/>
+   
     <div className="w-full max-w-md px-4">
       <h1 className="text-2xl font-semibold mb-6 text-white play-regular">Notification</h1>
 
@@ -175,8 +174,8 @@ const handleDelete = async (id) => {
       )}
     </div>
   </div>
-);
+  </>
+  )
+}
 
-};
-
-export default Notificationlist;
+export default Notification

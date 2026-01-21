@@ -4,7 +4,7 @@ import MainContent from "./MainContent";
 import AdminSidebar from "./AdminSidebar";
 
 export default function Admindashboard() {
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState("/dashboard");
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -22,6 +22,7 @@ export default function Admindashboard() {
       />
 
       {/* Right Content */}
+      
       <MainContent active={active} />
     </div>
   );
