@@ -9,9 +9,7 @@ function More() {
   <>
   <div className="relative h-screen w-full">
         {/* HOME WITH DIMMED OPACITY */}
-        {/* <div className="opacity-87 pointer-events-none">
-          <Home />
-        </div> */}
+      
   
         {/* OVERLAY */}
         <div className="absolute inset-0 flex items-center justify-center w-[50%]">
