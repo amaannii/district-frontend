@@ -65,7 +65,7 @@ function Search() {
             onClick={() => setSearch("")}
           >
             Clear all
-          </span>
+          </span> 
         </div>
 
         {filteredUsers.map((user) => (
