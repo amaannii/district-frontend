@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import post1 from "../../../assets/images/Kovalam.jpeg";
 import post2 from "../../../assets/images/12275dda944eb67cdde9ba2d76478ef4.jpg";
 import post3 from "../../../assets/images/download (11).jpeg";
@@ -7,110 +7,142 @@ import settings from "../../../assets/images/icons8-settings-50.png";
 import post from "../../../assets/images/icons8-menu-50.png";
 import saved from "../../../assets/images/icons8-bookmark-64.png";
 import profile from "../../../assets/images/icons8-test-account-32.png";
+import axios from "axios";
 
 function Profile() {
-      const [activeTab, setActiveTab] = useState("posts");
-    
-      const posts = []; // empty → shows "Photos of you"
-      const savedPosts = [post2, post3, post1];
+  const [activeTab, setActiveTab] = useState("posts");
+  const [userdetails, setuserdetails] = useState("");
+
+  const posts = []; // empty → shows "Photos of you"
+  const savedPosts = [post2, post3, post1];
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const token = localStorage.getItem("userToken");
+
+        const response = await axios.post(
+          "http://localhost:3001/user/userdetails",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setuserdetails(response.data.user);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
   return (
-   <>
-     <div className="flex h-screen w-full bg-black text-white play-regular">
-         
-   
-         <div className="flex-1 overflow-y-auto px-10 py-8">
-           {/* SETTINGS ICON */}
-           <div className="flex justify-end mb-6">
-             <button className="text-xl hover:text-gray-400">
-               <img className="h-6" src={settings}alt="" />
-             </button>
-           </div>
-   
-           {/* PROFILE CENTER */}
-           <div className="flex flex-col items-center text-center">
-             {/* PROFILE IMAGE */}
-             <div className="w-24 h-24 rounded-full bg-gray-600 overflow-hidden mb-3">
-               <img
-                 src={img2}
-                 alt="profile"
-                 className="w-full h-full object-cover"
-               />
-             </div>
-   
-             {/* NAME */}
-             <h1 className="text-xl font-semibold">john_jony__</h1>
-             <p className="text-sm text-gray-400 mb-4">john</p>
-   
-             {/* STATS */}
-             <div className="flex gap-10 mb-5">
-               <div>
-                 <p className="font-semibold">0</p>
-                 <p className="text-xs text-gray-400">posts</p>
-               </div>
-               <div>
-                 <p className="font-semibold">10</p>
-                 <p className="text-xs text-gray-400">connected</p>
-               </div>
-               <div>
-                 <p className="font-semibold">10</p>
-                 <p className="text-xs text-gray-400">connecting</p>
-               </div>
-             </div>
-   
-             {/* EDIT PROFILE (CENTERED LIKE IMAGE) */}
-             <button className="bg-[#879F00] hover:bg-[#879F00] px-6 py-2 rounded-md text-sm font-semibold w-[280px] mb-6">
-               Edit profile
-             </button>
-           </div>
-   
-           {/* TABS */}
-           <div className="flex justify-center border-t border-gray-700 pt-4 mb-6 gap-40">
-             <button
-               onClick={() => setActiveTab("posts")}
-               className={`px-10 py-2 ${
-                 activeTab === "posts"
-                   ? "text-white border-b-2 border-white"
-                   : "text-gray-400"
-               }`}
-             >
-               <img className="h-6 w-5" src={post} alt="" />
-             </button>
-             <button
-               onClick={() => setActiveTab("saved")}
-               className={`px-10 py-2 ${
-                 activeTab === "saved"
-                   ? "text-white border-b-2 border-white"
-                   : "text-gray-400"
-               }`}
-             >
-               <img className="h-6 w-7" src={saved} alt="" />
-             </button>
-           </div>
-   
-           {/* CONTENT */}
-           {activeTab === "posts" && posts.length === 0 ? (
-             <div className="flex flex-col items-center text-gray-500 mt-17">
-               <div className="text-5xl mb-3">
-                 <img className="h-20 w-20" src={profile} alt="" />
-               </div>
-               <p className="text-4xl">Photos of you</p>
-             </div>
-           ) : (
-             <div className="grid grid-cols-2 gap-1 max-w-[570px] mx-auto">
-               {(activeTab === "posts" ? posts : savedPosts).map((img, index) => (
-                 <img
-                   key={index}
-                   src={img}
-                   alt="post"
-                   className="w-full h-32 object-cover cursor-pointer"
-                 />
-               ))}
-             </div>
-           )}
-         </div>
-       </div>
-   </>
-  )
+    <>
+      <div className="flex h-screen w-full bg-black text-white play-regular">
+        <div className="flex-1 overflow-y-auto px-10 py-8">
+          {/* SETTINGS ICON */}
+          <div className="flex justify-end mb-6">
+            <button className="text-xl hover:text-gray-400">
+              <img className="h-6" src={settings} alt="" />
+            </button>
+          </div>
+
+          {/* PROFILE CENTER */}
+          <div className="flex flex-col items-center text-center">
+            {/* PROFILE IMAGE */}
+            <div className="w-20 h-20 rounded-full bg-white overflow-hidden mb-3">
+              {userdetails.img ? (
+                <img
+                  src={img2}
+                  alt="profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+              <img src="data:image/png;base64,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" alt="user-female-circle"  className="w-full h-full object-cover"/>
+              )}
+            </div>
+
+            {/* NAME */}
+            <h1 className="text-xl font-semibold">{userdetails.username}</h1>
+            <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
+
+            {/* STATS */}
+            <div className="flex gap-10 mb-5">
+              <div>
+                <p className="font-semibold">0</p>
+                <p className="text-xs text-gray-400">posts</p>
+              </div>
+              <div>
+                <p className="font-semibold">10</p>
+                <p className="text-xs text-gray-400">connected</p>
+              </div>
+              <div>
+                <p className="font-semibold">10</p>
+                <p className="text-xs text-gray-400">connecting</p>
+              </div>
+            </div>
+
+            {/* EDIT PROFILE (CENTERED LIKE IMAGE) */}
+            <button className="bg-[#879F00] hover:bg-[#879F00] px-6 py-2 rounded-md text-sm font-semibold w-[280px] mb-6">
+              Edit profile
+            </button>
+          </div>
+
+          {/* TABS */}
+          <div className="flex justify-center border-t border-gray-700 pt-4 mb-6 gap-40">
+            <button
+              onClick={() => setActiveTab("posts")}
+              className={`px-10 py-2 ${
+                activeTab === "posts"
+                  ? "text-white border-b-2 border-white"
+                  : "text-gray-400"
+              }`}
+            >
+              <img className="h-6 w-5" src={post} alt="" />
+            </button>
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`px-10 py-2 ${
+                activeTab === "saved"
+                  ? "text-white border-b-2 border-white"
+                  : "text-gray-400"
+              }`}
+            >
+              <img className="h-6 w-7" src={saved} alt="" />
+            </button>
+          </div>
+
+          {/* CONTENT */}
+          {activeTab === "posts" && posts.length === 0 ? (
+            <div className="flex flex-col items-center text-gray-500 mt-17">
+              <div className="text-5xl mb-3">
+                <img className="h-20 w-20" src={profile} alt="" />
+              </div>
+              <p className="text-4xl">Photos of you</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-1 max-w-[570px] mx-auto">
+              {(activeTab === "posts" ? posts : savedPosts).map(
+                (img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt="post"
+                    className="w-full h-32 object-cover cursor-pointer"
+                  />
+                ),
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
 }
 
-export default Profile
+export default Profile;

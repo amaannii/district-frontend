@@ -1,4 +1,3 @@
-import React from "react";
 
 import ksg from "../../../assets/images/Bekal Fort Kasargod.jpeg";
 import knr from "../../../assets/images/Theyyam.jpeg";
