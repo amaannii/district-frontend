@@ -34,9 +34,8 @@ const images = [
   { src: tvpm, title: "THIRUVANANTHAPURAM" },
 ];
 
-function Messages() {
+function Messages({ selectedDistrict, setSelectedDistrict }) {
   const [search, setSearch] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
 
   const filteredImages = images.filter((item) =>
     item.title.toLowerCase().includes(search.toLowerCase()),
@@ -97,12 +96,14 @@ function Messages() {
               </div>
             </>
           )}
-          {selectedDistrict && (
-            <ChatBox
-              district={selectedDistrict.title}
-              onBack={() => setSelectedDistrict(null)}
-            />
-          )}
+        {selectedDistrict ? (
+          <ChatBox
+            district={selectedDistrict.title}
+            onBack={() => setSelectedDistrict(null)}
+          />
+        ) : (
+          <p className="text-gray-400">Select a district</p>
+        )}
         </div>
       </div>
     </>

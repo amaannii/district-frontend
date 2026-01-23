@@ -14,18 +14,27 @@ import More from "./Components/More";
 
 
 function UserDashboard() {
-  const [activePage, setActivePage] = useState("HOME");
+   const [activePage, setActivePage] = useState("HOME");
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
 
   const renderContent = () => {
     switch (activePage) {
       case "HOME":
-        return <Home />;
+        return   <Home
+            openChat={(district) => {
+              setSelectedDistrict(district);
+              setActivePage("MESSAGES");
+            }}
+          />
       case "SEARCH":
         return <Search />;
       case "EXPLORE":
         return <Explore />;
       case "MESSAGES":
-        return <Messages />;
+        return   <Messages
+            selectedDistrict={selectedDistrict}
+            setSelectedDistrict={setSelectedDistrict}
+          />
       case "NOTIFICATION":
         return <Notification />;
       case "CREATE":
@@ -35,7 +44,7 @@ function UserDashboard() {
       case "MORE":
         return <More />;
       default:
-        return <HomeContent />;
+        return <Home />;
     }
   };
 
@@ -45,7 +54,7 @@ function UserDashboard() {
       <Sidebar active={activePage} setActive={setActivePage} />
 
       {/* Content Area */}
-      <div className="flex-1 flex justify-center items-center overflow-y-auto">
+      <div className="flex-1 flex  items-center overflow-y-auto">
         {renderContent()}
       </div>
     </div>

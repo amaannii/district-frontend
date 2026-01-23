@@ -12,7 +12,7 @@ function Create() {
 
       {/* Overlay + Center Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center mr-25 bg-black/40 rounded-3xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center  bg-black/40 rounded-3xl">
           
           {/* Modal */}
           <div className="bg-[#0f0f0f] w-[420px] rounded-2xl shadow-2xl relative">
@@ -31,7 +31,7 @@ function Create() {
             </button>
 
             {/* Content */}
-            <div className="p-6 flex flex-col items-center">
+            <div className=" flex flex-col items-center">
               <div className="border-2 border-dashed border-gray-600 rounded-lg w-full h-64 flex flex-col items-center justify-center hover:border-gray-400 transition">
                 <img src={uploadIcon} alt="upload" className="h-14 w-14 mb-4" />
                 <p className="text-gray-400 mb-4">Drag photos here</p>
