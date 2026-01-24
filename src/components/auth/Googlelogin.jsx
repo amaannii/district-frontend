@@ -2,9 +2,14 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleprovider } from "../../confiq/firebase.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import CompleteProfile from "../CompleteProfile.jsx";
 
 function Googlelogin() {
   const navigate = useNavigate();
+  const [profile,setprofile]=useState(false)
+
+
 
   const handleGoogleLogin = async () => {
     try {
@@ -19,20 +24,21 @@ function Googlelogin() {
         email: user.email,
       });
       if (res.data.status == true) {
-        navigate("/completeprofile");
+        setprofile(true)
       } else {
       }
 
       if (res.data.success == true) {
         navigate("/home");
       } else {
-        alert("gtgfgtf");
+        alert("complete your profile");
       }
     } catch (error) {
       console.error("Google Login Error:", error);
       alert("Google login failed");
     }
   };
+
 
   return (
     <>
@@ -46,7 +52,10 @@ function Googlelogin() {
           className="w-5"
         />
         <span>Log in with Google</span>
+
+
       </button>
+      {profile && (<CompleteProfile/>)}
     </>
   );
 }
