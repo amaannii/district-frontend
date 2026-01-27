@@ -42,7 +42,7 @@ function Messages({ selectedDistrict, setSelectedDistrict }) {
   );
   return (
     <>
-      <div className="flex h-screen w-full bg-black text-white play-regular">
+      <div className="flex h-screen w-full bg-black text-white play-regular space-y-2">
         <div className="flex-1 px-8 py-6 overflow-y-auto">
           {selectedDistrict && (
             <div className="flex items-center gap-4 mb-6 animate-slideDown">
