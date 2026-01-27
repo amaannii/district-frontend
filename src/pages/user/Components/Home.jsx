@@ -148,7 +148,11 @@ function Home({ openChat }) {
 
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [sharePost, setSharePost] = useState(null);
+ const [openChatRoom, setOpenChatRoom] = useState(false);
+  const [chatRoom, setChatRoom] = useState(null);
+  const [chatPost, setChatPost] = useState(null);
 
+  
   return (
     <div className="flex w-full min-h-screen bg-black text-white">
 
@@ -195,7 +199,7 @@ function Home({ openChat }) {
         </div>
 
         {/* POSTS */}
-        <div className="overflow-y-auto h-[calc(100vh-130px)] pb-10">
+        <div className="overflow-y-auto scrollbar-hide h-[calc(100vh-130px)] pb-10">
           {postsData.map((p) => (
             <PostCard
               key={p.id}
@@ -285,22 +289,22 @@ function Home({ openChat }) {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ">
           <div className="bg-neutral-900 w-[550px] h-[400px] rounded-lg flex flex-col">
             <div className="p-4 border-b border-neutral-700">Share to</div>
-            <div className="flex-1 overflow-y-auto p-4 ">
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 ">
               <Messages sharedPost={sharePost} />
             </div>
-            <div className="p-3 border-t border-neutral-700">
+            <div className="p-3 border-t border-neutral-700 w-full ">
               <button
                 onClick={() => setShowShareOptions(false)}
-                className="w-full bg-blue-600 py-2 rounded gap-2"
+                className="w-full bg-blue-600 py-2 rounded gap-1"
               >
                 Send
               </button>
               <button
                 onClick={() => setShowShareOptions(false)}
-                className="w-full bg-blue-600 py-2 rounded mt-2"
+                className="w-full bg-blue-600 py-2 rounded mt-1"
               >
                 cancel
-              </button>
+              </button> 
             </div>
           </div>
         </div>
