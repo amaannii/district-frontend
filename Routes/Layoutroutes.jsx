@@ -34,35 +34,12 @@ function Layoutroutes() {
               </Userprotectedroute>
             }
           />
-          {/* <Route
-            path="/Explore"
-            element={
-              <Userprotectedroute>
-                <Explore />
-              </Userprotectedroute>
-            }
-          /> */}
-          <Route
-            path="/sidebar"
-            element={
-              <Userprotectedroute>
-                <Sidebar />
-              </Userprotectedroute>
-            }
-          />
+   
 
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgetten" element={<ForgetPassword />} />
-          {/* <Route path="/search" element={<Search />} />
-          <Route path="/notification" element={<Notificationlist />} /> */}
-          <Route path="/completeprofile" element={<CompleteProfile />} />
           <Route path="/adminlogin" element={<AdminLogin />} />
-          {/* <Route path="/create" element={<Create />} />
-          <Route path="/messages" element={<Messages />} /> */}
-          {/* <Route path="/Chat/:state" element={<Chatroom />} /> */}
-          {/* <Route path="/profile" element={<Profile />} />
-          <Route path="/more" element={<More />} /> */}
 
           <Route
             path="/admindashboard"
@@ -72,12 +49,8 @@ function Layoutroutes() {
               </Protectedroute>
             }
           >
-            <Route element={<DashboardHome />} />
+           
           </Route>
-
-          <Route path="/maincontent" element={<MainContent />} />
-
-          {/* <Route path="/messages" element={<MessageAlerts />} /> */}
         </Routes>
       </BrowserRouter>
     </>
