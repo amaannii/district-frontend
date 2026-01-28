@@ -8,22 +8,21 @@ function More() {
   return (
   <>
   <div className="relative h-screen w-full">
-        {/* HOME WITH DIMMED OPACITY */}
+
       
   
-        {/* OVERLAY */}
+      
         <div className="absolute inset-0 flex items-center justify-center w-[50%]">
           <div className="bg-black text-white w-[220px] h-[170px] rounded-xl shadow-lg p-4 space-y-3">
             
-            {/* SAVED POSTS */}
+            
             <button
-              onClick={() => navigate("/Profile?saved=true")}
+              onClick={() => navigate("/Profile")}
               className="w-full text-left px-3 py-2 rounded hover:bg-gray-800 transition"
             >
                Saved Posts
             </button>
   
-            {/* LOGOUT */}
             <button
               onClick={() => navigate("/")}
               className="w-full text-left px-3 py-2 rounded hover:bg-gray-800 transition text-red-400"

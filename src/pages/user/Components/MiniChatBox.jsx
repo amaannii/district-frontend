@@ -32,7 +32,7 @@ const miniMessages = [
 
 function MiniChatBox({ openChat }) {
   return (
-    <div className="h-[100vh] bg-[#0f0f0f] border-l overflow-scroll border-neutral-800 px-4 py-6">
+    <div className="h-[100vh] bg-[#0f0f0f] border-l overflow-scroll scrollbar-hide border-neutral-800 px-4 py-6">
       
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
