@@ -43,14 +43,12 @@ const Login = () => {
       const { data } = await axios.post("http://localhost:3001/user/login", {
         email,
         password,
-      });
+      }); 
 
       console.log("Response:", data.success);
 
       if (data.success==true) {
-      
-      
-        
+
         localStorage.setItem("userToken", data.token);
         
         localStorage.setItem("role", data.role);

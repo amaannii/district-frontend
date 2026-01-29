@@ -14,8 +14,8 @@ function Profile() {
   const [userdetails, setuserdetails] = useState("");
   const [editprofile, seteditprofile] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
-
-  const posts = []; // empty → shows "Photos of you"
+  const [posts, setposts] = useState("");
+  const [selectedPost, setselectedPost] = useState("");
   const savedPosts = [post2, post3, post1];
 
   useEffect(() => {
@@ -34,7 +34,8 @@ function Profile() {
         );
 
         setuserdetails(response.data.user);
-        setSelectedImage(response.data.user.img)
+        setposts(response.data.user.post);
+        setSelectedImage(response.data.user.img);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -63,21 +64,16 @@ function Profile() {
 
       const result = await res.json();
 
-      if(result){
+      if (result) {
         console.log(result.secure_url);
 
-    
-
-      // preview + save url
-      setSelectedImage(result.secure_url);
+        // preview + save url
+        setSelectedImage(result.secure_url);
       }
-      
     } catch (error) {
       console.error("Image upload failed", error);
     }
   };
-
-
 
   const handlesubmit = async () => {
     try {
@@ -92,17 +88,14 @@ function Profile() {
           },
         },
       );
-      if(response){
-              seteditprofile(false)
+      if (response) {
+        seteditprofile(false);
       }
       // update profile image from backend response
-
     } catch (error) {
       console.error("Error updating profile image:", error);
     }
   };
-
-
 
   return (
     <>
@@ -197,14 +190,15 @@ function Profile() {
               <p className="text-4xl">Photos of you</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-1 max-w-[570px] mx-auto">
+            <div className="grid grid-cols-3 gap-5 max-w-[90%]  mx-auto">
               {(activeTab === "posts" ? posts : savedPosts).map(
                 (img, index) => (
                   <img
                     key={index}
-                    src={img}
+                    src={img.image}
                     alt="post"
-                    className="w-full h-32 object-cover cursor-pointer"
+                    className="w-[100%] h-[400px] object-cover cursor-pointer"
+                    onClick={() => setselectedPost(img)} // 👈 ADD THIS
                   />
                 ),
               )}
@@ -247,7 +241,7 @@ function Profile() {
               <div className="flex justify-between mt-4">
                 <button
                   className="px-4 py-2 text-sm bg-white text-black rounded"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => seteditprofile(false)}
                 >
                   Cancel
                 </button>
@@ -263,6 +257,49 @@ function Profile() {
           </div>
         )}
       </div>
+      {selectedPost && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+          <div className="bg-[#0f0f0f] w-[800px] h-[500px] rounded-xl overflow-hidden flex">
+            {/* LEFT: IMAGE */}
+            <div className="w-1/2 bg-black">
+              <img
+                src={selectedPost.image}
+                alt="post"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* RIGHT: DETAILS */}
+            <div className="w-1/2 p-4 flex flex-col">
+              {/* USER INFO */}
+              <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
+                <img
+                  src={userdetails.img || profile}
+                  className="w-10 h-10 rounded-full object-cover"
+                  alt="user"
+                />
+                <span className="font-semibold">{userdetails.username}</span>
+              </div>
+
+              {/* CAPTION */}
+              <div className="flex-1 overflow-y-auto text-sm">
+                <span className="font-semibold mr-2">
+                  {userdetails.username}
+                </span>
+                {selectedPost.caption}
+              </div>
+
+              {/* CLOSE */}
+              <button
+                onClick={() => setselectedPost(null)}
+                className="mt-4 bg-[#879F00] py-2 rounded text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
