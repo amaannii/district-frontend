@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Search() {
   const users = [
@@ -7,13 +7,15 @@ function Search() {
       name: "Lunor",
       username: "lunor.sab",
       status: "connected",
+      posts: 120,
       image: "https://i.pravatar.cc/150?img=1",
     },
     {
       id: 2,
       name: "Feylo",
       username: "feylo",
-      status: "connected",
+      status: "connecting",
+      posts: 54,
       image: "https://i.pravatar.cc/150?img=2",
     },
     {
@@ -21,6 +23,7 @@ function Search() {
       name: "Yuvoh",
       username: "yuvoh",
       status: "connected",
+      posts: 89,
       image: "https://i.pravatar.cc/150?img=3",
     },
     {
@@ -28,6 +31,7 @@ function Search() {
       name: "Kavro",
       username: "kavro",
       status: "connected",
+      posts: 32,
       image: "https://i.pravatar.cc/150?img=4",
     },
   ];
@@ -36,31 +40,41 @@ function Search() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [recentUsers, setRecentUsers] = useState([]);
 
-  const filteredUsers = search
-    ? users.filter(
-        (user) =>
-          user.name.toLowerCase().includes(search.toLowerCase()) ||
-          user.username.toLowerCase().includes(search.toLowerCase())
-      )
-    : [];
+  /* 🔹 Load recent searches */
+  useEffect(() => {
+    const stored = localStorage.getItem("recentUsers");
+    if (stored) setRecentUsers(JSON.parse(stored));
+  }, []);
+
+  /* 🔹 Save recent searches */
+  useEffect(() => {
+    localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
+  }, [recentUsers]);
+
+  const searchResults = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(search.toLowerCase()) ||
+      user.username.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
 
     setRecentUsers((prev) => {
-      const exists = prev.find((u) => u.id === user.id);
-      if (exists) return prev;
-      return [user, ...prev];
+      const filtered = prev.filter((u) => u.id !== user.id);
+      return [user, ...filtered].slice(0, 6);
     });
+
+    setSearch("");
   };
 
   const handleClearAll = () => {
-    setSearch("");
-    setSelectedUser(null);
     setRecentUsers([]);
+    localStorage.removeItem("recentUsers");
   };
 
-  const listToShow = search ? filteredUsers : recentUsers;
+  /* 🔹 Decide list */
+  const listToShow = search ? searchResults : recentUsers;
 
   return (
     <>
@@ -80,7 +94,8 @@ function Search() {
           <span className="text-sm">
             {search ? "Results" : "Recent"}
           </span>
-          {recentUsers.length > 0 && (
+
+          {recentUsers.length > 0 && !search && (
             <span
               className="text-green-500 text-sm cursor-pointer"
               onClick={handleClearAll}
@@ -126,13 +141,32 @@ function Search() {
               alt={selectedUser.name}
               className="w-28 h-28 rounded-full mx-auto mb-4"
             />
+
             <h2 className="text-2xl font-semibold">
-              {selectedUser.name}
+              @{selectedUser.username}
             </h2>
-            <p className="text-gray-400">@{selectedUser.username}</p>
+
+            <p className="text-sm text-gray-400">
+              Status:{" "}
+              <span
+                className={
+                  selectedUser.status === "connected"
+                    ? "text-green-500"
+                    : "text-yellow-500"
+                }
+              >
+                {selectedUser.status}
+              </span>
+            </p>
+
+            <p className="text-sm text-gray-400">
+              Posts: {selectedUser.posts}
+            </p>
           </div>
         ) : (
-          <p className="text-gray-500">Search and select a user</p>
+          <p className="text-gray-500">
+            Search and select a user
+          </p>
         )}
       </div>
     </>

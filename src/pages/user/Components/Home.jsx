@@ -26,8 +26,8 @@ import Messages from "./Messages";
 const notesData = [
   { id: 1, note: "Busy", avatar: profile4 },
   { id: 2, note: "At work", avatar: profile2 },
-  { id: 3, note: "Coffee ", avatar: profile3 },
-  { id: 4, note: "Goodbye ", avatar: profile },
+  { id: 3, note: "Coffee", avatar: profile3 },
+  { id: 4, note: "Goodbye", avatar: profile },
 ];
 
 const postsData = [
@@ -39,7 +39,7 @@ const postsData = [
 
 /* ---------------- POST CARD ---------------- */
 
-function PostCard({ data, onOpenOptions, onShare, openChat }) {
+function PostCard({ data, onShare, onOpenOptions }) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(data.likes);
@@ -49,15 +49,11 @@ function PostCard({ data, onOpenOptions, onShare, openChat }) {
 
   return (
     <div className="border-b border-neutral-800 mb-6">
-
-      {/* HEADER */}
       <div className="px-6 py-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <img src={data.avatar} className="w-8 h-8 rounded-full mr-1" />
           <span className="font-semibold">{data.username}</span>
         </div>
-
-        {/* THREE DOTS */}
         <span
           className="cursor-pointer text-xl"
           onClick={() => onOpenOptions(data)}
@@ -66,10 +62,8 @@ function PostCard({ data, onOpenOptions, onShare, openChat }) {
         </span>
       </div>
 
-      {/* IMAGE */}
       <img src={data.image} className="w-full max-h-[430px] object-cover" />
 
-      {/* ACTIONS */}
       <div className="flex justify-between px-6 py-3">
         <div className="flex gap-5 items-center">
           <div className="flex items-center gap-1">
@@ -90,7 +84,6 @@ function PostCard({ data, onOpenOptions, onShare, openChat }) {
             onClick={() => setShowComments(!showComments)}
           />
 
-          {/* SHARE */}
           <img
             src={send}
             className="w-5 cursor-pointer"
@@ -105,13 +98,13 @@ function PostCard({ data, onOpenOptions, onShare, openChat }) {
         />
       </div>
 
-      {/* COMMENTS */}
       {showComments && (
         <div className="px-6 pb-4">
           {comments.map((c, i) => (
-            <p key={i} className="text-sm text-gray-300">{c}</p>
+            <p key={i} className="text-sm text-gray-300">
+              {c}
+            </p>
           ))}
-
           <div className="flex gap-2 mt-2">
             <input
               value={commentText}
@@ -140,34 +133,39 @@ function PostCard({ data, onOpenOptions, onShare, openChat }) {
 
 function Home({ openChat }) {
   const [myNote, setMyNote] = useState("");
-  const [showNoteInput, setShowNoteInput] = useState(false);
+  const [notes, setNotes] = useState(notesData);
+
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [sharePost, setSharePost] = useState(null);
+  const [shareNote, setShareNote] = useState(null);
 
   const [selectedPost, setSelectedPost] = useState(null);
   const [showPostOptions, setShowPostOptions] = useState(false);
   const [showAboutAccount, setShowAboutAccount] = useState(false);
 
-  const [showShareOptions, setShowShareOptions] = useState(false);
-  const [sharePost, setSharePost] = useState(null);
- const [openChatRoom, setOpenChatRoom] = useState(false);
-  const [chatRoom, setChatRoom] = useState(null);
-  const [chatPost, setChatPost] = useState(null);
-
-  
   return (
     <div className="flex w-full min-h-screen bg-black text-white">
-
-      {/* FEED */}
       <div className="flex-1 max-w-2xl mx-auto">
 
         {/* NOTES */}
         <div className="h-[130px] px-6 border-b border-neutral-800">
-          <div className="flex gap-12 overflow-x-auto mt-6">
+          <div className="flex gap-12 overflow-x-auto mt-6 scrollbar-hide">
+
+            {/* MY NOTE */}
             <div className="flex flex-col items-center w-[85px] shrink-0">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 <img src={profile1} className="w-full h-full object-cover" />
                 {!myNote && (
                   <button
-                    onClick={() => setShowNoteInput(true)}
+                    onClick={() => {
+                      const note = prompt("Enter note");
+                      if (!note) return;
+                      setMyNote(note);
+                      setNotes((prev) => [
+                        { id: Date.now(), note, avatar: profile1, isMine: true },
+                        ...prev,
+                      ]);
+                    }}
                     className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-blue-600 text-xs"
                   >
                     +
@@ -177,7 +175,10 @@ function Home({ openChat }) {
 
               {myNote && (
                 <div
-                  onClick={() => setMyNote("")}
+                  onClick={() => {
+                    setMyNote("");
+                    setNotes((prev) => prev.filter((n) => !n.isMine));
+                  }}
                   className="bg-white text-black text-[11px] px-3 py-1 rounded-full mt-1 cursor-pointer"
                 >
                   {myNote}
@@ -185,8 +186,16 @@ function Home({ openChat }) {
               )}
             </div>
 
-            {notesData.map((n) => (
-              <div key={n.id} className="flex flex-col items-center w-[80px] shrink-0">
+            {/* OTHER NOTES */}
+            {notes.map((n) => (
+              <div
+                key={n.id}
+                className="flex flex-col items-center w-[80px] shrink-0"
+                onClick={() => {
+                  setShareNote(n);
+                  setShowShareOptions(true);
+                }}
+              >
                 <div className="w-16 h-16 rounded-full overflow-hidden">
                   <img src={n.avatar} className="w-full h-full object-cover" />
                 </div>
@@ -204,113 +213,100 @@ function Home({ openChat }) {
             <PostCard
               key={p.id}
               data={p}
-              openChat={openChat}
-              onOpenOptions={(post) => {
-                setSelectedPost(post);
-                setShowPostOptions(true);
-              }}
               onShare={(post) => {
                 setSharePost(post);
                 setShowShareOptions(true);
+              }}
+              onOpenOptions={(post) => {
+                setSelectedPost(post);
+                setShowPostOptions(true);
               }}
             />
           ))}
         </div>
       </div>
-{/* POST OPTIONS */}
-{showPostOptions && selectedPost && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-neutral-900 w-[280px] rounded-lg overflow-hidden">
-      <button
-        onClick={() => {
-          setShowPostOptions(false);
-          setShowAboutAccount(true);
-        }}
-        className="w-full py-3 hover:bg-neutral-800"
-      >
-        About this account
-      </button>
 
-      <button
-        onClick={() => setShowPostOptions(false)}
-        className="w-full py-3 hover:bg-neutral-800"
-      >
-        Go to post
-      </button>
+      {/* POST OPTIONS */}
+      {showPostOptions && selectedPost && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-neutral-900 w-[280px] rounded-lg overflow-hidden">
+            <button
+              onClick={() => {
+                setShowPostOptions(false);
+                setShowAboutAccount(true);
+              }}
+              className="w-full py-3 hover:bg-neutral-800"
+            >
+              About this account
+            </button>
 
-      <button
-        onClick={() => setShowPostOptions(false)}
-        className="w-full py-3 text-red-400 hover:bg-neutral-800"
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-)}
-
-{/* ABOUT ACCOUNT */}
-{showAboutAccount && selectedPost && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-neutral-900 w-[360px] rounded-lg p-4">
-      <div className="flex justify-between mb-4">
-        <h3 className="text-sm font-semibold">About this account</h3>
-        <button onClick={() => setShowAboutAccount(false)}>✕</button>
-      </div>
-
-      <div className="flex items-center gap-3 mb-4">
-        <img src={selectedPost.avatar} className="w-14 h-14 rounded-full" />
-        <div>
-          <p className="font-semibold">{selectedPost.username}</p>
-          <p className="text-xs text-gray-400">Public profile</p>
-          {/* 🔹 Connection status */}
-          <p className="text-xs text-gray-400 mt-1">
-            {selectedPost.connected
-              ? "Connected"
-              : selectedPost.connecting
-              ? "Connecting..."
-              : "Not connected"}
-          </p>
+            <button
+              onClick={() => setShowPostOptions(false)}
+              className="w-full py-3 text-red-400 hover:bg-neutral-800"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      <button
-        onClick={() => setShowAboutAccount(false)}
-        className="w-full bg-neutral-800 py-2 rounded"
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
+      {/* ABOUT ACCOUNT */}
+      {showAboutAccount && selectedPost && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-neutral-900 w-[360px] rounded-lg p-4">
+            <div className="flex justify-between mb-4">
+              <h3 className="text-sm font-semibold">About this account</h3>
+              <button onClick={() => setShowAboutAccount(false)}>✕</button>
+            </div>
 
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={selectedPost.avatar}
+                className="w-14 h-14 rounded-full"
+              />
+              <div>
+                <p className="font-semibold">{selectedPost.username}</p>
+                <p className="text-xs text-gray-400">Public profile</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Not connected
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowAboutAccount(false)}
+              className="w-full bg-neutral-800 py-2 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* SHARE MODAL */}
-      {showShareOptions && sharePost && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ">
+      {showShareOptions && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-neutral-900 w-[550px] h-[400px] rounded-lg flex flex-col">
             <div className="p-4 border-b border-neutral-700">Share to</div>
-            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 ">
-              <Messages sharedPost={sharePost} />
+            <div className="flex-1 overflow-y-auto p-4">
+              <Messages sharedPost={sharePost} sharedNote={shareNote} />
             </div>
-            <div className="p-3 border-t border-neutral-700 w-full ">
+            <div className="p-3 border-t border-neutral-700">
               <button
-                onClick={() => setShowShareOptions(false)}
-                className="w-full bg-blue-600 py-2 rounded gap-1"
+                onClick={() => {
+                  setShowShareOptions(false);
+                  setSharePost(null);
+                  setShareNote(null);
+                }}
+                className="w-full bg-blue-600 py-2 rounded"
               >
                 Send
               </button>
-              <button
-                onClick={() => setShowShareOptions(false)}
-                className="w-full bg-blue-600 py-2 rounded mt-1"
-              >
-                cancel
-              </button> 
             </div>
           </div>
         </div>
       )}
 
-      {/* RIGHT CHAT */}
       <div className="w-[320px] hidden lg:block">
         <MiniChatBox openChat={openChat} />
       </div>
