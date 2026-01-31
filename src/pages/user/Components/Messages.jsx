@@ -15,7 +15,7 @@ import pathmtta from "../../../assets/images/Pathanamthitta.jpeg";
 import tvpm from "../../../assets/images/download (12).jpeg";
 import ernklm from "../../../assets/images/fortkochi (1).jpeg";
 import location from "../../../assets/images/icons8-location-24.png";
-import ChatBox from "./Chatbox";
+import ChatBox from "./ChatBox";
 
 const images = [
   { src: ksg, title: "KASARGOD" },
