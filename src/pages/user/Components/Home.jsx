@@ -48,7 +48,7 @@ function PostCard({ data, onShare, onOpenOptions }) {
   const [comments, setComments] = useState([]);
 
   return (
-    <div className="border-b border-neutral-800 mb-6">
+    <div className="border-b border-neutral-800 mb-6  ">
       <div className="px-6 py-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <img src={data.avatar} className="w-8 h-8 rounded-full mr-1" />

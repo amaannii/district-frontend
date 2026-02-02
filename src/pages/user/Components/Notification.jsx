@@ -4,146 +4,103 @@ import { useNavigate } from "react-router-dom";
 
 function Notification() {
   const navigate = useNavigate();
-
-  const [notifications, setNotifications] = useState([
-    {
-      _id: "1",
-      userId: "101",
-      username: "_Lunr",
-      avatar: "https://i.pravatar.cc/150?img=1",
-      message: "requested to connect you.",
-      date: "4d",
-      status: "pending",
-      group: "week",
-    },
-    {
-      _id: "2",
-      userId: "102",
-      username: "yuv00_",
-      avatar: "https://i.pravatar.cc/150?img=2",
-      message: "requested to connect you.",
-      date: "10 Nov",
-      status: "pending",
-      group: "month",
-    },
-    {
-      _id: "3",
-      userId: "103",
-      username: "_Kaw",
-      avatar: "https://i.pravatar.cc/150?img=3",
-      message: "started connected you.",
-      date: "29 Nov",
-      status: "connected",
-      group: "earlier",
-    },
-    {
-      _id: "4",
-      userId: "104",
-      username: "feylo",
-      avatar: "https://i.pravatar.cc/150?img=4",
-      message: "requested to connect you.",
-      date: "1d",
-      status: "pending",
-      group: "week",
-    },
-    {
-      _id: "5",
-      userId: "105",
-      username: "kavro",
-      avatar: "https://i.pravatar.cc/150?img=5",
-      message: "started connected you.",
-      date: "20 Nov",
-      status: "connected",
-      group: "month",
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [deleted, setdeleted] = useState(0);
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [deleted]);
 
+  // 🔹 Fetch notifications
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/notifications");
-      if (Array.isArray(res.data)) {
-        setNotifications(res.data);
+      const token = localStorage.getItem("userToken");
+
+      const res = await axios.get("http://localhost:3001/user/notifications", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.success) {
+        setNotifications(res.data.request);
       }
     } catch (err) {
       console.error("Fetch notifications failed:", err);
     }
   };
 
-  // ✅ Confirm request
+  // 🔹 Confirm request
   const handleConfirm = async (id) => {
     try {
-      await axios.post(
-        `http://localhost:3001/notifications/confirm/${id}`
-      );
+      await axios.post(`http://localhost:3001/notifications/confirm/${id}`);
 
+      // Optional UI update
       setNotifications((prev) =>
         prev.map((item) =>
-          item._id === id
-            ? {
-                ...item,
-                status: "connected",
-                message: "started connected you.",
-              }
-            : item
-        )
+          item._id === id ? { ...item, confirmed: true } : item,
+        ),
       );
     } catch (err) {
       console.error(err);
     }
   };
 
-  // ✅ Delete (works for pending + connected)
+  // 🔹 Delete notification
   const handleDelete = async (id) => {
+    const token = localStorage.getItem("userToken");
     try {
-      await axios.delete(
-        `http://localhost:3001/notifications/delete/${id}`
+      const response = await axios.post(
+        `http://localhost:3001/user/notificationdelete`,
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
+      if (response.data.success == true) {
+        setdeleted(deleted + 1);
+        alert("deleted");
+      }else{
+        alert("deleted failed")
+      }
 
-      setNotifications((prev) =>
-        prev.filter((item) => item._id !== id)
-      );
+      setNotifications((prev) => prev.filter((item) => item._id !== id));
     } catch (err) {
       console.error(err);
     }
   };
 
-  // 🔹 Group notifications
-  const groupByTime = (type) =>
-    notifications.filter((item) => item.group === type);
-
+  // 🔹 Notification Card
   const NotificationItem = ({ item }) => (
     <div className="flex items-center justify-between py-4 border-b border-white/10">
       {/* Profile */}
       <div
         className="flex items-center gap-4 cursor-pointer"
-        onClick={() => navigate(`/profile/${item.userId}`)}
+        onClick={() => navigate(`/profile/${item._id}`)}
       >
         <img
-          src={item.avatar}
+          src={item.img}
           alt="profile"
           className="w-12 h-12 rounded-full object-cover"
         />
 
         <div>
           <p className="text-white text-sm">
-            <span className="font-semibold">
-              {item.username}
-            </span>{" "}
-            {item.message}
+            <span className="font-semibold">{item.username}</span> sent you a
+            connection request
           </p>
+
           <p className="text-gray-400 text-xs">
-            {item.date}
+            {new Date(item.Date).toLocaleString()}
           </p>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex gap-3">
-        {item.status === "pending" && (
+        {!item.confirmed ? (
           <>
             <button
               onClick={() => handleConfirm(item._id)}
@@ -151,6 +108,7 @@ function Notification() {
             >
               Confirm
             </button>
+
             <button
               onClick={() => handleDelete(item._id)}
               className="px-4 py-1 bg-white text-black rounded-full text-sm"
@@ -158,9 +116,7 @@ function Notification() {
               Delete
             </button>
           </>
-        )}
-
-        {item.status === "connected" && (
+        ) : (
           <button
             onClick={() => handleDelete(item._id)}
             className="px-4 py-1 bg-white text-black rounded-full text-sm"
@@ -173,55 +129,18 @@ function Notification() {
   );
 
   return (
-    <div className="min-h-screen bg-black flex py-6 play-regular">
-      <div className="w-full max-w-md px-4">
-        <h1 className="text-2xl font-semibold mb-6 text-white play-regular">
-          Notification
+    <div className="min-h-screen bg-black flex py-6 border-r border-gray-700">
+      <div className="w-[450px] max-w-md px-2">
+        <h1 className="text-2xl font-semibold mb-6 text-white">
+          Notifications
         </h1>
 
-        {/* THIS WEEK */}
-        {groupByTime("week").length > 0 && (
-          <>
-            <p className="text-gray-400 text-sm mb-2">
-              This week
-            </p>
-            {groupByTime("week").map((item) => (
-              <NotificationItem
-                key={item._id}
-                item={item}
-              />
-            ))}
-          </>
-        )}
-
-        {/* THIS MONTH */}
-        {groupByTime("month").length > 0 && (
-          <>
-            <p className="text-gray-400 text-sm mt-6 mb-2">
-              This month
-            </p>
-            {groupByTime("month").map((item) => (
-              <NotificationItem
-                key={item._id}
-                item={item}
-              />
-            ))}
-          </>
-        )}
-
-        {/* EARLIER */}
-        {groupByTime("earlier").length > 0 && (
-          <>
-            <p className="text-gray-400 text-sm mt-6 mb-2">
-              Earlier
-            </p>
-            {groupByTime("earlier").map((item) => (
-              <NotificationItem
-                key={item._id}
-                item={item}
-              />
-            ))}
-          </>
+        {notifications.length === 0 ? (
+          <p className="text-gray-400 text-sm">No notifications</p>
+        ) : (
+          notifications.map((item) => (
+            <NotificationItem key={item._id} item={item} />
+          ))
         )}
       </div>
     </div>
