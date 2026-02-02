@@ -16,6 +16,8 @@ function Profile() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [posts, setposts] = useState("");
   const [selectedPost, setselectedPost] = useState("");
+  const [isFollowing, setIsFollowing] = useState(false);
+
   const savedPosts = [post2, post3, post1];
 
   useEffect(() => {
@@ -44,6 +46,12 @@ function Profile() {
     fetchUserDetails();
   }, [editprofile]);
 
+  useEffect(() => {
+    if (userdetails.followers?.includes(loggedInUserId)) {
+      setIsFollowing(true);
+    }
+  }, [userdetails]);
+
   const handleimage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -66,8 +74,6 @@ function Profile() {
 
       if (result) {
         console.log(result.secure_url);
-
-        // preview + save url
         setSelectedImage(result.secure_url);
       }
     } catch (error) {
@@ -91,26 +97,23 @@ function Profile() {
       if (response) {
         seteditprofile(false);
       }
-      // update profile image from backend response
     } catch (error) {
       console.error("Error updating profile image:", error);
     }
   };
 
+
   return (
     <>
       <div className="flex h-screen w-full bg-black text-white play-regular">
         <div className="flex-1 overflow-y-auto px-10 py-8">
-          {/* SETTINGS ICON */}
           <div className="flex justify-end mb-6">
             <button className="text-xl hover:text-gray-400">
               <img className="h-6" src={settings} alt="" />
             </button>
           </div>
 
-          {/* PROFILE CENTER */}
           <div className="flex flex-col items-center text-center">
-            {/* PROFILE IMAGE */}
             <div
               onClick={() => seteditprofile(true)}
               className="w-20 h-20 rounded-full bg-white overflow-hidden mb-3"
@@ -131,33 +134,31 @@ function Profile() {
               )}
             </div>
 
-            {/* NAME */}
             <h1 className="text-xl font-semibold">{userdetails.username}</h1>
             <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
 
-            {/* STATS */}
             <div className="flex gap-10 mb-5">
               <div>
-                <p className="font-semibold">0</p>
+                <p className="font-semibold">{userdetails.post?.length || 0}</p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
               <div>
-                <p className="font-semibold">10</p>
+                <p className="font-semibold">
+                  {userdetails.followers?.length || 0}
+                </p>
                 <p className="text-xs text-gray-400">connected</p>
               </div>
               <div>
-                <p className="font-semibold">10</p>
+                <p className="font-semibold">
+                  {userdetails.following?.length || 0}
+                </p>
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
 
-            {/* EDIT PROFILE (CENTERED LIKE IMAGE) */}
-            <button className="bg-[#879F00] hover:bg-[#879F00] px-6 py-2 rounded-md text-sm font-semibold w-[280px] mb-6">
-              Edit profile
-            </button>
+          
           </div>
 
-          {/* TABS */}
           <div className="flex justify-center border-t border-gray-700 pt-4 mb-6 gap-40">
             <button
               onClick={() => setActiveTab("posts")}
@@ -181,7 +182,6 @@ function Profile() {
             </button>
           </div>
 
-          {/* CONTENT */}
           {activeTab === "posts" && posts.length === 0 ? (
             <div className="flex flex-col items-center text-gray-500 mt-17">
               <div className="text-5xl mb-3">
@@ -212,7 +212,6 @@ function Profile() {
                 Upload profile photo
               </h2>
 
-              {/* IMAGE PREVIEW */}
               <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-white mb-4">
                 {selectedImage ? (
                   <img
@@ -229,7 +228,6 @@ function Profile() {
                 )}
               </div>
 
-              {/* FILE INPUT */}
               <input
                 type="file"
                 accept="image/*"
@@ -237,7 +235,6 @@ function Profile() {
                 onChange={(e) => handleimage(e)}
               />
 
-              {/* ACTION BUTTONS */}
               <div className="flex justify-between mt-4">
                 <button
                   className="px-4 py-2 text-sm bg-white text-black rounded"
@@ -260,7 +257,6 @@ function Profile() {
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
           <div className="bg-[#0f0f0f] w-[800px] h-[500px] rounded-xl overflow-hidden flex">
-            {/* LEFT: IMAGE */}
             <div className="w-1/2 bg-black">
               <img
                 src={selectedPost.image}
@@ -269,9 +265,7 @@ function Profile() {
               />
             </div>
 
-            {/* RIGHT: DETAILS */}
             <div className="w-1/2 p-4 flex flex-col">
-              {/* USER INFO */}
               <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
                 <img
                   src={userdetails.img || profile}
@@ -281,7 +275,6 @@ function Profile() {
                 <span className="font-semibold">{userdetails.username}</span>
               </div>
 
-              {/* CAPTION */}
               <div className="flex-1 overflow-y-auto text-sm">
                 <span className="font-semibold mr-2">
                   {userdetails.username}
@@ -289,7 +282,6 @@ function Profile() {
                 {selectedPost.caption}
               </div>
 
-              {/* CLOSE */}
               <button
                 onClick={() => setselectedPost(null)}
                 className="mt-4 bg-[#879F00] py-2 rounded text-sm"
