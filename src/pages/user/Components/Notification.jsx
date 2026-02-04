@@ -6,10 +6,11 @@ function Notification() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [deleted, setdeleted] = useState(0);
+  const[confirmed,setconfirmed]=useState(0)
 
   useEffect(() => {
     fetchNotifications();
-  }, [deleted]);
+  }, [deleted,confirmed]);
 
   // 🔹 Fetch notifications
   const fetchNotifications = async () => {
@@ -31,21 +32,29 @@ function Notification() {
   };
 
   // 🔹 Confirm request
-  const handleConfirm = async (id) => {
+  const handleConfirm = async (username) => {
+       const token = localStorage.getItem("userToken");
     try {
-      await axios.post(`http://localhost:3001/notifications/confirm/${id}`);
-
-      // Optional UI update
-      setNotifications((prev) =>
-        prev.map((item) =>
-          item._id === id ? { ...item, confirmed: true } : item,
-        ),
+   const response=   await axios.post(`http://localhost:3001/user/confirmnotification`,{username},
+         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
+
+if(response.data.success==true){
+  setconfirmed(confirmed+1)
+}
+
+
     } catch (err) {
-      console.error(err);
+      console.error(err);    
     }
   };
 
+
+  
   // 🔹 Delete notification
   const handleDelete = async (id) => {
     const token = localStorage.getItem("userToken");
@@ -103,7 +112,7 @@ function Notification() {
         {!item.confirmed ? (
           <>
             <button
-              onClick={() => handleConfirm(item._id)}
+              onClick={() => handleConfirm(item.username)}
               className="px-4 py-1 bg-[#879F00] text-white rounded-sm text-sm font-medium"
             >
               Confirm
