@@ -66,19 +66,18 @@ const handlesubmit = async () => {
   }
 };
 
-
-
-
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     handlepost(file);
   };
 
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
+  
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     handlepost(file);

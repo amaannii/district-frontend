@@ -16,8 +16,8 @@ function Profile() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [posts, setposts] = useState("");
   const [selectedPost, setselectedPost] = useState("");
-  const [isFollowing, setIsFollowing] = useState(false);
-
+  const [connected, setconnected] = useState(0);
+  const [connecting, setconnecting] = useState(0);
   const savedPosts = [post2, post3, post1];
 
   useEffect(() => {
@@ -37,6 +37,8 @@ function Profile() {
 
         setuserdetails(response.data.user);
         setposts(response.data.user.post);
+        setconnected(response.data.user.connected.length)
+        setconnecting(response.data.user.connecting.length)
         setSelectedImage(response.data.user.img);
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -45,12 +47,6 @@ function Profile() {
 
     fetchUserDetails();
   }, [editprofile]);
-
-  useEffect(() => {
-    if (userdetails.followers?.includes(loggedInUserId)) {
-      setIsFollowing(true);
-    }
-  }, [userdetails]);
 
   const handleimage = async (e) => {
     const file = e.target.files[0];
@@ -102,7 +98,6 @@ function Profile() {
     }
   };
 
-
   return (
     <>
       <div className="flex h-screen w-full bg-black text-white play-regular">
@@ -144,19 +139,17 @@ function Profile() {
               </div>
               <div>
                 <p className="font-semibold">
-                  {userdetails.followers?.length || 0}
+                  {connected}
                 </p>
                 <p className="text-xs text-gray-400">connected</p>
               </div>
               <div>
                 <p className="font-semibold">
-                  {userdetails.following?.length || 0}
+                  {connecting}
                 </p>
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
-
-          
           </div>
 
           <div className="flex justify-center border-t border-gray-700 pt-4 mb-6 gap-40">
