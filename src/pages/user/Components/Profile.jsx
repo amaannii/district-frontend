@@ -19,6 +19,10 @@ function Profile() {
   const [connected, setconnected] = useState(0);
   const [connecting, setconnecting] = useState(0);
   const savedPosts = [post2, post3, post1];
+  const [showConnections, setShowConnections] = useState(false);
+const [connectionType, setConnectionType] = useState(""); // "connected" | "connecting"
+const [connectionList, setConnectionList] = useState([]);
+
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -104,7 +108,7 @@ function Profile() {
         <div className="flex-1 overflow-y-auto px-10 py-8">
           <div className="flex justify-end mb-6">
             <button className="text-xl hover:text-gray-400">
-              <img className="h-6" src={settings} alt="" />
+              <img className="h-6 cursor-pointer" src={settings} alt="" />
             </button>
           </div>
 
@@ -137,18 +141,24 @@ function Profile() {
                 <p className="font-semibold">{userdetails.post?.length || 0}</p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
-              <div>
-                <p className="font-semibold">
-                  {connected}
-                </p>
-                <p className="text-xs text-gray-400">connected</p>
-              </div>
-              <div>
-                <p className="font-semibold">
-                  {connecting}
-                </p>
-                <p className="text-xs text-gray-400">connecting</p>
-              </div>
+              <div onClick={() => {
+  setConnectionType("connected");
+  setConnectionList(userdetails.connected);
+  setShowConnections(true);
+}}>
+  <p className="font-semibold cursor-pointer">{connected}</p>
+  <p className="text-xs text-gray-400">connected</p>
+</div>
+
+              <div onClick={() => {
+  setConnectionType("connecting");
+  setConnectionList(userdetails.connecting);
+  setShowConnections(true);
+}}>
+  <p className="font-semibold cursor-pointer">{connecting}</p>
+  <p className="text-xs text-gray-400">connecting</p>
+</div>
+
             </div>
           </div>
 
@@ -184,7 +194,7 @@ function Profile() {
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-5 max-w-[90%]  mx-auto">
-              {(activeTab === "posts" ? posts : savedPosts).map(
+              {(activeTab === "posts" ? posts : savedPosts).map( 
                 (img, index) => (
                   <img
                     key={index}
@@ -194,6 +204,7 @@ function Profile() {
                     onClick={() => setselectedPost(img)} // 👈 ADD THIS
                   />
                 ),
+
               )}
             </div>
           )}
@@ -285,6 +296,51 @@ function Profile() {
           </div>
         </div>
       )}
+
+
+      {showConnections && (
+  <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+    <div className="bg-[#0f0f0f] w-[550px] rounded-xl p-4 h-auto">
+      <h2 className="text-center text-lg font-semibold mb-4 capitalize">
+        {connectionType}
+      </h2>
+
+      <div className="max-h-[300px] overflow-y-auto">
+        {connectionList.length === 0 ? (
+          <p className="text-center text-gray-400 text-sm">
+            No users found
+          </p>
+        ) : (
+          connectionList.map((user, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 py-2 border-b border-gray-700"
+            >
+              <img
+
+                src={user.img || profile}
+                className="w-10 h-10 rounded-full object-cover"
+                alt="user"
+              />
+              <div>
+                <p className="font-semibold text-sm">{user.username}</p>
+                <p className="text-xs text-gray-400">{user.name}</p>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <button
+        onClick={() => setShowConnections(false)}
+        className="mt-4 w-full bg-[#879F00] py-2 rounded text-sm"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </>
   );
 }
