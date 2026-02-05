@@ -97,7 +97,7 @@ function Home({ openChat }) {
                         ...prev,
                       ]);
                     }}
-                    className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-blue-600 text-xs"
+                    className="absolute bottom-2 right-1 w-4 h-4 rounded-full bg-blue-600 text-xs"
                   >
                     +
                   </button>
