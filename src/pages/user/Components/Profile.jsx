@@ -333,7 +333,7 @@ const [connectionList, setConnectionList] = useState([]);
 
       <button
         onClick={() => setShowConnections(false)}
-        className="mt-4 w-full bg-[#879F00] py-2 rounded text-sm"
+        className="mt-3 w-full bg-[#879F00] py-2 rounded text-sm"
       >
         Close
       </button>
