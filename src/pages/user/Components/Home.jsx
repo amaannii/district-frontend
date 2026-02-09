@@ -163,20 +163,23 @@ function Home({ openChat }) {
             </div>
 
             {/* OTHER NOTES */}
-            {notes.map((n) => (
-              <div
-                key={n._id}
-                className="flex flex-col items-center w-[80px] shrink-0"
-              >
-                <div className="w-16 h-16 rounded-full overflow-hidden">
-                  <img src={n.avatar} className="w-full h-full object-cover" />
-                </div>
+         {notes.map((n) => (
+  <div key={n._id} className="flex flex-col items-center w-[80px] shrink-0">
+    
+    <div className="w-16 h-16 rounded-full overflow-hidden">
+      <img src={n.avatar} className="w-full h-full object-cover" />
+    </div>
 
-                <div className="bg-neutral-800 text-[11px] px-3 py-1 rounded-full mt-1">
-                  {n.note || "No note"}
-                </div>
-              </div>
-            ))}
+    <p className="text-xs text-gray-300 mt-1">
+      {n.username}
+    </p>
+
+    <div className="bg-neutral-800 text-[11px] px-3 py-1 rounded-full mt-1">
+      {n.note}
+    </div>
+  </div>
+))}
+
           </div>
         </div>
 
