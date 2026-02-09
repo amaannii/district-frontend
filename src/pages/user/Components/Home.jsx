@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-
-/* ICONS */
-
-/* IMAGES */
+import MiniChatBox from "./MiniChatbox";
+import Messages from "./Messages";
+import PostCard from "./PostCard";
+import axios from "axios";
 import profile from "../../../assets/images/p1.jpg";
 import profile1 from "../../../assets/images/download.jpeg";
 import post from "../../../assets/images/download (13).jpeg";
@@ -13,11 +13,6 @@ import profile2 from "../../../assets/images/images.jpeg";
 import profile3 from "../../../assets/images/images (1).jpeg";
 import profile4 from "../../../assets/images/Veste Tapisserie Roxane 29 - Marine Guillemette.jpeg";
 
-/* COMPONENTS */
-import MiniChatBox from "./MiniChatbox";
-import Messages from "./Messages";
-import PostCard from "./PostCard";
-import axios from "axios";
 
 const postsData = [
   { id: 1, username: "akshay__", avatar: profile, image: post, likes: 128 },
@@ -45,18 +40,36 @@ function Home({ openChat }) {
   const [showPostOptions, setShowPostOptions] = useState(false);
   const [showAboutAccount, setShowAboutAccount] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [image, setimage] = useState();
 
   useEffect(() => {
+    const fetchimage = async () => {
+      try {
+        const token = localStorage.getItem("userToken");
+
+        const res = await axios.get("http://localhost:3001/user/image", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.data.success) {
+          setimage(res.data.image); // ✅ correct
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }; 
+
     const fetchFeed = async () => {
       try {
         const token = localStorage.getItem("userToken");
 
-        const res = await axios.get("http://localhost:3001/user/feed",  
-           {
+        const res = await axios.get("http://localhost:3001/user/feed", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },);
+        });
 
         console.log("Feed:", res.data);
 
@@ -69,6 +82,7 @@ function Home({ openChat }) {
     };
 
     fetchFeed();
+    fetchimage();
   }, []);
 
   return (
@@ -80,7 +94,11 @@ function Home({ openChat }) {
             {/* MY NOTE */}
             <div className="flex flex-col items-center w-[85px] shrink-0">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                <img src={profile1} className="w-full h-full object-cover" />
+                <img
+                  src={image ? image : profile1}
+                  className="w-full h-full object-cover"
+                />
+
                 {!myNote && (
                   <button
                     onClick={() => {
