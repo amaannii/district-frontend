@@ -13,7 +13,6 @@ import profile2 from "../../../assets/images/images.jpeg";
 import profile3 from "../../../assets/images/images (1).jpeg";
 import profile4 from "../../../assets/images/Veste Tapisserie Roxane 29 - Marine Guillemette.jpeg";
 
-
 const postsData = [
   { id: 1, username: "akshay__", avatar: profile, image: post, likes: 128 },
   { id: 2, username: "john_dev", avatar: profile2, image: post1, likes: 87 },
@@ -31,8 +30,6 @@ const notesData = [
 /* ---------------- HOME ---------------- */
 
 function Home({ openChat }) {
-  const [myNote, setMyNote] = useState("");
-  const [notes, setNotes] = useState(notesData);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [sharePost, setSharePost] = useState(null);
   const [shareNote, setShareNote] = useState(null);
@@ -41,6 +38,8 @@ function Home({ openChat }) {
   const [showAboutAccount, setShowAboutAccount] = useState(false);
   const [posts, setPosts] = useState([]);
   const [image, setimage] = useState();
+  const [myNote, setMyNote] = useState("");
+  const [notes, setNotes] = useState([]);
 
   useEffect(() => {
     const fetchimage = async () => {
@@ -59,7 +58,7 @@ function Home({ openChat }) {
       } catch (err) {
         console.log(err);
       }
-    }; 
+    };
 
     const fetchFeed = async () => {
       try {
@@ -81,9 +80,50 @@ function Home({ openChat }) {
       }
     };
 
+    const fetchNotes = async () => {
+      try {
+        const token = localStorage.getItem("userToken");
+
+        const res = await axios.get("http://localhost:3001/user/notes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.data.success) {
+          setMyNote(res.data.myNote.note);
+          setNotes(res.data.connectedNotes);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     fetchFeed();
     fetchimage();
+    fetchNotes();
   }, []);
+
+  const addMyNote = async () => {
+    const note = prompt("Enter note");
+    if (!note) return;
+
+    const token = localStorage.getItem("userToken");
+
+    const res = await axios.post(
+      "http://localhost:3001/user/note",
+      { note },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (res.data.success) {
+      setMyNote(note);
+    }
+  };
 
   return (
     <div className="flex w-full min-h-screen bg-black text-white">
@@ -101,20 +141,7 @@ function Home({ openChat }) {
 
                 {!myNote && (
                   <button
-                    onClick={() => {
-                      const note = prompt("Enter note");
-                      if (!note) return;
-                      setMyNote(note);
-                      setNotes((prev) => [
-                        {
-                          id: Date.now(),
-                          note,
-                          avatar: profile1,
-                          isMine: true,
-                        },
-                        ...prev,
-                      ]);
-                    }}
+                    onClick={addMyNote}
                     className="absolute bottom-2 right-1 w-4 h-4 rounded-full bg-blue-600 text-xs"
                   >
                     +
@@ -138,18 +165,15 @@ function Home({ openChat }) {
             {/* OTHER NOTES */}
             {notes.map((n) => (
               <div
-                key={n.id}
+                key={n._id}
                 className="flex flex-col items-center w-[80px] shrink-0"
-                onClick={() => {
-                  setShareNote(n);
-                  setShowShareOptions(true);
-                }}
               >
                 <div className="w-16 h-16 rounded-full overflow-hidden">
                   <img src={n.avatar} className="w-full h-full object-cover" />
                 </div>
+
                 <div className="bg-neutral-800 text-[11px] px-3 py-1 rounded-full mt-1">
-                  {n.note}
+                  {n.note || "No note"}
                 </div>
               </div>
             ))}
