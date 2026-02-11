@@ -11,8 +11,6 @@ function Notification() {
   const[confirmed,setconfirmed]=useState(0)
   const [loading, setloading] = useState(false);
 
-  const [confirmed, setconfirmed] = useState(0);
-
 
   // 🔹 Load stored notifications first (like search recent)
   useEffect(() => {
@@ -56,8 +54,6 @@ function Notification() {
 
 
       setloading(true)
-   const response=   await axios.post(`http://localhost:3001/user/confirmnotification`,{username},
-         {
 
       const response = await axios.post(
         `http://localhost:3001/user/confirmnotification`,

@@ -46,6 +46,8 @@ function Explore() {
             className="chaotic-orbit
        "
           ></div>
+          </div>
+       )}
 
 
 
