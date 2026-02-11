@@ -13,6 +13,7 @@ function PostCard({ data, onShare }) {
   const [saved, setSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [loading, setloading] = useState(false);
 
   // ✅ server-driven state
   const [liked, setLiked] = useState(data.isLiked || false);
@@ -24,6 +25,7 @@ function PostCard({ data, onShare }) {
   /* ❤️ LIKE POST */
   const handleLike = async () => {
     try {
+      setloading(true)
       const res = await axios.post(
         "/like-post",
         { postId: data._id },
@@ -36,6 +38,8 @@ function PostCard({ data, onShare }) {
       }
     } catch (err) {
       console.error("Like failed", err);
+    }finally {
+      setloading(false);
     }
   };
 
@@ -44,6 +48,7 @@ function PostCard({ data, onShare }) {
     if (!commentText.trim()) return;
 
     try {
+      setloading(true)
       const res = await axios.post(
         "/add-comment",
         {
@@ -59,6 +64,8 @@ function PostCard({ data, onShare }) {
       }
     } catch (err) {
       console.error("Comment failed", err);
+    }finally {
+      setloading(false);
     }
   };
 
@@ -160,6 +167,14 @@ function PostCard({ data, onShare }) {
               Post
             </button>
           </div>
+        </div>
+      )}
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
         </div>
       )}
     </div>

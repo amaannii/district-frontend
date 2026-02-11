@@ -7,6 +7,7 @@ function Notification() {
   const [notifications, setNotifications] = useState([]);
   const [deleted, setdeleted] = useState(0);
   const[confirmed,setconfirmed]=useState(0)
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     fetchNotifications();
@@ -15,6 +16,7 @@ function Notification() {
   // 🔹 Fetch notifications
   const fetchNotifications = async () => {
     try {
+      setloading(true)
       const token = localStorage.getItem("userToken");
 
       const res = await axios.get("http://localhost:3001/user/notifications", {
@@ -28,6 +30,8 @@ function Notification() {
       }
     } catch (err) {
       console.error("Fetch notifications failed:", err);
+    }finally {
+      setloading(false);
     }
   };
 
@@ -35,6 +39,7 @@ function Notification() {
   const handleConfirm = async (username) => {
        const token = localStorage.getItem("userToken");
     try {
+      setloading(true)
    const response=   await axios.post(`http://localhost:3001/user/confirmnotification`,{username},
          {
           headers: {
@@ -50,6 +55,8 @@ if(response.data.success==true){
 
     } catch (err) {
       console.error(err);    
+    }finally {
+      setloading(false);
     }
   };
 
@@ -152,6 +159,14 @@ if(response.data.success==true){
           ))
         )}
       </div>
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
     </div>
   );
 }

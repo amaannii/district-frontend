@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 function Explore() {
   const [posts, setPosts] = useState([]);
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     fetchExplorePosts();
@@ -9,10 +10,13 @@ function Explore() {
 
   const fetchExplorePosts = async () => {
     try {
+      setloading(true)
       const res = await axios.get("http://localhost:3001/user/posts/explore");
       setPosts(res.data);
     } catch (error) {
       console.error("Explore fetch error:", error);
+    }finally {
+      setloading(false);
     }
   };
 
@@ -30,6 +34,14 @@ function Explore() {
           </div>
         ))}
       </div>
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
     </div>
   );
 }

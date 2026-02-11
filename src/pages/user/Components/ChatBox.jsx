@@ -12,6 +12,7 @@ function ChatBox({ district, onBack }) {
 const mediaRecorderRef = useRef(null);
 const audioChunksRef = useRef([]);
 const [recording, setRecording] = useState(false);
+const [loading, setloading] = useState(false);
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -162,6 +163,14 @@ const stopRecording = () => {
           Send
         </button>
       </div>
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
     </div>
   );
 }

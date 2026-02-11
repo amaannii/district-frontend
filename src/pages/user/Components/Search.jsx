@@ -9,9 +9,11 @@ function Search() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [recentUsers, setRecentUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("recentUsers");
+    setloading(true)
     if (stored) setRecentUsers(JSON.parse(stored));
     localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
     const fetchusers = async () => {
@@ -22,6 +24,9 @@ function Search() {
       } else {
         alert("users not found");
       }
+      setloading(false);
+ 
+
     };
     fetchusers();
   }, []);
@@ -52,6 +57,7 @@ function Search() {
   const listToShow = search ? searchResults : recentUsers;
 
   const handlerequest = async () => {
+    setloading(true)
     const token = localStorage.getItem("userToken");
     const response = await axios.post(
       "http://localhost:3001/user/request",
@@ -198,6 +204,14 @@ function Search() {
           </div>
         ) : (
           <p className="text-gray-500">Search and select a user</p>
+        )}
+        {loading && (
+          <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+            <div
+              className="chaotic-orbit
+       "
+            ></div>
+          </div>
         )}
       </div>
     </>
