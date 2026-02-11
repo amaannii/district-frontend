@@ -6,9 +6,23 @@ function Notification() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [deleted, setdeleted] = useState(0);
+
+
   const[confirmed,setconfirmed]=useState(0)
   const [loading, setloading] = useState(false);
 
+  const [confirmed, setconfirmed] = useState(0);
+
+
+  // 🔹 Load stored notifications first (like search recent)
+  useEffect(() => {
+    const stored = localStorage.getItem("recentNotifications");
+    if (stored) {
+      setNotifications(JSON.parse(stored));
+    }
+  }, []);
+
+  // 🔹 Fetch notifications
   useEffect(() => {
     fetchNotifications();
   }, [deleted,confirmed]);
@@ -39,9 +53,16 @@ function Notification() {
   const handleConfirm = async (username) => {
        const token = localStorage.getItem("userToken");
     try {
+
+
       setloading(true)
    const response=   await axios.post(`http://localhost:3001/user/confirmnotification`,{username},
          {
+
+      const response = await axios.post(
+        `http://localhost:3001/user/confirmnotification`,
+        { username },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -54,10 +75,13 @@ if(response.data.success==true){
 
 
     } catch (err) {
+
       console.error(err);    
     }finally {
       setloading(false);
-    }
+
+      console.error(err);
+  }
   };
 
 

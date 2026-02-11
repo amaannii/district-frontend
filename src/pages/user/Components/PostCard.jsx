@@ -9,11 +9,13 @@ import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 
 /* ---------------- POST CARD ---------------- */
 
+
 function PostCard({ data, onShare }) {
   const [saved, setSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [loading, setloading] = useState(false);
+
 
   // ✅ server-driven state
   const [liked, setLiked] = useState(data.isLiked || false);
@@ -37,9 +39,13 @@ function PostCard({ data, onShare }) {
         setLikeCount(res.data.likes);
       }
     } catch (err) {
+
+
       console.error("Like failed", err);
     }finally {
       setloading(false);
+
+      console.error(err);
     }
   };
 
@@ -63,9 +69,44 @@ function PostCard({ data, onShare }) {
         setCommentText("");
       }
     } catch (err) {
+
+
       console.error("Comment failed", err);
     }finally {
       setloading(false);
+
+      console.error(err);
+    }
+  };
+
+  /* ---------------- DELETE ---------------- */
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`/delete-post/${data._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      onPostDeleted?.(data._id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  /* ---------------- UPDATE ---------------- */
+  const handleUpdate = async () => {
+    try {
+      const res = await axios.put(
+        `/update-post/${data._id}`,
+        { caption: editedCaption },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (res.data.success) {
+        setIsEditing(false);
+        onPostUpdated?.(res.data.post);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 

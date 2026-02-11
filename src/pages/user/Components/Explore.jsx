@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 function Explore() {
   const [posts, setPosts] = useState([]);
+
+
   const [loading, setloading] = useState(false);
+
+  const [selectedPost, setSelectedPost] = useState(null); // ✅ NEW
+
 
   useEffect(() => {
     fetchExplorePosts();
@@ -34,12 +39,38 @@ function Explore() {
           </div>
         ))}
       </div>
+
        {loading && (
         <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
           <div
             className="chaotic-orbit
        "
           ></div>
+
+
+
+      {/* ================= POST MODAL ================= */}
+      {selectedPost && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+          
+          <div className="relative max-w-4xl w-full flex justify-center">
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-4 right-4 text-white text-2xl"
+            >
+              ✕
+            </button>
+
+            {/* Post Image */}
+            <img
+              src={selectedPost.image}
+              alt="full-post"
+              className="max-h-[90vh] object-contain"
+            />
+
+          </div>
         </div>
       )}
     </div>

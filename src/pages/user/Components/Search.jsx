@@ -19,6 +19,7 @@ function Search() {
     const fetchusers = async () => {
       const res = await axios.get("http://localhost:3001/user/allusers");
 
+
       if (res.data.success == true) {
         setusers(res.data.users);
       } else {
@@ -26,6 +27,7 @@ function Search() {
       }
       setloading(false);
  
+
 
     };
     fetchusers();
@@ -53,6 +55,7 @@ function Search() {
     localStorage.removeItem("recentUsers");
   };
 
+
   /* 🔹 Decide list */
   const listToShow = search ? searchResults : recentUsers;
 
@@ -72,6 +75,25 @@ function Search() {
       alert("request send successfully");
     } else {
       alert("request failed");
+
+
+      const response = await axios.post(
+        "http://localhost:3001/user/request",
+        { username: selectedUser.username },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert("Request sent successfully");
+      } else {
+        alert("Request failed");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -204,6 +226,14 @@ function Search() {
           </div>
         ) : (
           <p className="text-gray-500">Search and select a user</p>
+        )}
+        {loading && (
+          <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+            <div
+              className="chaotic-orbit
+       "
+            ></div>
+          </div>
         )}
         {loading && (
           <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">

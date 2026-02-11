@@ -8,11 +8,35 @@ function ChatBox({ district, onBack }) {
   const [showEmojis, setShowEmojis] = useState(false);
 
   const fileInputRef = useRef(null);
+
   const audioInputRef = useRef(null);
 const mediaRecorderRef = useRef(null);
 const audioChunksRef = useRef([]);
 const [recording, setRecording] = useState(false);
 const [loading, setloading] = useState(false);
+
+
+  const docInputRef = useRef(null);
+
+  const [previewIndex, setPreviewIndex] = useState(null);
+
+  // Load messages from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(`chat_${district}`);
+    if (stored) setMessages(JSON.parse(stored));
+  }, [district]);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(`chat_${district}`, JSON.stringify(messages));
+  }, [messages, district]);
+
+  const formatTime = (sec) => {
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -163,14 +187,54 @@ const stopRecording = () => {
           Send
         </button>
       </div>
+
        {loading && (
         <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
           <div
             className="chaotic-orbit
        "
           ></div>
+
         </div>
       )}
+
+
+      {/* Preview Modal */}
+      {previewIndex !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="relative flex flex-col items-center">
+            <button
+              onClick={() => setPreviewIndex(null)}
+              className="absolute top-2 right-2 text-white text-2xl"
+            >
+              ✖
+            </button>
+
+            {messages[previewIndex].type === "image" && (
+              <img
+                src={messages[previewIndex].content}
+                className="max-h-[80vh] max-w-[80vw] rounded-lg"
+              />
+            )}
+
+            {messages[previewIndex].type === "document" && (
+              <div className="flex flex-col items-center gap-4 text-white">
+                <p>📄 {messages[previewIndex].name}</p>
+                <a
+                  href={messages[previewIndex].content}
+                  download={messages[previewIndex].name}
+                  className="px-4 py-2 bg-[#879F00] rounded"
+                >
+                  Download
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+
+
     </div>
   );
 }
