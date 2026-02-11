@@ -14,6 +14,13 @@ function ChatBox({ district, onBack }) {
   const audioChunksRef = useRef([]);
 
   const fileInputRef = useRef(null);
+
+  const audioInputRef = useRef(null);
+const mediaRecorderRef = useRef(null);
+const audioChunksRef = useRef([]);
+const [recording, setRecording] = useState(false);
+const [loading, setloading] = useState(false);
+
   const docInputRef = useRef(null);
 
   const [previewIndex, setPreviewIndex] = useState(null);
@@ -34,6 +41,7 @@ function ChatBox({ district, onBack }) {
     const s = String(sec % 60).padStart(2, "0");
     return `${m}:${s}`;
   };
+
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -207,6 +215,16 @@ function ChatBox({ district, onBack }) {
         )}
       </div>
 
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
+
+
       {/* Preview Modal */}
       {previewIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
@@ -240,6 +258,7 @@ function ChatBox({ district, onBack }) {
           </div>
         </div>
       )}
+
 
     </div>
   );

@@ -7,64 +7,66 @@ function Create() {
   const [isOpen, setIsOpen] = useState(true);
   const [post, setpost] = useState(uploadIcon);
   const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [uploadpost,setuploadpost]=useState("")
+  const [loading, setloading] = useState(false);
+  const [uploadpost, setuploadpost] = useState("");
 
-const handlepost = async (file) => {
-  if (!file) return;
-
-  setLoading(true);
-
-  const data = new FormData();
-  data.append("file", file);
-  data.append("upload_preset", "newuploads");
-
-  try {
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
-      { method: "POST", body: data }
-    );
-
-    const result = await res.json();
-
-    if (result.secure_url) {
-      setpost(result.secure_url);
-    }
-  } catch (error) {
-    console.error("Image upload failed", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  const handlepost = async (file) => {
+    if (!file) return;
 
 
 
-const handlesubmit = async () => {
-  try {
-    const token = localStorage.getItem("userToken");
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "newuploads");
 
-    const response = await axios.post(
-      "http://localhost:3001/user/posting",
-      {
-        image: post,
-        caption: description,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      setloading(true)
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
+        { method: "POST", body: data },
+      );
+
+      const result = await res.json();
+
+      if (result.secure_url) {
+        setpost(result.secure_url);
       }
-    );
-
-    if (response.data.success) {
-      setIsOpen(false);
-      setpost(uploadIcon);
-      setDescription("");
+    } catch (error) {
+      console.error("Image upload failed", error);
+    } finally {
+      setloading(false);
     }
-  } catch (error) {
-    console.error("Error uploading post:", error);
-  }
-};
+  };
+
+  const handlesubmit = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("userToken");
+
+      const response = await axios.post(
+        "http://localhost:3001/user/posting",
+        {
+          image: post,
+          caption: description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setIsOpen(false);
+        setpost(uploadIcon);
+        setDescription("");
+      }
+    } catch (error) {
+      console.error("Error uploading post:", error);
+    } finally {
+      setloading(false);
+    }
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -72,12 +74,10 @@ const handlesubmit = async () => {
     handlepost(file);
   };
 
-
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     handlepost(file);
@@ -163,12 +163,20 @@ const handlesubmit = async () => {
                     {/* Upload Button */}
                     <button
                       className="w-full bg-[#879F00] py-2 rounded font-semibold hover:opacity-90"
-                      onClick={handlesubmit} >
+                      onClick={handlesubmit}
+                    >
                       Upload Post
                     </button>
                   </div>
                 )}
-                {loading && <p className="text-gray-400">Uploading...</p>}
+                {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
               </div>
             </div>
           </div>

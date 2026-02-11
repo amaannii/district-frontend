@@ -12,7 +12,14 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
   const token = localStorage.getItem("token");
   const loggedUser = JSON.parse(localStorage.getItem("user"));
 
-  const isOwner = loggedUser?._id === data.userId?._id;
+
+function PostCard({ data, onShare }) {
+  const [saved, setSaved] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [loading, setloading] = useState(false);
+
+
 
   const [liked, setLiked] = useState(data.isLiked || false);
   const [likeCount, setLikeCount] = useState(data.likes || 0);
@@ -41,6 +48,7 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
   /* ---------------- LIKE ---------------- */
   const handleLike = async () => {
     try {
+      setloading(true)
       const res = await axios.post(
         "/like-post",
         { postId: data._id },
@@ -52,7 +60,13 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
         setLikeCount(res.data.likes);
       }
     } catch (err) {
+
+      console.error("Like failed", err);
+    }finally {
+      setloading(false);
+
       console.error(err);
+
     }
   };
 
@@ -61,6 +75,7 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
     if (!commentText.trim()) return;
 
     try {
+      setloading(true)
       const res = await axios.post(
         "/add-comment",
         { postId: data._id, text: commentText },
@@ -72,6 +87,11 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
         setCommentText("");
       }
     } catch (err) {
+
+      console.error("Comment failed", err);
+    }finally {
+      setloading(false);
+
       console.error(err);
     }
   };
@@ -104,6 +124,7 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
       }
     } catch (err) {
       console.error(err);
+
     }
   };
 
@@ -251,6 +272,14 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
               Post
             </button>
           </div>
+        </div>
+      )}
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
         </div>
       )}
     </div>

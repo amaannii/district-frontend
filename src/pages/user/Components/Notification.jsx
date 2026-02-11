@@ -6,7 +6,12 @@ function Notification() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [deleted, setdeleted] = useState(0);
+
+  const[confirmed,setconfirmed]=useState(0)
+  const [loading, setloading] = useState(false);
+
   const [confirmed, setconfirmed] = useState(0);
+
 
   // 🔹 Load stored notifications first (like search recent)
   useEffect(() => {
@@ -23,6 +28,7 @@ function Notification() {
 
   const fetchNotifications = async () => {
     try {
+      setloading(true)
       const token = localStorage.getItem("userToken");
 
       const res = await axios.get("http://localhost:3001/user/notifications", {
@@ -42,6 +48,8 @@ function Notification() {
       }
     } catch (err) {
       console.error("Fetch notifications failed:", err);
+    }finally {
+      setloading(false);
     }
   };
 
@@ -49,10 +57,16 @@ function Notification() {
   const handleConfirm = async (username) => {
     const token = localStorage.getItem("userToken");
     try {
+
+      setloading(true)
+   const response=   await axios.post(`http://localhost:3001/user/confirmnotification`,{username},
+         {
+
       const response = await axios.post(
         `http://localhost:3001/user/confirmnotification`,
         { username },
         {
+
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -63,8 +77,13 @@ function Notification() {
         setconfirmed(confirmed + 1);
       }
     } catch (err) {
+
+      console.error(err);    
+    }finally {
+      setloading(false);
+
       console.error(err);
-    }
+  }
   };
 
   // 🔹 Delete notification
@@ -173,6 +192,14 @@ function Notification() {
           ))
         )}
       </div>
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
     </div>
   );
 }

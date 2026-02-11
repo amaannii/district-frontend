@@ -9,10 +9,18 @@ function Search() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [recentUsers, setRecentUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
+  const [loading, setloading] = useState(false);
 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     const stored = localStorage.getItem("recentUsers");
+
+    setloading(true)
+    if (stored) setRecentUsers(JSON.parse(stored));
+    localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
+    const fetchusers = async () => {
+      const res = await axios.get("http://localhost:3001/user/allusers");
+
     if (stored) {
       setRecentUsers(JSON.parse(stored));
     }
@@ -29,6 +37,9 @@ function Search() {
       } catch (error) {
         console.error(error);
       }
+      setloading(false);
+ 
+
     };
 
     fetchUsers();
@@ -81,6 +92,24 @@ function Search() {
     try {
       const token = localStorage.getItem("userToken");
 
+
+  const handlerequest = async () => {
+    setloading(true)
+    const token = localStorage.getItem("userToken");
+    const response = await axios.post(
+      "http://localhost:3001/user/request",
+      { username: selectedUser.username },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    if (response.data.success == true) {
+      alert("request send successfully");
+    } else {
+      alert("request failed");
+
       const response = await axios.post(
         "http://localhost:3001/user/request",
         { username: selectedUser.username },
@@ -98,6 +127,7 @@ function Search() {
       }
     } catch (error) {
       console.error(error);
+
     }
   };
 
@@ -276,6 +306,14 @@ function Search() {
             <p className="text-gray-500 text-center">
               Search and select a user
             </p>
+          </div>
+        )}
+        {loading && (
+          <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+            <div
+              className="chaotic-orbit
+       "
+            ></div>
           </div>
         )}
       </div>

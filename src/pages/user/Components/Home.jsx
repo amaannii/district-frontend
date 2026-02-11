@@ -40,9 +40,11 @@ function Home({ openChat }) {
   const [image, setimage] = useState();
   const [myNote, setMyNote] = useState("");
   const [notes, setNotes] = useState([]);
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     const fetchimage = async () => {
+      setloading(true);
       try {
         const token = localStorage.getItem("userToken");
 
@@ -57,10 +59,13 @@ function Home({ openChat }) {
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        setloading(false);
       }
     };
 
     const fetchFeed = async () => {
+      setloading(true);
       try {
         const token = localStorage.getItem("userToken");
 
@@ -77,10 +82,13 @@ function Home({ openChat }) {
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        setloading(false);
       }
     };
 
     const fetchNotes = async () => {
+      setloading(true);
       try {
         const token = localStorage.getItem("userToken");
 
@@ -96,6 +104,8 @@ function Home({ openChat }) {
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        setloading(false);
       }
     };
 
@@ -134,10 +144,7 @@ function Home({ openChat }) {
             {/* MY NOTE */}
             <div className="flex flex-col items-center w-[85px] shrink-0">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                <img
-                  src={image ? image : profile1}
-                  className="w-full h-full object-cover"
-                />
+                <img src={image} className="w-full h-full object-cover" />
 
                 {!myNote && (
                   <button
@@ -155,7 +162,7 @@ function Home({ openChat }) {
                     setMyNote("");
                     setNotes((prev) => prev.filter((n) => !n.isMine));
                   }}
-                  className="bg-white text-black text-[11px] px-3 py-1 rounded-full mt-1 cursor-pointer"
+                  className="bg-[#879F00] text-white text-[11px] px-3 py-1 rounded-full mt-1 cursor-pointer"
                 >
                   {myNote}
                 </div>
@@ -163,28 +170,24 @@ function Home({ openChat }) {
             </div>
 
             {/* OTHER NOTES */}
-       {notes.map((n) => (
-  <div
-    key={n._id}
-    className="flex flex-col items-center w-[80px] shrink-0"
-  >
-    <div className="w-16 h-16 rounded-full overflow-hidden">
-      <img
-        src={n.img ? n.img : profile1}
-        className="w-full h-full object-cover"
-      />
-    </div>
+            {notes
+              .filter((n) => n.note && n.note.trim() !== "")
+              .map((n) => (
+                <div
+                  key={n._id}
+                  className="flex flex-col items-center w-[80px] shrink-0"
+                >
+                  <div className="w-16 h-16 rounded-full overflow-hidden">
+                    <img src={n.img} className="w-full h-full object-cover" />
+                  </div>
 
-    <p className="text-xs text-gray-300 mt-1">
-      {n.username}
-    </p>
+                  <p className="text-xs text-gray-300 mt-1">{n.username}</p>
 
-    <div className="bg-neutral-800 text-[11px] px-3 py-1 rounded-full mt-1">
-      {n.note}
-    </div>
-  </div>
-))}
-
+                  <div className="bg-[#879F00] text-[11px] px-3 py-1 rounded-full mt-1">
+                    {n.note}
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
 
@@ -287,6 +290,14 @@ function Home({ openChat }) {
       <div className="w-[320px] hidden lg:block">
         <MiniChatBox openChat={openChat} />
       </div>
+      {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+        </div>
+      )}
     </div>
   );
 }

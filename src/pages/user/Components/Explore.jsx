@@ -3,7 +3,11 @@ import axios from "axios";
 
 function Explore() {
   const [posts, setPosts] = useState([]);
+
+  const [loading, setloading] = useState(false);
+
   const [selectedPost, setSelectedPost] = useState(null); // ✅ NEW
+
 
   useEffect(() => {
     fetchExplorePosts();
@@ -11,10 +15,13 @@ function Explore() {
 
   const fetchExplorePosts = async () => {
     try {
+      setloading(true)
       const res = await axios.get("http://localhost:3001/user/posts/explore");
       setPosts(res.data);
     } catch (error) {
       console.error("Explore fetch error:", error);
+    }finally {
+      setloading(false);
     }
   };
 
@@ -34,6 +41,14 @@ function Explore() {
           </div>
         ))}
       </div>
+
+       {loading && (
+        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+          <div
+            className="chaotic-orbit
+       "
+          ></div>
+
 
       {/* ================= POST MODAL ================= */}
       {selectedPost && (
@@ -57,6 +72,7 @@ function Explore() {
             />
 
           </div>
+
         </div>
       )}
     </div>
