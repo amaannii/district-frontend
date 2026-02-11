@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
 function Explore() {
   const [posts, setPosts] = useState([]);
+
 
   const [loading, setloading] = useState(false);
 
@@ -27,7 +27,6 @@ function Explore() {
 
   return (
     <div className="min-h-screen w-full bg-black text-white p-2">
-      
       {/* MASONRY GRID */}
       <div className="columns-2 md:columns-3 lg:columns-4 gap-1">
         {posts.map((post, index) => (
@@ -35,8 +34,7 @@ function Explore() {
             <img
               src={post.image}
               alt="post"
-              onClick={() => setSelectedPost(post)} // ✅ CLICK TO OPEN
-              className="w-full cursor-pointer"
+              className="w-full "
             />
           </div>
         ))}
@@ -48,6 +46,7 @@ function Explore() {
             className="chaotic-orbit
        "
           ></div>
+
 
 
       {/* ================= POST MODAL ================= */}
@@ -72,7 +71,6 @@ function Explore() {
             />
 
           </div>
-
         </div>
       )}
     </div>

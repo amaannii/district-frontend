@@ -4,94 +4,60 @@ import saved from "../../../assets/images/icons8-bookmark-64.png";
 import post from "../../../assets/images/icons8-menu-50.png";
 
 function Search() {
-  const [users, setUsers] = useState([]);
+  const [users, setusers] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [recentUsers, setRecentUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [loading, setloading] = useState(false);
 
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     const stored = localStorage.getItem("recentUsers");
-
     setloading(true)
     if (stored) setRecentUsers(JSON.parse(stored));
     localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
     const fetchusers = async () => {
       const res = await axios.get("http://localhost:3001/user/allusers");
 
-    if (stored) {
-      setRecentUsers(JSON.parse(stored));
-    }
 
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:3001/user/allusers"
-        );
-
-        if (res.data.success) {
-          setUsers(res.data.users);
-        }
-      } catch (error) {
-        console.error(error);
+      if (res.data.success == true) {
+        setusers(res.data.users);
+      } else {
+        alert("users not found");
       }
       setloading(false);
  
 
-    };
 
-    fetchUsers();
+    };
+    fetchusers();
   }, []);
 
-  /* ================= SAVE RECENTS ================= */
-  useEffect(() => {
-    localStorage.setItem(
-      "recentUsers",
-      JSON.stringify(recentUsers)
-    );
-  }, [recentUsers]);
-
-  /* ================= SEARCH FILTER ================= */
   const searchResults = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.username.toLowerCase().includes(search.toLowerCase())
+      user.username.toLowerCase().includes(search.toLowerCase()),
   );
 
-  /* ================= SELECT USER ================= */
   const handleSelectUser = (user) => {
     setSelectedUser(user);
 
     setRecentUsers((prev) => {
-      const filtered = prev.filter(
-        (u) => u._id !== user._id
-      );
+      const filtered = prev.filter((u) => u.id !== user.id);
       return [user, ...filtered].slice(0, 6);
     });
 
     setSearch("");
   };
 
-  /* ================= DELETE SINGLE ================= */
-  const handleDeleteRecent = (id) => {
-    setRecentUsers((prev) =>
-      prev.filter((user) => user._id !== id)
-    );
-  };
-
-  /* ================= CLEAR ALL ================= */
   const handleClearAll = () => {
     setRecentUsers([]);
     localStorage.removeItem("recentUsers");
   };
 
-  /* ================= SEND REQUEST ================= */
-  const handleRequest = async () => {
-    try {
-      const token = localStorage.getItem("userToken");
 
+  /* 🔹 Decide list */
+  const listToShow = search ? searchResults : recentUsers;
 
   const handlerequest = async () => {
     setloading(true)
@@ -110,6 +76,7 @@ function Search() {
     } else {
       alert("request failed");
 
+
       const response = await axios.post(
         "http://localhost:3001/user/request",
         { username: selectedUser.username },
@@ -127,34 +94,25 @@ function Search() {
       }
     } catch (error) {
       console.error(error);
-
     }
   };
 
-  const listToShow = search ? searchResults : recentUsers;
-
   return (
-    <div className="flex h-screen text-white bg-black">
-      {/* ================= LEFT SIDE ================= */}
-      <div className="w-[350px] p-4 border-r border-gray-700 overflow-y-auto">
-        <h1 className="text-2xl font-semibold mb-4">
-          Search
-        </h1>
+    <>
+      {/* LEFT SIDE */}
+      <div className="w-[350px] p-4 border-r border-gray-700 h-full">
+        <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
         <input
           type="text"
           placeholder="Search users"
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => setSearch(e.target.value)}
           className="w-full p-2 rounded bg-white text-black mb-4"
         />
 
         <div className="flex justify-between mb-2">
-          <span className="text-sm">
-            {search ? "Results" : "Recent"}
-          </span>
+          <span className="text-sm">{search ? "Results" : "Recent"}</span>
 
           {recentUsers.length > 0 && !search && (
             <span
@@ -169,143 +127,112 @@ function Search() {
         {listToShow.length > 0 ? (
           listToShow.map((user) => (
             <div
-              key={user._id}
-              className="flex items-center justify-between py-3 hover:bg-gray-800 rounded px-2"
+              key={user.id}
+              onClick={() => handleSelectUser(user)}
+              className="flex items-center gap-3 py-3 cursor-pointer hover:bg-gray-800 rounded"
             >
-              <div
-                onClick={() =>
-                  handleSelectUser(user)
-                }
-                className="flex items-center gap-3 cursor-pointer"
-              >
-                <img
-                  src={user.img}
-                  alt={user.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-medium">
-                    {user.name}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    @{user.username}
-                  </p>
-                </div>
+              <img
+                src={user.img}
+                alt={user.name}
+                className="w-10 h-10 rounded-full"
+              />
+              <div>
+                <p className="font-medium">{user.name}</p>
+                <p className="text-xs text-gray-400">
+                  @{user.username} · {user.status}
+                </p>
               </div>
-
-              {!search && (
-                <button
-                  onClick={() =>
-                    handleDeleteRecent(
-                      user._id
-                    )
-                  }
-                  className="text-gray-400 hover:text-red-500 text-sm"
-                >
-                  ✕
-                </button>
-              )}
             </div>
           ))
         ) : (
           <p className="text-gray-500 text-sm">
-            {search
-              ? "No users found"
-              : "No recent searches"}
+            {search ? "No users found" : "No recent searches"}
           </p>
         )}
       </div>
 
-      {/* ================= RIGHT SIDE ================= */}
-      <div className="flex-1 flex justify-center items-center overflow-y-auto">
+      {/* RIGHT SIDE */}
+      <div className="flex-1 flex justify-center overflow-scroll scrollbar-hide">
         {selectedUser ? (
-          <div className="w-full min-h-full flex flex-col items-center p-10 text-center">
+          <div className="text-center h-[100vh] p-10 w-[100%]">
             <img
               src={selectedUser.img}
               alt={selectedUser.name}
-              className="w-28 h-28 rounded-full mb-4 object-cover"
+              className="w-28 h-28 rounded-full mx-auto mb-4"
             />
 
-            <h2 className="text-xl mb-4">
-              <strong>
-                @{selectedUser.username}
-              </strong>
+            <h2 className="text-xl  ">
+              {" "}
+              <strong>@{selectedUser.username} </strong>
               <br />
               {selectedUser.name}
             </h2>
 
-            <button
-              onClick={handleRequest}
-              className="h-[35px] w-[160px] text-white rounded-md bg-[#879F00] mb-6"
-            >
-              Connect
-            </button>
-
-            <hr className="w-full mb-6 border-gray-700" />
-
-            <div className="flex justify-center gap-20 mb-6">
+            <div className="text-sm text-gray-400 h-[100px] items-center flex justify-center ">
               <button
-                onClick={() =>
-                  setActiveTab("posts")
-                }
-                className={
-                  activeTab === "posts"
-                    ? "border-b-2 border-white"
-                    : "opacity-50"
-                }
+                onClick={handlerequest}
+                className="h-[30px] w-[150px] text-white rounded-md  bg-[#879F00]"
               >
-                <img
-                  className="h-6 w-5"
-                  src={post}
-                  alt=""
-                />
+                connect
               </button>
+            </div>
+            <hr />
 
+            <div className="flex justify-center border-t border-gray-700 pt-4 mb-6 gap-40">
               <button
-                onClick={() =>
-                  setActiveTab("saved")
-                }
-                className={
-                  activeTab === "saved"
-                    ? "border-b-2 border-white"
-                    : "opacity-50"
-                }
+                onClick={() => setActiveTab("posts")}
+                className={`px-10 py-2 ${
+                  activeTab === "posts"
+                    ? "text-white border-b-2 border-white"
+                    : "text-gray-400"
+                }`}
               >
-                <img
-                  className="h-6 w-7"
-                  src={saved}
-                  alt=""
-                />
+                <img className="h-6 w-5" src={post} alt="" />
+              </button>
+              <button
+                onClick={() => setActiveTab("saved")}
+                className={`px-10 py-2 ${
+                  activeTab === "saved"
+                    ? "text-white border-b-2 border-white"
+                    : "text-gray-400"
+                }`}
+              >
+                <img className="h-6 w-7" src={saved} alt="" />
               </button>
             </div>
 
-            {selectedUser.post &&
-            selectedUser.post.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2 max-w-[90%] mx-auto w-full">
-                {selectedUser.post.map(
+            {activeTab === "posts" && selectedUser.post.length === 0 ? (
+              <div className="flex flex-col items-center  text-gray-500 mt-17">
+                <div className="text-5xl mb-3">
+                  <img className="h-20 w-20" src={profile} alt="" />
+                </div>
+                <p className="text-4xl">Photos of you</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 max-w-[90%]   mx-auto">
+                {(activeTab === "posts" ? selectedUser.post : savedPosts).map(
                   (img, index) => (
                     <img
                       key={index}
                       src={img.image}
                       alt="post"
-                      className="w-full h-[250px] object-cover"
+                      className="w-[100%] h-[300px] object-cover cursor-pointer"
+                      onClick={() => setSelectedUser(img)} // 👈 ADD THIS
                     />
-                  )
+                  ),
                 )}
-              </div>
-            ) : (
-              <div className="flex justify-center items-center flex-1 w-full">
-                <p className="text-gray-500">
-                  No posts available
-                </p>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex justify-center items-center h-full w-full">
-            <p className="text-gray-500 text-center">
-              Search and select a user
-            </p>
+          <p className="text-gray-500">Search and select a user</p>
+        )}
+        {loading && (
+          <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
+            <div
+              className="chaotic-orbit
+       "
+            ></div>
           </div>
         )}
         {loading && (
@@ -317,7 +244,7 @@ function Search() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
 
