@@ -6,26 +6,14 @@ function Notification() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [deleted, setdeleted] = useState(0);
-<<<<<<< HEAD
   const[confirmed,setconfirmed]=useState(0)
   const [loading, setloading] = useState(false);
-=======
-  const [confirmed, setconfirmed] = useState(0);
->>>>>>> 396c5828002d9c7a12ddb5078bb41d453ee9bdac
 
-  // 🔹 Load stored notifications first (like search recent)
-  useEffect(() => {
-    const stored = localStorage.getItem("recentNotifications");
-    if (stored) {
-      setNotifications(JSON.parse(stored));
-    }
-  }, []);
-
-  // 🔹 Fetch notifications
   useEffect(() => {
     fetchNotifications();
-  }, [deleted, confirmed]);
+  }, [deleted,confirmed]);
 
+  // 🔹 Fetch notifications
   const fetchNotifications = async () => {
     try {
       setloading(true)
@@ -39,12 +27,6 @@ function Notification() {
 
       if (res.data.success) {
         setNotifications(res.data.request);
-
-        // ✅ Store in localStorage
-        localStorage.setItem(
-          "recentNotifications",
-          JSON.stringify(res.data.request)
-        );
       }
     } catch (err) {
       console.error("Fetch notifications failed:", err);
@@ -55,38 +37,31 @@ function Notification() {
 
   // 🔹 Confirm request
   const handleConfirm = async (username) => {
-    const token = localStorage.getItem("userToken");
+       const token = localStorage.getItem("userToken");
     try {
-<<<<<<< HEAD
       setloading(true)
    const response=   await axios.post(`http://localhost:3001/user/confirmnotification`,{username},
          {
-=======
-      const response = await axios.post(
-        `http://localhost:3001/user/confirmnotification`,
-        { username },
-        {
->>>>>>> 396c5828002d9c7a12ddb5078bb41d453ee9bdac
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
-      if (response.data.success === true) {
-        setconfirmed(confirmed + 1);
-      }
+if(response.data.success==true){
+  setconfirmed(confirmed+1)
+}
+
+
     } catch (err) {
-<<<<<<< HEAD
       console.error(err);    
     }finally {
       setloading(false);
-=======
-      console.error(err);
->>>>>>> 396c5828002d9c7a12ddb5078bb41d453ee9bdac
     }
   };
 
+
+  
   // 🔹 Delete notification
   const handleDelete = async (id) => {
     const token = localStorage.getItem("userToken");
@@ -98,25 +73,16 @@ function Notification() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-
-      if (response.data.success === true) {
+      if (response.data.success == true) {
         setdeleted(deleted + 1);
         alert("deleted");
-      } else {
-        alert("deleted failed");
+      }else{
+        alert("deleted failed")
       }
 
-      // ✅ Update UI + localStorage
-      setNotifications((prev) => {
-        const updated = prev.filter((item) => item._id !== id);
-        localStorage.setItem(
-          "recentNotifications",
-          JSON.stringify(updated)
-        );
-        return updated;
-      });
+      setNotifications((prev) => prev.filter((item) => item._id !== id));
     } catch (err) {
       console.error(err);
     }
