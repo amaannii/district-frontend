@@ -60,8 +60,11 @@ function Search() {
   const listToShow = search ? searchResults : recentUsers;
 
   const handlerequest = async () => {
-    setloading(true)
+  try {
+    setloading(true);
+
     const token = localStorage.getItem("userToken");
+
     const response = await axios.post(
       "http://localhost:3001/user/request",
       { username: selectedUser.username },
@@ -69,33 +72,20 @@ function Search() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
-    );
-    if (response.data.success == true) {
-      alert("request send successfully");
-    } else {
-      alert("request failed");
-
-
-      const response = await axios.post(
-        "http://localhost:3001/user/request",
-        { username: selectedUser.username },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.success) {
-        alert("Request sent successfully");
-      } else {
-        alert("Request failed");
       }
-    } catch (error) {
-      console.error(error);
+    );
+
+    if (response.data.success) {
+      alert("Request sent successfully ✅");
+    } else {
+      alert("Request failed ❌");
     }
-  };
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setloading(false);
+  }
+};
 
   return (
     <>
