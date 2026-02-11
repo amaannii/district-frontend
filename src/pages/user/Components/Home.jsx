@@ -142,7 +142,7 @@ function Home({ openChat }) {
                 {!myNote && (
                   <button
                     onClick={addMyNote}
-                    className="absolute bottom-2 right-1 w-4 h-4 rounded-full bg-blue-600 text-xs"
+                    className="absolute bottom-2 right-1 w-4 h-4 rounded-full bg-[#879F00] text-xs"
                   >
                     +
                   </button>
@@ -163,11 +163,16 @@ function Home({ openChat }) {
             </div>
 
             {/* OTHER NOTES */}
-         {notes.map((n) => (
-  <div key={n._id} className="flex flex-col items-center w-[80px] shrink-0">
-    
+       {notes.map((n) => (
+  <div
+    key={n._id}
+    className="flex flex-col items-center w-[80px] shrink-0"
+  >
     <div className="w-16 h-16 rounded-full overflow-hidden">
-      <img src={n.avatar} className="w-full h-full object-cover" />
+      <img
+        src={n.img ? n.img : profile1}
+        className="w-full h-full object-cover"
+      />
     </div>
 
     <p className="text-xs text-gray-300 mt-1">
@@ -270,7 +275,7 @@ function Home({ openChat }) {
                   setSharePost(null);
                   setShareNote(null);
                 }}
-                className="w-full bg-blue-600 py-2 rounded"
+                className="w-full bg-[#879F00] py-2 rounded"
               >
                 Send
               </button>
