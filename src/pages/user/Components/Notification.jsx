@@ -176,7 +176,7 @@ if(response.data.success===true){
   );
 
   return (
-    <div className="min-h-screen bg-black flex py-6 border-r border-gray-600">
+    <div className="min-h-screen play-regular bg-black flex py-6 border-r border-gray-600">
       <div className="w-[450px] max-w-md px-2">
         <h1 className="text-2xl font-semibold mb-6 text-white">
           Notifications

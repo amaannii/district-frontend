@@ -1,7 +1,7 @@
 function Security() {
 
   return (
-    <div>
+    <div className="play-regular">
       <h1 className="text-2xl font-bold mb-6">
         Password and security
       </h1>

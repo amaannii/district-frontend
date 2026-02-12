@@ -62,7 +62,7 @@ function UserDashboard() {
   };
 
   return (
-    <div className="flex bg-black h-screen text-white">
+    <div className="flex bg-black h-screen text-white play-regular">
       {/* Main Sidebar */}
       <Sidebar active={activePage} setActive={setActivePage} />
 

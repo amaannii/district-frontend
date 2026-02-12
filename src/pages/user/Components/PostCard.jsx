@@ -63,7 +63,9 @@ function PostCard({ data, onShare }) {
   };
 
   return (
+
     <div className="border-b border-neutral-800 mb-6 relative">
+
 
       {/* HEADER */}
       <div className="px-6 py-3 flex items-center justify-between">

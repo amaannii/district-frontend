@@ -8,17 +8,17 @@ function SettingsSidebar({ activeSetting, setActiveSetting }) {
   ];
 
   return (
-    <aside className="h-screen bg-black text-white border-r border-gray-800 flex flex-col py-9 w-[260px]">
+    <aside className="h-screen bg-black play-regular text-white border-r border-gray-800 flex flex-col py-9 w-[260px]">
 
       {/* Title like Sidebar Logo Space */}
       <div className="mb-10 px-6">
-        <h2 className="text-xl font-semibold tracking-wide uppercase">
+        <h2 className="text-xl font-semibold tracking-wide ">
           Settings
         </h2>
       </div>
 
       {/* Menu Items */}
-      <div className="flex flex-col gap-2 px-2">
+      <div className="flex flex-col gap-2 py-7 px-2">
         {menuItems.map((item) => {
           const isActive = activeSetting === item.key;
 

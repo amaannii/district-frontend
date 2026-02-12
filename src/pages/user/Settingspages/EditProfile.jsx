@@ -3,8 +3,9 @@
 function EditProfile() {
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
+    <>
+    <div className="play-regular">
+      <h1 className="text-3xl font-bold mb-6 ">Edit Profile</h1>
 
       {/* Profile Card */}
       <div className="flex items-center justify-between bg-gray-200 text-black p-4 rounded-xl mb-8">
@@ -44,6 +45,7 @@ function EditProfile() {
         Submit
       </button>
     </div>
+    </>
   );
 }
 

@@ -2,7 +2,7 @@ import React from 'react'
 
 function Comments() {
   return (
-    <div>Comments</div>
+    <div className='play-regular'>Comments</div>
   )
 }
 

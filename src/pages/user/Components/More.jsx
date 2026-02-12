@@ -2,7 +2,7 @@ import React from "react";
 
 function More({ setActive }) {
   return (
-    <div className="bg-black text-white w-[220px] rounded-xl shadow-lg p-4 space-y-3">
+    <div className="bg-black play-regular text-white w-[220px] rounded-xl shadow-lg p-4 space-y-3">
       
       {/* ✅ Settings Button */}
       <button
@@ -21,7 +21,7 @@ function More({ setActive }) {
 
       <button
         onClick={() => setActive("LOGOUT")}
-        className="w-full text-left px-3 py-2 rounded hover:bg-red-600 transition text-red-400"
+        className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition text-red-400"
       >
         Log out
       </button>
