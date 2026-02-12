@@ -42,7 +42,7 @@ function Messages({ selectedDistrict, setSelectedDistrict }) {
   );
   return (
     <>
-      <div className="flex h-screen w-full bg-black text-white play-regular space-y-2">
+      <div className="flex h-screen w-full play-regular bg-black text-white play-regular space-y-2">
         <div className="flex-1 px-8 py-6 overflow-y-auto">
           {selectedDistrict && (
             <div className="flex items-center gap-4 mb-6 animate-slideDown">
@@ -60,7 +60,7 @@ function Messages({ selectedDistrict, setSelectedDistrict }) {
           {/* Image Grid */}
           {!selectedDistrict && (
             <>
-              <h1 className="text-2xl font-bold mb-1">john_jony</h1>
+              <h1 className="text-2xl font-bold mb-1">amani</h1>
 
               {/* Search bar */}
               <input

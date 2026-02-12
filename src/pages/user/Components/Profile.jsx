@@ -98,7 +98,9 @@ function Profile() {
 
   return (
     <>
-      <div className="flex h-screen w-full bg-black text-white">
+
+      <div className="flex play-regular h-screen w-full bg-black text-white play-regular">
+
         <div className="flex-1 overflow-y-auto px-10 py-8">
 
           {/* SETTINGS */}

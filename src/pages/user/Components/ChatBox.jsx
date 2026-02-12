@@ -103,7 +103,7 @@ const [loading, setloading] = useState(false);
   };
 
   return (
-    <div className="flex flex-col h-[80vh] bg-[#0f0f0f] rounded-xl p-4 relative">
+    <div className="flex flex-col h-[80vh] bg-[#0f0f0f] rounded-xl play-regular p-4 relative">
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
