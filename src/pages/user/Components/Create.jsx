@@ -85,7 +85,7 @@ function Create() {
 
   return (
     <>
-      <div className="relative w-full h-full text-white play-regular">
+      <div className="relative w-full h-full play-regular text-white play-regular">
         {/* Home UI */}
         <Home />
 

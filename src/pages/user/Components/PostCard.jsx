@@ -131,7 +131,7 @@ function PostCard({ data, onShare, onPostDeleted, onPostUpdated }) {
   /* ---------------- UPDATE ---------------- */
 
   return (
-    <div className="border-b border-neutral-800 mb-6">
+    <div className="border-b play-regular border-neutral-800 mb-6">
 
       {/* HEADER */}
        <div className="px-6 py-3 flex items-center justify-between">

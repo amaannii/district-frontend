@@ -114,7 +114,7 @@ function Profile() {
 
   return (
     <>
-      <div className="flex h-screen w-full bg-black text-white play-regular">
+      <div className="flex play-regular h-screen w-full bg-black text-white play-regular">
         <div className="flex-1 overflow-y-auto px-10 py-8">
           <div className="flex justify-end mb-6">
             <button className="text-xl hover:text-gray-400">

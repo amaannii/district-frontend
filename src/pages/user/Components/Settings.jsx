@@ -28,7 +28,7 @@ function Settings() {
   };
 
   return (
-    <div className="flex w-full h-full bg-black text-white">
+    <div className="flex w-full h-full bg-black text-white play-regular">
 
       {/* Settings Sidebar */}
       <SettingsSidebar

@@ -136,7 +136,7 @@ function Home({ openChat }) {
   };
 
   return (
-    <div className="flex w-full min-h-screen bg-black text-white">
+    <div className="flex w-full play-regular min-h-screen bg-black text-white">
       <div className="flex-1 max-w-2xl mx-auto">
         {/* NOTES */}
         <div className="h-[130px] px-6 border-b border-neutral-800">

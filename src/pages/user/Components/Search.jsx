@@ -110,7 +110,7 @@ function Search() {
   const listToShow = search ? searchResults : recentUsers;
 
   return (
-    <div className="flex h-screen text-white bg-black relative">
+    <div className="flex play-regular h-screen text-white bg-black relative">
       {/* ================= LEFT SIDE ================= */}
       <div className="w-[350px] p-4 border-r border-gray-700 overflow-y-auto">
         <h1 className="text-2xl font-semibold mb-4">Search</h1>
