@@ -7,56 +7,67 @@ import Messages from "./Components/Messages";
 import Notification from "./Components/Notification";
 import Create from "./Components/Create";
 import Profile from "./Components/Profile";
+import Settings from "./Components/Settings";
 import More from "./Components/More";
-
-
-
-
+// ✅ NEW SETTINGS PAGE
 
 function UserDashboard() {
-   const [activePage, setActivePage] = useState("HOME");
+  const [activePage, setActivePage] = useState("HOME");
   const [selectedDistrict, setSelectedDistrict] = useState(null);
 
   const renderContent = () => {
     switch (activePage) {
       case "HOME":
-        return   <Home
+        return (
+          <Home
             openChat={(district) => {
               setSelectedDistrict(district);
               setActivePage("MESSAGES");
             }}
           />
+        );
+
       case "SEARCH":
         return <Search />;
+
       case "EXPLORE":
         return <Explore />;
+
       case "MESSAGES":
-        return   <Messages
+        return (
+          <Messages
             selectedDistrict={selectedDistrict}
             setSelectedDistrict={setSelectedDistrict}
           />
+        );
+
       case "NOTIFICATION":
         return <Notification />;
+
       case "CREATE":
         return <Create />;
+
       case "PROFILE":
         return <Profile />;
+
+      case "SETTINGS":
+        return <Settings />;
+      // ✅ SETTINGS PANEL HERE
       case "MORE":
-        return <More />;
+        return <More setActive={setActivePage} />;
+
       default:
         return <Home />;
     }
   };
 
   return (
-    <div className="flex bg-black h-screen text-white play-regular">
-      {/* Pass state + setter to Sidebar */}
+    <div className="flex bg-black h-screen text-white">
+      {/* Main Sidebar */}
       <Sidebar active={activePage} setActive={setActivePage} />
 
-      {/* Content Area */}
-      <div className="flex-1 flex  items-center overflow-y-auto">
-        {renderContent()}
-      </div>
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden">{renderContent()}</div>
     </div>
   );
 }

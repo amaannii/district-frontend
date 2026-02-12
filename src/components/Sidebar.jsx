@@ -36,7 +36,9 @@ function Sidebar({ active, setActive }) {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 rounded-full hover:bg-white/10 transition"
-        >
+          
+        >  
+        
           <img
             src={topIcon}
             alt="toggle"
@@ -71,13 +73,19 @@ function SidebarItem({ icon, text, collapsed, active, setActive }) {
   const isActive = active === text;
 
   return (
-    <button
+   <button
       onClick={() => setActive(text)}
-      className={`flex items-center px-4 py-3 rounded-lg transition
+      className={`relative flex items-center px-4 py-3 rounded-lg transition
         ${collapsed ? "justify-center" : "gap-4"}
-        ${isActive ? "bg-white/10" : "hover:bg-white/5"}
+        ${isActive ? "bg-white/10 text-white" : "hover:bg-white/5 text-gray-300 hover:text-white"}
       `}
     >
+      {/* ✅ Active Green Line Indicator */}
+      {isActive && (
+        <span className="absolute left-0 top-2 bottom-2 w-[4px] bg-[#879F00] rounded-full"></span>
+      )}
+
+      {/* Icon */}
       <img
         src={icon}
         alt={text}

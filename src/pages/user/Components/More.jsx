@@ -1,34 +1,32 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import Home from "./Home";
-import Profile from "./Profile";
 
-function More() {
-      const navigate = useNavigate();
+function More({ setActive }) {
   return (
-  <>
-  <div className="relative h-screen w-full">
-    <Home/>
-        <div className="absolute inset-0 flex items-center justify-center w-[50%]">
-          <div className="bg-black text-white w-[220px] h-[170px] rounded-xl shadow-lg p-4 space-y-3">
-            <button className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition">settings</button>
-            <button
-             onClick={() => navigate("/profile", { state: { tab: "saved" } })}
+    <div className="bg-black text-white w-[220px] rounded-xl shadow-lg p-4 space-y-3">
+      
+      {/* ✅ Settings Button */}
+      <button
+        onClick={() => setActive("SETTINGS")}
+        className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
+      >
+        Settings
+      </button>
 
-              className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
-            >
-               Saved Posts
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition text-red-400">
-               Log out
-            </button>
-          </div>
-        </div>
-      </div>
-  </>
-  )
+      <button
+        onClick={() => setActive("SAVED")}
+        className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
+      >
+        Saved Posts
+      </button>
+
+      <button
+        onClick={() => setActive("LOGOUT")}
+        className="w-full text-left px-3 py-2 rounded hover:bg-red-600 transition text-red-400"
+      >
+        Log out
+      </button>
+    </div>
+  );
 }
 
-export default More
+export default More;
