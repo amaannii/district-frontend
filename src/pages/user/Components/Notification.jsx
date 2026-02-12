@@ -6,24 +6,19 @@ function Notification() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [deleted, setdeleted] = useState(0);
-
-
   const[confirmed,setconfirmed]=useState(0)
   const [loading, setloading] = useState(false);
 
-
-  // 🔹 Load stored notifications first (like search recent)
   useEffect(() => {
-    const stored = localStorage.getItem("recentNotifications");
+       const stored = localStorage.getItem("recentNotifications");
     if (stored) {
       setNotifications(JSON.parse(stored));
     }
   }, []);
-
-  // 🔹 Fetch notifications
-  useEffect(() => {
+   useEffect(() => {
     fetchNotifications();
-  }, [deleted,confirmed]);
+  }, [deleted, confirmed]);
+
 
   // 🔹 Fetch notifications
   const fetchNotifications = async () => {
@@ -39,6 +34,10 @@ function Notification() {
 
       if (res.data.success) {
         setNotifications(res.data.request);
+          localStorage.setItem(
+          "recentNotifications",
+          JSON.stringify(res.data.request)
+        );
       }
     } catch (err) {
       console.error("Fetch notifications failed:", err);
@@ -49,8 +48,10 @@ function Notification() {
 
   // 🔹 Confirm request
   const handleConfirm = async (username) => {
-       const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("userToken");
+
     try {
+
 
 
       setloading(true)
@@ -59,18 +60,20 @@ function Notification() {
         `http://localhost:3001/user/confirmnotification`,
         { username },
         {
+
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       );
 
-if(response.data.success==true){
+if(response.data.success===true){
   setconfirmed(confirmed+1)
 }
 
 
     } catch (err) {
+
 
       console.error(err);    
     }finally {
@@ -78,6 +81,7 @@ if(response.data.success==true){
 
       console.error(err);
   }
+
   };
 
 
@@ -102,7 +106,14 @@ if(response.data.success==true){
         alert("deleted failed")
       }
 
-      setNotifications((prev) => prev.filter((item) => item._id !== id));
+       setNotifications((prev) => {
+        const updated = prev.filter((item) => item._id !== id);
+        localStorage.setItem(
+          "recentNotifications",
+          JSON.stringify(updated)
+        );
+        return updated;
+      });
     } catch (err) {
       console.error(err);
     }
@@ -165,7 +176,7 @@ if(response.data.success==true){
   );
 
   return (
-    <div className="min-h-screen bg-black flex py-6 border-r border-gray-700">
+    <div className="min-h-screen bg-black flex py-6 border-r border-gray-600">
       <div className="w-[450px] max-w-md px-2">
         <h1 className="text-2xl font-semibold mb-6 text-white">
           Notifications
