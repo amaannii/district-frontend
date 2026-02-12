@@ -7,7 +7,7 @@ function Security() {
   return (
     <div className="play-regular text-white">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold mb-10">Password and security</h1>
+      <h1 className="text-xl font-bold mb-10">Password and security</h1>
 
       {/* Section */}
       <div>
