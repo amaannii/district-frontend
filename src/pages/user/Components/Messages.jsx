@@ -33,7 +33,7 @@ const images = [
   { src: pathmtta, title: "PATHANAMTHITTA" },
   { src: tvpm, title: "THIRUVANANTHAPURAM" },
 ];
-
+ 
 function Messages({ selectedDistrict, setSelectedDistrict }) {
   const [search, setSearch] = useState("");
 

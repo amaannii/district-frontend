@@ -4,9 +4,11 @@ function Explore() {
   const [posts, setPosts] = useState([]);
 
 
+
   const [loading, setloading] = useState(false);
 
   const [selectedPost, setSelectedPost] = useState(null); // ✅ NEW
+
 
 
   useEffect(() => {
@@ -34,11 +36,13 @@ function Explore() {
             <img
               src={post.image}
               alt="post"
-              className="w-full "
+               onClick={() => setSelectedPost(post)} // ✅ CLICK TO OPEN
+              className="w-full cursor-pointer"
             />
           </div>
         ))}
       </div>
+
 
        {loading && (
         <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
@@ -75,6 +79,7 @@ function Explore() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
