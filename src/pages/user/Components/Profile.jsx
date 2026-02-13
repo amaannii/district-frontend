@@ -38,7 +38,7 @@ const [editedCaption, setEditedCaption] = useState("");
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
 
         const user = response.data.user;
@@ -70,6 +70,9 @@ const [editedCaption, setEditedCaption] = useState("");
     try {
       setloading(true);
 
+      const token = localStorage.getItem("userToken");
+
+
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
         { method: "POST", body: data }
@@ -80,7 +83,9 @@ const [editedCaption, setEditedCaption] = useState("");
         setSelectedImage(result.secure_url);
       }
     } catch (error) {
+
       console.error(error);
+
     } finally {
       setloading(false);
     }
@@ -90,6 +95,7 @@ const [editedCaption, setEditedCaption] = useState("");
     try {
       setloading(true);
       const token = localStorage.getItem("userToken");
+
 
       await axios.post(
         "http://localhost:3001/user/upload",
@@ -102,6 +108,7 @@ const [editedCaption, setEditedCaption] = useState("");
       seteditprofile(false);
     } catch (error) {
       console.error(error);
+
     } finally {
       setloading(false);
     }
@@ -167,10 +174,11 @@ const [editedCaption, setEditedCaption] = useState("");
 
   return (
     <>
+
       <div className="flex h-screen w-full bg-black text-white">
 
-        <div className="flex-1 overflow-y-auto px-10 py-8">
 
+        <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
             <img className="h-6 cursor-pointer" src={settings} alt="" />
@@ -189,12 +197,8 @@ const [editedCaption, setEditedCaption] = useState("");
               />
             </div>
 
-            <h1 className="text-xl font-semibold">
-              {userdetails.username}
-            </h1>
-            <p className="text-sm text-gray-400 mb-4">
-              {userdetails.name}
-            </p>
+            <h1 className="text-xl font-semibold">{userdetails.username}</h1>
+            <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
 
             <div className="flex gap-10 mb-5">
               <div>
@@ -232,6 +236,7 @@ const [editedCaption, setEditedCaption] = useState("");
 
           {/* POSTS GRID */}
           <div className="grid grid-cols-3 gap-5 max-w-[90%] mx-auto">
+
             {posts.map((img, index) => (
               <img
                 key={index}
@@ -239,6 +244,7 @@ const [editedCaption, setEditedCaption] = useState("");
                 alt="post"
                 className="w-full h-[400px] object-cover cursor-pointer"
                 onClick={() => setselectedPost(img)}
+
               />
             ))}
           </div>
@@ -247,10 +253,12 @@ const [editedCaption, setEditedCaption] = useState("");
 
       {/* POST MODAL */}
       {selectedPost && (
+
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
           <div className="bg-[#0f0f0f] w-[800px] h-[500px] rounded-xl flex">
 
             <div className="w-1/2">
+
               <img
                 src={selectedPost.image}
                 alt=""
@@ -259,6 +267,7 @@ const [editedCaption, setEditedCaption] = useState("");
             </div>
 
             <div className="w-1/2 p-4 flex flex-col">
+
 
               <div className="flex justify-between border-b border-gray-700 pb-3">
                 <span className="font-semibold">
@@ -283,6 +292,7 @@ const [editedCaption, setEditedCaption] = useState("");
 >
   Delete
 </button>
+
 
                 </div>
               </div>
