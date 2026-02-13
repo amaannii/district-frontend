@@ -39,7 +39,7 @@ function Create() {
   };
 
   const handlesubmit = async () => {
-    setLoading(true);
+    setloading(true);
     try {
       const token = localStorage.getItem("userToken");
 
