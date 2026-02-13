@@ -269,7 +269,7 @@ function Search() {
           </div>
         ) : (
           <p className="text-gray-500 text-center">
-            Search and select a user
+          
           </p>
         )}
       </div>

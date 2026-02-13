@@ -35,7 +35,7 @@ function Profile() {
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
 
         const user = response.data.user;
@@ -58,6 +58,7 @@ function Profile() {
   /* ---------------- DELETE POST ---------------- */
   const handleDeletePost = async (postId) => {
     try {
+      setloading(true);
       const token = localStorage.getItem("userToken");
 
       await axios.delete(`http://localhost:3001/delete-post/${postId}`, {
@@ -68,6 +69,8 @@ function Profile() {
       setselectedPost(null);
     } catch (error) {
       console.error("Delete failed:", error);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -77,32 +80,32 @@ function Profile() {
     if (!newCaption) return;
 
     try {
+      setloading(true);
       const token = localStorage.getItem("userToken");
 
       await axios.put(
         `http://localhost:3001/update-post/${post._id}`,
         { caption: newCaption },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       const updatedPosts = posts.map((p) =>
-        p._id === post._id ? { ...p, caption: newCaption } : p
+        p._id === post._id ? { ...p, caption: newCaption } : p,
       );
 
       setposts(updatedPosts);
       setselectedPost({ ...post, caption: newCaption });
     } catch (error) {
       console.error("Update failed:", error);
+    } finally {
+      setloading(false);
     }
   };
 
   return (
     <>
-
       <div className="flex play-regular h-screen w-full bg-black text-white play-regular">
-
         <div className="flex-1 overflow-y-auto px-10 py-8">
-
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
             <img className="h-6 cursor-pointer" src={settings} alt="" />
@@ -121,18 +124,12 @@ function Profile() {
               />
             </div>
 
-            <h1 className="text-xl font-semibold">
-              {userdetails.username}
-            </h1>
-            <p className="text-sm text-gray-400 mb-4">
-              {userdetails.name}
-            </p>
+            <h1 className="text-xl font-semibold">{userdetails.username}</h1>
+            <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
 
             <div className="flex gap-10 mb-5">
               <div>
-                <p className="font-semibold">
-                  {posts.length}
-                </p>
+                <p className="font-semibold">{posts.length}</p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
 
@@ -161,20 +158,15 @@ function Profile() {
 
           {/* POSTS GRID */}
           <div className="grid grid-cols-3 gap-5 max-w-[90%] mx-auto">
-            {(activeTab === "posts" ? posts : savedPosts).map(
-              (img, index) => (
-                <img
-                  key={index}
-                  src={activeTab === "posts" ? img.image : img}
-                  alt="post"
-                  className="w-full h-[400px] object-cover cursor-pointer"
-                  onClick={() =>
-                    activeTab === "posts" &&
-                    setselectedPost(img)
-                  }
-                />
-              )
-            )}
+            {(activeTab === "posts" ? posts : savedPosts).map((img, index) => (
+              <img
+                key={index}
+                src={activeTab === "posts" ? img.image : img}
+                alt="post"
+                className="w-full h-[400px] object-cover cursor-pointer"
+                onClick={() => activeTab === "posts" && setselectedPost(img)}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -183,7 +175,6 @@ function Profile() {
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
           <div className="bg-[#0f0f0f] w-[800px] h-[500px] rounded-xl overflow-hidden flex">
-
             <div className="w-1/2 bg-black">
               <img
                 src={selectedPost.image}
@@ -193,7 +184,6 @@ function Profile() {
             </div>
 
             <div className="w-1/2 p-4 flex flex-col">
-
               <div className="flex items-center justify-between mb-4 border-b border-gray-700 pb-3">
                 <div className="flex items-center gap-3">
                   <img
@@ -201,25 +191,19 @@ function Profile() {
                     className="w-10 h-10 rounded-full object-cover"
                     alt="user"
                   />
-                  <span className="font-semibold">
-                    {userdetails.username}
-                  </span>
+                  <span className="font-semibold">{userdetails.username}</span>
                 </div>
 
                 <div className="flex gap-4">
                   <button
-                    onClick={() =>
-                      handleEditPost(selectedPost)
-                    }
+                    onClick={() => handleEditPost(selectedPost)}
                     className="text-blue-400 text-sm"
                   >
                     Edit
                   </button>
 
                   <button
-                    onClick={() =>
-                      handleDeletePost(selectedPost._id)
-                    }
+                    onClick={() => handleDeletePost(selectedPost._id)}
                     className="text-red-500 text-sm"
                   >
                     Delete
