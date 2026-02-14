@@ -24,6 +24,15 @@ function Profile() {
   const [loading, setloading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 const [editedCaption, setEditedCaption] = useState("");
+const [confirmAction, setConfirmAction] = useState(null);
+// values: "delete" | "update" | null
+
+
+
+const [confirmModal, setConfirmModal] = useState({
+  show: false,
+  type: null, // "delete" | "update"
+});
 
 
   /* ---------------- FETCH USER ---------------- */
@@ -285,13 +294,15 @@ const [editedCaption, setEditedCaption] = useState("");
   Edit
 </button>
 
-
-                <button
-  onClick={() => handleDeletePost(selectedPost._id)}
+<button
+  onClick={() =>
+    setConfirmModal({ show: true, type: "delete" })
+  }
   className="text-red-500 text-sm"
 >
   Delete
 </button>
+
 
 
                 </div>
@@ -306,12 +317,15 @@ const [editedCaption, setEditedCaption] = useState("");
       />
 
       <div className="flex gap-3 mt-3">
-        <button
-          onClick={handleUpdatePost}
-          className="bg-[#879F00] px-4 py-1 rounded text-sm"
-        >
-          Update
-        </button>
+       <button
+  onClick={() =>
+    setConfirmModal({ show: true, type: "update" })
+  }
+  className="bg-[#879F00] px-4 py-1 rounded text-sm"
+>
+  Update
+</button>
+
 
         <button
           onClick={() => setIsEditing(false)}
@@ -405,6 +419,52 @@ const [editedCaption, setEditedCaption] = useState("");
           </div>
         </div>
       )}
+
+
+      {confirmModal.show && (
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="bg-[#0f0f0f] w-[350px] p-6 rounded-xl text-center">
+
+      <h2 className="text-lg font-semibold mb-4">
+        {confirmModal.type === "delete"
+          ? "Delete Post?"
+          : "Update Post?"}
+      </h2>
+
+      <p className="text-sm text-gray-400 mb-6">
+        {confirmModal.type === "delete"
+          ? "This action cannot be undone."
+          : "Are you sure you want to save changes?"}
+      </p>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={async () => {
+            if (confirmModal.type === "delete") {
+              await handleDeletePost(selectedPost._id);
+            } else if (confirmModal.type === "update") {
+              await handleUpdatePost();
+            }
+            setConfirmModal({ show: false, type: null });
+          }}
+          className="bg-red-600 px-5 py-2 rounded text-sm"
+        >
+          Confirm
+        </button>
+
+        <button
+          onClick={() =>
+            setConfirmModal({ show: false, type: null })
+          }
+          className="bg-gray-600 px-5 py-2 rounded text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 }
