@@ -7,6 +7,8 @@ import post from "../../../assets/images/icons8-menu-50.png";
 import saved from "../../../assets/images/icons8-bookmark-64.png";
 import profile from "../../../assets/images/profile.png";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 function Profile() {
   const [activeTab, setActiveTab] = useState("posts");
@@ -26,6 +28,8 @@ function Profile() {
 const [editedCaption, setEditedCaption] = useState("");
 const [confirmAction, setConfirmAction] = useState(null);
 // values: "delete" | "update" | null
+const navigate = useNavigate();
+
 
 
 
@@ -190,7 +194,13 @@ const [confirmModal, setConfirmModal] = useState({
         <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
-            <img className="h-6 cursor-pointer" src={settings} alt="" />
+           <img
+  className="h-6 cursor-pointer"
+  src={settings}
+  alt="settings"
+  onClick={() => navigate("/settings")}
+/>
+
           </div>
 
           {/* PROFILE */}
