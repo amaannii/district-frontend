@@ -20,6 +20,7 @@ import Admindashboard from "../src/pages/admin/Admindashboard";
 // import More from "../src/components/More";
 import DashboardHome from "../src/pages/admin/DashboardHome";
 import UserDashboard from "../src/pages/user/UserDashboard";
+import Settings from "../src/pages/user/Components/Settings";
 
 function Layoutroutes() {
   return (
@@ -40,6 +41,9 @@ function Layoutroutes() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgetten" element={<ForgetPassword />} />
           <Route path="/adminlogin" element={<AdminLogin />} />
+<Route path="/settings" element={<Settings />} />
+<Route path="/login" element={<Login />} />
+
 
           <Route
             path="/admindashboard"

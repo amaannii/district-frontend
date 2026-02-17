@@ -19,48 +19,51 @@ function PostCard({ data, onShare }) {
   const [comments, setComments] = useState(data.comments || []);
 
   /* ❤️ LIKE */
-  const handleLike = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.post(
-        "/like-post",
-        { postId: data._id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+ const handleLike = async () => {
+  const updatedLiked = !liked;
+  const updatedCount = updatedLiked
+    ? likeCount + 1
+    : likeCount - 1;
 
-      if (res.data.success) {
-        setLiked(res.data.isLiked);
-        setLikeCount(res.data.likes);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLiked(updatedLiked);
+  setLikeCount(updatedCount);
+
+  try {
+    await axios.post(
+      "http://localhost:5000/api/like-post",
+      { postId: data._id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   /* 💬 COMMENT */
-  const handleComment = async () => {
-    if (!commentText.trim()) return;
+ const handleComment = async () => {
+  if (!commentText.trim()) return;
 
-    try {
-      setLoading(true);
-      const res = await axios.post(
-        "/add-comment",
-        { postId: data._id, text: commentText },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (res.data.success) {
-        setComments(res.data.comments);
-        setCommentText("");
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const newComment = {
+    username: localStorage.getItem("username"), // or from user context
+    text: commentText,
   };
+
+  // Instant UI update
+  setComments((prev) => [...prev, newComment]);
+  setCommentText("");
+
+  try {
+    await axios.post(
+      "http://localhost:5000/api/add-comment",
+      { postId: data._id, text: commentText },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   return (
 
@@ -102,12 +105,13 @@ function PostCard({ data, onShare }) {
 
           {/* LIKE */}
           <div className="flex items-center gap-1">
-            <img
-              src={liked ? heartRed : heart}
-              className="w-5 cursor-pointer"
-              onClick={handleLike}
-              alt="like"
-            />
+           <img
+  src={liked ? heartRed : heart}
+  className="w-5 cursor-pointer "
+  onClick={handleLike}
+  alt="like"
+/>
+
             <span className="text-xs text-gray-400">
               {likeCount}
             </span>
