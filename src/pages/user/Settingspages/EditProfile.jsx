@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 function EditProfile() {
   const [bio, setBio] = useState("");
-  const [gender, setGender] = useState("Female");
+  const [gender, setGender] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [userdetails, setuserdetails] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
@@ -12,6 +12,8 @@ function EditProfile() {
   const [deleted, setdeleted] = useState(0);
   const [user, setUser] = useState({});
   const [uploadshow, setuploadshow] = useState(false);
+  const [savedGender, setSavedGender] = useState("");
+  const [savedBio, setSavedBio] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -32,6 +34,13 @@ function EditProfile() {
         setuserdetails(user);
         setposts(user.post || []);
         setSelectedImage(user.img);
+
+        // ✅ ADD THESE LINES
+        setGender(user.gender || "");
+        setSavedGender(user.gender || "");
+
+        setBio(user.bio || "");
+        setSavedBio(user.bio || "");
       } catch (error) {
         console.error("Error fetching user details:", error);
       } finally {
@@ -65,7 +74,7 @@ function EditProfile() {
           img: "",
         }));
 
-        setShowModal(false)
+        setShowModal(false);
       }
     } catch (error) {
       console.error("Error deleting image ❌", error);
@@ -102,7 +111,7 @@ function EditProfile() {
         );
         if (res.data.success == true) {
           setuploadshow(false);
-          setShowModal(false)
+          setShowModal(false);
         }
       }
     } catch (error) {
@@ -115,6 +124,55 @@ function EditProfile() {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     handleuploadimg(file);
+  };
+
+  const handleSaveGender = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
+      const res = await axios.post(
+        "http://localhost:3001/user/updateGender",
+        { gender },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (res.data.success) {
+        setSavedGender(gender); // ✅ update button state
+        alert("Gender saved successfully ✅");
+      }
+
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+      alert("Error saving gender ❌");
+    }
+  };
+
+  const handleSaveBio = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
+
+      const res = await axios.post(
+        "http://localhost:3001/user/updateBio",
+        { bio },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (res.data.success) {
+        setSavedBio(bio);
+        alert("Bio saved successfully ✅");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error saving bio ❌");
+    }
   };
 
   return (
@@ -150,17 +208,46 @@ function EditProfile() {
       {/* Form Section */}
       <div className="mt-5 w-[600px] flex flex-col gap-6">
         {/* Bio */}
+        {/* Bio */}
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-300">
             Bio
           </label>
+
           <input
             type="text"
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="Bio"
-            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+            onChange={(e) => {
+              if (e.target.value.length <= 250) {
+                setBio(e.target.value);
+              }
+            }}
+            placeholder="Bio (max 250 characters)"
+            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700"
           />
+
+          {/* Character Counter */}
+          <p
+            className={`text-xs mt-2 ${
+              bio.length === 250 ? "text-red-500" : "text-gray-400"
+            }`}
+          >
+            {bio.length}/250 characters
+          </p>
+
+          {/* Save Button */}
+          <button
+            onClick={handleSaveBio}
+            disabled={bio === savedBio || bio.length === 0}
+            className={`mt-4 px-5 py-1 rounded-xl text-white
+      ${bio === savedBio ? "bg-[#879F00]" : "bg-[#879F00]"}`}
+          >
+            {savedBio === ""
+              ? "Save Bio"
+              : bio !== savedBio
+                ? "Update Bio"
+                : "change bio"}
+          </button>
         </div>
 
         {/* Gender */}
@@ -168,21 +255,32 @@ function EditProfile() {
           <label className="block mb-2 text-sm font-medium text-gray-300">
             Gender
           </label>
+
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700"
           >
-            <option>Female</option>
-            <option>Male</option>
-            <option>Other</option>
+            <option value="">Select Gender</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Other">Other</option>
           </select>
-        </div>
 
-        {/* Submit */}
-        <button className="w-[140px] bg-[#879F00] text-white py-2 rounded-xl text-sm font-medium hover:opacity-90 transition">
-          Submit
-        </button>
+          {/* Save Button */}
+          <button
+            onClick={handleSaveGender}
+            disabled={gender === savedGender}
+            className={`mt-4 px-6 py-2 rounded-xl text-white
+    ${gender === savedGender ? "bg-[#879F00]" : "bg-[#879F00]"}`}
+          >
+            {savedGender === ""
+              ? "Save Gender"
+              : gender !== savedGender
+                ? "Update Gender"
+                : "change gender"}
+          </button>
+        </div>
       </div>
 
       {/* ================= MODAL ================= */}
@@ -221,42 +319,42 @@ function EditProfile() {
         </div>
       )}
       {uploadshow && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-    
-    {/* Modal Box */}
-    <div className="bg-white p-6 rounded-xl w-[350px] shadow-lg text-center">
-      <h2 className="text-xl font-semibold mb-4">
-        Upload Image
-      </h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          {/* Modal Box */}
+          <div className="bg-white justify-between flex flex-col  items-center p-6 rounded-xl w-[350px] shadow-lg text-center">
+            <h2 className="text-xl font-semibold text-black mb-4">
+              Upload Image
+            </h2>
+            <div className="w-[200px] justify-between flex ">
+              {/* Upload Button */}
+              <label
+                htmlFor="fileUpload"
+                className="cursor-pointer bg-black  text-white px-4 py-2 rounded-lg"
+              >
+                Choose File
+              </label>
 
-      {/* Upload Button */}
-      <label
-        htmlFor="fileUpload"
-        className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg"
-      >
-        Choose File
-      </label>
+              {/* Hidden Input */}
+              <input
+                type="file"
+                accept="image/*"
+                id="fileUpload"
+                hidden
+                onChange={handleFileSelect}
+              />
 
-      {/* Hidden Input */}
-      <input
-        type="file"
-        accept="image/*"
-        id="fileUpload"
-        hidden
-        onChange={handleFileSelect}
-      />
-
-      {/* Close Button */}
-      <button
-        onClick={() => setuploadshow(false)}
-        className="mt-4 text-sm text-gray-500 hover:text-black"
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-)}
- {loading && (
+              {/* Close Button */}
+              <button
+                onClick={() => setuploadshow(false)}
+                className=" text-sm text-black hover:text-black"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {loading && (
         <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
           <div
             className="chaotic-orbit
@@ -264,7 +362,6 @@ function EditProfile() {
           ></div>
         </div>
       )}
-
     </div>
   );
 }
