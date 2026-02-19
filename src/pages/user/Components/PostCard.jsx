@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import heart from "../../../assets/images/icons8-heart-24.png";
 import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
@@ -8,20 +8,27 @@ import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 
 function PostCard({ data, onShare }) {
   const token = localStorage.getItem("userToken");
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
-  const [liked, setLiked] = useState(data.isLiked || false);
-  const [likeCount, setLikeCount] = useState(data.likes || 0);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState(data.comments || []);
+  const [comments, setComments] = useState([]);
   const [saved, setSaved] = useState(false);
 
-  // ----------- Like / Unlike -----------
-  const handleLike = async () => {
-    if (!token) return alert("You must be logged in");
+  // Initialize post data
+  useEffect(() => {
+    if (!data) return;
 
-    setLiked(!liked);
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+    setComments(data.comments || []);
+    setLikeCount(data.likes || 0);
+    setLiked(data.isLiked || false);
+  }, [data]);
+
+  // LIKE POST
+  const handleLike = async () => {
+    if (!token) return alert("Login required");
 
     try {
       const res = await axios.post(
@@ -31,102 +38,86 @@ function PostCard({ data, onShare }) {
       );
 
       if (res.data.success) {
-        setLiked(res.data.isLiked);
         setLikeCount(res.data.likes);
+        setLiked(res.data.isLiked);
       }
     } catch (err) {
-      console.error(err);
-      setLiked(liked);
-      setLikeCount(likeCount);
+      console.error("Like error:", err);
     }
   };
 
-  // ----------- Add Comment -----------
+  // ADD COMMENT
   const handleComment = async () => {
-    if (!token) return alert("You must be logged in");
+    if (!token) return alert("Login required");
     if (!commentText.trim()) return;
-
-    const tempComment = {
-      _id: Math.random().toString(36).substr(2, 9),
-      username: "You",
-      text: commentText,
-      createdAt: new Date().toISOString(),
-    };
-
-    setComments([...comments, tempComment]);
-    setCommentText("");
 
     try {
       const res = await axios.post(
         "http://localhost:3001/user/add-comment",
-        { postId: data._id, text: tempComment.text },
+        { postId: data._id, text: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data.success) {
-        setComments(prev =>
-          prev.map(c => (c._id === tempComment._id ? res.data.comment : c))
-        );
+        setComments((prev) => [...prev, res.data.comment]);
+        setCommentText("");
       }
     } catch (err) {
-      console.error(err);
-      setComments(prev => prev.filter(c => c._id !== tempComment._id));
+      console.error("Add comment error:", err);
     }
   };
 
-  // ----------- Delete Comment -----------
+  // DELETE COMMENT
   const handleDeleteComment = async (commentId) => {
-    if (!token) return alert("You must be logged in");
+    if (!token) return alert("Login required");
 
     try {
       const res = await axios.delete(
         "http://localhost:3001/user/delete-comment",
         {
           headers: { Authorization: `Bearer ${token}` },
-          data: { postId: data._id, commentId }
+          data: { postId: data._id, commentId },
         }
       );
 
       if (res.data.success) {
-        setComments(prev => prev.filter(c => c._id !== commentId));
-      } else {
-        alert(res.data.message || "Failed to delete comment");
+        setComments((prev) => prev.filter((c) => c._id !== commentId));
       }
     } catch (err) {
-      console.error(err);
-      alert("Server error while deleting comment");
+      console.error("Delete comment error:", err);
     }
   };
 
   return (
-    <div className="border-b border-neutral-800 mb-6 relative">
-      {/* User Info */}
+    <div className="border-b border-neutral-800 mb-6">
+
+      {/* USER INFO */}
       <div className="px-6 py-3 flex items-center gap-2">
         <img
-          src={data.userId?.img}
+          src={data.userId?.img || "/default-avatar.png"}
+          alt="user"
           className="w-8 h-8 rounded-full object-cover"
-          alt={data.userId?.username}
         />
         <span className="font-semibold">{data.userId?.username}</span>
       </div>
 
-      {/* Post Image */}
+      {/* IMAGE */}
       <img
         src={data.image}
-        className="w-full max-h-[450px] object-cover"
         alt="post"
+        className="w-full max-h-[450px] object-cover"
       />
 
-      {/* Caption */}
+      {/* CAPTION */}
       <div className="px-6 py-2 text-gray-300">
         <span className="font-semibold mr-2">{data.userId?.username}</span>
         {data.caption}
       </div>
 
-      {/* Actions */}
+      {/* ACTIONS */}
       <div className="flex justify-between px-6 py-3">
         <div className="flex gap-5 items-center">
-          {/* Like */}
+          {/* LIKE */}
           <div className="flex items-center gap-1">
             <img
               src={liked ? heartRed : heart}
@@ -136,22 +127,25 @@ function PostCard({ data, onShare }) {
             />
             <span className="text-xs text-gray-400">{likeCount}</span>
           </div>
-          {/* Comment */}
+
+          {/* COMMENT */}
           <img
             src={commentIcon}
             className="w-5 cursor-pointer"
             onClick={() => setShowComments(!showComments)}
             alt="comment"
           />
-          {/* Share */}
+
+          {/* SHARE */}
           <img
             src={send}
             className="w-5 cursor-pointer"
-            onClick={() => onShare?.(data)}
+            onClick={() => onShare && onShare(data)}
             alt="share"
           />
         </div>
-        {/* Bookmark */}
+
+        {/* BOOKMARK */}
         <img
           src={bookmark}
           className={`w-5 cursor-pointer ${saved ? "" : "opacity-50"}`}
@@ -160,50 +154,64 @@ function PostCard({ data, onShare }) {
         />
       </div>
 
-      {/* Comments Section */}
-      {showComments && (
-        <div className="px-6 pb-4">
-          {comments.map((c) => (
-            <div
-              key={c._id}
-              className="text-sm text-gray-300 mb-1 flex justify-between items-start"
-            >
-              <div>
-                <span className="font-semibold mr-2">{c.username}</span>
-                {c.text}
-                <div className="text-xs text-gray-500">
-                  {new Date(c.createdAt).toLocaleString()}
-                </div>
-              </div>
-              {/* Delete button for own comment */}
-              {c.username === "You" && (
-                <button
-                  onClick={() => handleDeleteComment(c._id)}
-                  className="text-red-500 text-xs ml-2"
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          ))}
-
-          {/* Add Comment Input */}
-          <div className="flex gap-2 mt-2">
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="flex-1 bg-neutral-800 p-2 rounded"
-              placeholder="Add a comment..."
-            />
-            <button
-              onClick={handleComment}
-              className="text-blue-500 font-semibold"
-            >
-              Post
-            </button>
-          </div>
+    { /* COMMENTS */ }
+{showComments && (
+  <div className="px-6 pb-4">
+    {comments.map((c) => (
+      <div key={c._id} className="flex justify-between items-start text-sm text-gray-300 mb-2">
+        <div>
+          <span className="font-semibold mr-2">{c.username}</span>
+          {c.text}
+          <div className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleString()}</div>
         </div>
-      )}
+
+        {String(c.userId) === String(currentUser?.id) && (
+          <button
+            onClick={async () => {
+              try {
+                const res = await axios.delete("http://localhost:3001/user/delete-comment", {
+                  headers: { Authorization: `Bearer ${token}` },
+                  data: { postId: data._id, commentId: c._id },
+                });
+                if (res.data.success) setComments((prev) => prev.filter((cm) => cm._id !== c._id));
+              } catch (err) {
+                console.error(err);
+              }
+            }}
+            className="text-gray-400 hover:text-red-500 ml-3"
+          >
+            ✖
+          </button>
+        )}
+      </div>
+    ))}
+
+    <div className="flex gap-2 mt-3">
+      <input
+        value={commentText}
+        onChange={(e) => setCommentText(e.target.value)}
+        className="flex-1 bg-neutral-800 p-2 rounded"
+        placeholder="Add a comment..."
+      />
+      <button onClick={async () => {
+        if (!commentText.trim()) return;
+        try {
+          const res = await axios.post(
+            "http://localhost:3001/user/add-comment",
+            { postId: data._id, text: commentText },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (res.data.success) {
+            setComments((prev) => [...prev, res.data.comment]);
+            setCommentText("");
+          }
+        } catch (err) { console.error(err); }
+      }} className="text-blue-500 font-semibold">Post</button>
+    </div>
+    
+  </div>
+)}
+
     </div>
   );
 }
