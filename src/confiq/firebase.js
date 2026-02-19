@@ -1,13 +1,13 @@
-// Import the functions you need from the SDKs you need
+// Import Firebase SDK
 import { initializeApp } from "firebase/app";
-import { getAuth,GoogleAuthProvider } from "firebase/auth";
 
-// import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Auth imports
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// ✅ Messaging import (Push Notification)
+import { getMessaging } from "firebase/messaging";
+
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDbPEHDiU1dtbOj-vQqfDtX1ihsFqnEbtE",
   authDomain: "distrix-5f2de.firebaseapp.com",
@@ -15,11 +15,15 @@ const firebaseConfig = {
   storageBucket: "distrix-5f2de.firebasestorage.app",
   messagingSenderId: "106602278526",
   appId: "1:106602278526:web:f4fb48614d00d7c000f22f",
-  measurementId: "G-CM9HW0LY13"
+  measurementId: "G-CM9HW0LY13",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-export const auth=getAuth(app)
-export const googleprovider=new GoogleAuthProvider()
+// ✅ Auth exports
+export const auth = getAuth(app);
+export const googleprovider = new GoogleAuthProvider();
+
+// ✅ Messaging export (FCM)
+export const messaging = getMessaging(app);
