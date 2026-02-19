@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { generateFCMToken } from "../../../config/fcmToken";
+
 
 
 
@@ -51,10 +53,11 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
       }
     );
 
-    // If enabled, generate FCM token
+    // If enabled → Generate token and test notification
     if (newEnabled === true) {
       const fcmToken = await generateFCMToken();
 
+      // Save token
       await axios.post(
         "http://localhost:3001/user/saveFCMToken",
         { token: fcmToken },
@@ -62,6 +65,13 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
           headers: { Authorization: `Bearer ${userToken}` },
         }
       );
+
+      // ✅ Send test popup immediately
+      await axios.post("http://localhost:3001/user/testNotification", {
+        token: fcmToken,
+      });
+
+      console.log("🔥 Test notification sent!");
     }
 
     console.log("Notification settings saved ✅");
@@ -69,6 +79,7 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
     console.log("Error saving notification settings ❌", error);
   }
 };
+
 
 
   return (
