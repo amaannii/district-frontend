@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+
+
 function Notifications() {
   const [enabled, setEnabled] = useState(true);
   const [duration, setDuration] = useState("for 2 days");
@@ -17,7 +19,7 @@ function Notifications() {
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
 
         const user = res.data.user;
@@ -33,34 +35,52 @@ function Notifications() {
   }, []);
 
   // ✅ Save settings to backend
-  const saveNotificationSettings = async (newEnabled, newDuration) => {
-    try {
-      const token = localStorage.getItem("userToken");
+const saveNotificationSettings = async (newEnabled, newDuration) => {
+  try {
+    const userToken = localStorage.getItem("userToken");
+
+    // Save enabled + duration
+    await axios.post(
+      "http://localhost:3001/user/updateNotifications",
+      {
+        enabled: newEnabled,
+        duration: newDuration,
+      },
+      {
+        headers: { Authorization: `Bearer ${userToken}` },
+      }
+    );
+
+    // If enabled, generate FCM token
+    if (newEnabled === true) {
+      const fcmToken = await generateFCMToken();
 
       await axios.post(
-        "http://localhost:3001/user/updateNotifications",
+        "http://localhost:3001/user/saveFCMToken",
+        { token: fcmToken },
         {
-          enabled: newEnabled,
-          duration: newDuration,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${userToken}` },
         }
       );
-
-      console.log("Notification settings saved ✅");
-    } catch (error) {
-      console.log("Error saving notification settings ❌", error);
     }
-  };
+
+    console.log("Notification settings saved ✅");
+  } catch (error) {
+    console.log("Error saving notification settings ❌", error);
+  }
+};
+
 
   return (
     <div className="w-full text-white play-regular">
       <h1 className="text-xl font-bold mb-10">Notifications</h1>
 
       {/* Toggle */}
+      {/* Toggle */}
       <div className="bg-white text-black rounded-xl p-5 flex items-center justify-between w-[500px] shadow-lg">
-        <p className="text-sm font-medium">Notification On</p>
+        <p className="text-sm font-medium">
+          Notifications {enabled ? "On " : "Off "}
+        </p>
 
         <button
           onClick={() => {
@@ -114,9 +134,7 @@ function Notifications() {
 
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      duration === item
-                        ? "border-white"
-                        : "border-gray-500"
+                      duration === item ? "border-white" : "border-gray-500"
                     }`}
                   >
                     {duration === item && (

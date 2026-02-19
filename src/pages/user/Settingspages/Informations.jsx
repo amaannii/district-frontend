@@ -13,10 +13,9 @@ function Informations() {
   const [ShowEditModal, setShowEditModal] = useState(false);
   const [showBirthdayModal, setShowBirthdayModal] = useState(false);
 
-const [month, setMonth] = useState("December");
-const [day, setDay] = useState("30");
-const [year, setYear] = useState("2001");
-
+  const [month, setMonth] = useState("December");
+  const [day, setDay] = useState("30");
+  const [year, setYear] = useState("2001");
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -39,8 +38,13 @@ const [year, setYear] = useState("2001");
 
         const user = response.data.user;
         setuserdetails(user);
-
         setContacts(res.data.contacts);
+        // ✅ Load birthday from backend
+        if (user.birthday) {
+          setMonth(user.birthday.month);
+          setDay(user.birthday.day);
+          setYear(user.birthday.year);
+        }
       } catch (err) {
         console.log("Error fetching contacts:", err);
       }
@@ -124,31 +128,34 @@ const [year, setYear] = useState("2001");
   };
 
   const handleSaveBirthday = async () => {
-  try {
-    const token = localStorage.getItem("userToken");
+    try {
+      const token = localStorage.getItem("userToken");
 
-    const res = await axios.post(
-      "http://localhost:3001/user/updateBirthday",
-      {
-        month,
-        day,
-        year,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axios.post(
+        "http://localhost:3001/user/updateBirthday",
+        {
+          month,
+          day,
+          year,
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    alert("Birthday Saved ✅");
+      alert("Birthday Saved ✅");
+      // ✅ Update UI instantly without refresh
+      setMonth(res.data.birthday.month);
+      setDay(res.data.birthday.day);
+      setYear(res.data.birthday.year);
 
-    setShowBirthdayModal(false);
-  } catch (err) {
-    alert("Error saving birthday ❌");
-  }
-};
-
+      setShowBirthdayModal(false);
+    } catch (err) {
+      alert("Error saving birthday ❌");
+    }
+  };
 
   return (
     <div className="play-regular text-white">
@@ -167,15 +174,22 @@ const [year, setYear] = useState("2001");
       </div>
 
       {/* Birthday Row */}
-    {/* Birthday Row */}
-<div
-  onClick={() => setShowBirthdayModal(true)}
-  className="w-[520px] border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between cursor-pointer"
->
-  <span className="text-gray-300 text-sm">Birthday</span>
-  <span className="text-gray-400 text-xl">{">"}</span>
-</div>
+      {/* Birthday Row */}
+      <div
+        onClick={() => setShowBirthdayModal(true)}
+        className="w-[520px] border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between cursor-pointer"
+      >
+        <div>
+          <p className="text-gray-300 text-sm">Birthday</p>
 
+          {/* ✅ Show saved birthday */}
+          <p className="text-gray-500 text-xs">
+            {month} {day}, {year}
+          </p>
+        </div>
+
+        <span className="text-gray-400 text-xl">{">"}</span>
+      </div>
 
       {/* ========================= */}
       {/* CONTACT INFO MODAL */}
@@ -290,8 +304,7 @@ const [year, setYear] = useState("2001");
             {/* Save Button (Same Content) */}
             <button
               onClick={handleSaveContact}
-             disabled={contacts ? true : false}
-
+              disabled={contacts ? true : false}
               className={`w-full py-2 rounded-xl font-semibold text-lg transition
                 {contacts && (
   <p>Number already added</p>
@@ -450,91 +463,89 @@ const [year, setYear] = useState("2001");
       )}
 
       {/* ========================= */}
-{/* BIRTHDAY MODAL */}
-{/* ========================= */}
-{showBirthdayModal && (
-  <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-[80]">
-    <div className="w-[750px] bg-black border border-gray-700 rounded-2xl p-10 relative">
+      {/* BIRTHDAY MODAL */}
+      {/* ========================= */}
+      {showBirthdayModal && (
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-[80]">
+          <div className="w-[750px] bg-black border border-gray-700 rounded-2xl p-10 relative">
+            {/* Close */}
+            <button
+              onClick={() => setShowBirthdayModal(false)}
+              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
+            >
+              x
+            </button>
 
-      {/* Close */}
-      <button
-        onClick={() => setShowBirthdayModal(false)}
-        className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
-      >
-        x
-      </button>
+            {/* Title */}
+            <h2 className="text-3xl font-bold mb-2">Edit your birthday</h2>
 
-      {/* Title */}
-      <h2 className="text-3xl font-bold mb-2">Edit your birthday</h2>
+            {/* Subtitle */}
+            <p className="text-gray-400 text-sm mb-8">
+              This birthday is used for the accounts. Any changes you make will
+              apply to all of them.
+            </p>
 
-      {/* Subtitle */}
-      <p className="text-gray-400 text-sm mb-8">
-        This birthday is used for the accounts. Any changes you make will apply to all of them.
-      </p>
+            {/* Dropdowns */}
+            <div className="flex gap-6 mb-6">
+              {/* Month */}
+              <select
+                value={month}
+                onChange={(e) => setMonth(e.target.value)}
+                className="w-full bg-black border border-gray-600 rounded-xl px-3 py-3 text-white focus:outline-none"
+              >
+                <option>January</option>
+                <option>February</option>
+                <option>March</option>
+                <option>April</option>
+                <option>May</option>
+                <option>June</option>
+                <option>July</option>
+                <option>August</option>
+                <option>September</option>
+                <option>October</option>
+                <option>November</option>
+                <option>December</option>
+              </select>
 
-      {/* Dropdowns */}
-      <div className="flex gap-6 mb-6">
+              {/* Day */}
+              <select
+                value={day}
+                onChange={(e) => setDay(e.target.value)}
+                className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none"
+              >
+                {Array.from({ length: 31 }, (_, i) => (
+                  <option key={i + 1}>{i + 1}</option>
+                ))}
+              </select>
 
-        {/* Month */}
-        <select
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="w-full bg-black border border-gray-600 rounded-xl px-3 py-3 text-white focus:outline-none"
-        >
-          <option>January</option>
-          <option>February</option>
-          <option>March</option>
-          <option>April</option>
-          <option>May</option>
-          <option>June</option>
-          <option>July</option>
-          <option>August</option>
-          <option>September</option>
-          <option>October</option>
-          <option>November</option>
-          <option>December</option>
-        </select>
+              {/* Year */}
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none"
+              >
+                {Array.from({ length: 50 }, (_, i) => (
+                  <option key={i}>{2025 - i}</option>
+                ))}
+              </select>
+            </div>
 
-        {/* Day */}
-        <select
-          value={day}
-          onChange={(e) => setDay(e.target.value)}
-          className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none"
-        >
-          {Array.from({ length: 31 }, (_, i) => (
-            <option key={i + 1}>{i + 1}</option>
-          ))}
-        </select>
+            {/* Note */}
+            <p className="text-gray-500 text-xs mb-8">
+              Note: This is the last time you can edit your birthday. After
+              this, you'll have to wait before you can edit it again.
+            </p>
 
-        {/* Year */}
-        <select
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none"
-        >
-          {Array.from({ length: 50 }, (_, i) => (
-            <option key={i}>{2025 - i}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Note */}
-      <p className="text-gray-500 text-xs mb-8">
-        Note: This is the last time you can edit your birthday. After this, you'll have to wait before you can edit it again.
-      </p>
-
-      {/* Save Button */}
-     <button
-  onClick={handleSaveBirthday}
-  className="w-full bg-[#879F00] hover:bg-[#6f8500] py-3 rounded-xl font-semibold text-lg"
->
-  Save
-</button>
-
-    </div>
-  </div>
-)}
-
+            {/* Save Button */}
+            <button
+              onClick={handleSaveBirthday}
+              className="w-full bg-[#879F00] hover:bg-[#6f8500] py-3 rounded-xl font-semibold text-lg"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
