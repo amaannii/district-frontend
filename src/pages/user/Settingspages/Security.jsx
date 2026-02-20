@@ -10,6 +10,12 @@ function Security() {
 const [newPassword, setNewPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
 const [message, setMessage] = useState("");
+const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [otp, setOtp] = useState("");
+const [showOtpModal, setShowOtpModal] = useState(false);
+
+
 
   
 
@@ -66,21 +72,43 @@ const [message, setMessage] = useState("");
       }
     );
 
-    if (res.data.success) {
-      setMessage("✅ Password updated successfully");
+   if (res.data.success) {
+  setShowSuccessPopup(true);
 
-      // Clear fields
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+  // Clear fields
+  setCurrentPassword("");
+  setNewPassword("");
+  setConfirmPassword("");
 
-      // Close modal after 1 sec
-      setTimeout(() => {
-        setOpenPasswordModal(false);
-      }, 1000);
-    }
+  // Close popup + modal after 2 sec
+  setTimeout(() => {
+    setShowSuccessPopup(false);
+    setOpenPasswordModal(false);
+  }, 2000);
+}
+
   } catch (error) {
     setMessage(error.response?.data?.message || "❌ Something went wrong");
+  }
+};
+
+const sendOtpToEmail = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+
+    await axios.post(
+      "http://localhost:3001/user/sendPasswordOtp",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setShowOtpModal(true); // Open OTP input modal
+  } catch (error) {
+    setMessage("Failed to send OTP");
   }
 };
 
@@ -209,7 +237,18 @@ const [message, setMessage] = useState("");
 
         {/* Save Button */}
         <button
-          onClick={handleChangePassword}
+            onClick={() => {
+    setMessage("");
+
+    // Confirm password check first
+    if (newPassword !== confirmPassword) {
+      setMessage("❌ New password and confirm password do not match");
+      return;
+    }
+
+    // Open confirmation modal instead of direct API call
+    setShowConfirmModal(true);
+  }}
           className="w-full bg-[#879F00] text-black font-semibold py-3 rounded-xl hover:bg-gray-200 transition"
         >
           Save Password
@@ -218,6 +257,111 @@ const [message, setMessage] = useState("");
     </div>
   </div>
 )}
+{/* ================= SUCCESS POPUP ================= */}
+{showSuccessPopup && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[100]">
+    <div className="bg-black border border-gray-700 rounded-2xl w-[400px] p-8 flex flex-col items-center gap-4 shadow-xl">
+
+      {/* Tick Icon */}
+      <div className="w-16 h-16 flex items-center justify-center rounded-full bg-green-600 text-white text-3xl">
+        ✓
+      </div>
+
+      {/* Message */}
+      <h2 className="text-xl font-bold text-white">
+        Password Changed Successfully!
+      </h2>
+
+      <p className="text-gray-400 text-sm text-center">
+        Your password has been updated securely ✅
+      </p>
+    </div>
+  </div>
+)}
+{/* ================= CONFIRMATION MODAL ================= */}
+{showConfirmModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[90]">
+    <div className="bg-black border border-gray-700 rounded-2xl w-[500px] p-8">
+
+      <h2 className="text-xl font-bold mb-3 text-white">
+        Confirm Password Change
+      </h2>
+
+      <p className="text-gray-400 mb-6 text-sm">
+        Are you sure you want to change the password for this account?
+      </p>
+
+      <div className="bg-gray-900 p-3 rounded-xl mb-6">
+        <p className="text-white font-semibold">
+          {userdetails.email}
+        </p>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-4">
+        {/* Cancel */}
+        <button
+          onClick={() => setShowConfirmModal(false)}
+          className="w-full py-3 rounded-xl border border-gray-600 text-white hover:bg-gray-800 transition"
+        >
+          Cancel
+        </button>
+
+        {/* Confirm */}
+        <button
+          onClick={() => {
+            setShowConfirmModal(false);
+           sendOtpToEmail();
+
+          }}
+          className="w-full py-3 rounded-xl bg-[#879F00] text-black font-semibold hover:bg-lime-400 transition"
+        >
+          Yes, Change
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showOtpModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[100]">
+    <div className="bg-black border border-gray-700 rounded-2xl w-[450px] p-8">
+
+      <h2 className="text-xl font-bold mb-4 text-white">
+        Enter Verification Code
+      </h2>
+
+      <p className="text-gray-400 mb-5 text-sm">
+        We sent a 6-digit code to your email:
+        <span className="text-white font-semibold"> {userdetails.email}</span>
+      </p>
+
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        placeholder="Enter OTP"
+        className="w-full px-4 py-3 rounded-xl border border-gray-700 text-white bg-transparent mb-5"
+      />
+
+      <button
+        onClick={() => handleChangePassword()}
+        className="w-full py-3 rounded-xl bg-[#879F00] text-black font-semibold"
+      >
+        Verify & Change Password
+      </button>
+
+      <button
+        onClick={() => setShowOtpModal(false)}
+        className="w-full mt-3 py-3 rounded-xl border border-gray-600 text-white"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
+
 
     </div>
   );
