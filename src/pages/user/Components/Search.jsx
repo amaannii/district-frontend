@@ -266,7 +266,7 @@ function Search() {
 
       {/* Loading Overlay */}
       {loading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-70">
+        <div className="absolute inset-0 flex justify-center items-center bg-opacity-70">
           <div className="chaotic-orbit"></div>
         </div>
       )}
