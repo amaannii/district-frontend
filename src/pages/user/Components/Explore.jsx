@@ -28,7 +28,7 @@ function Explore() {
   };
 
   return (
-    <div className="min-h-screen w-full play-regular bg-black text-white p-2">
+    <div className="min-h-screen w-full play-regular scrollbar-hide overflow-scroll bg-black text-white p-2">
       {/* MASONRY GRID */}
       <div className="columns-2 md:columns-3 lg:columns-4 gap-1">
         {posts.map((post, index) => (

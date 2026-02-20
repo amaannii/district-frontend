@@ -48,7 +48,7 @@ function UserDashboard() {
         return <Create />;
 
       case "PROFILE":
-        return <Profile />;
+        return <Profile setActive={setActivePage}  />;
 
       case "SETTINGS":
         return <Settings />;

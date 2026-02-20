@@ -9,8 +9,7 @@ import profile from "../../../assets/images/profile.png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
-function Profile() {
+function Profile({setActive}) {
   const [activeTab, setActiveTab] = useState("posts");
   const [userdetails, setuserdetails] = useState({});
   const [editprofile, seteditprofile] = useState(false);
@@ -25,19 +24,15 @@ function Profile() {
   const [connectionList, setConnectionList] = useState([]);
   const [loading, setloading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-const [editedCaption, setEditedCaption] = useState("");
-const [confirmAction, setConfirmAction] = useState(null);
-// values: "delete" | "update" | null
-const navigate = useNavigate();
+  const [editedCaption, setEditedCaption] = useState("");
+  const [confirmAction, setConfirmAction] = useState(null);
+  // values: "delete" | "update" | null
+  const navigate = useNavigate();
 
-
-
-
-const [confirmModal, setConfirmModal] = useState({
-  show: false,
-  type: null, // "delete" | "update"
-});
-
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    type: null, // "delete" | "update"
+  });
 
   /* ---------------- FETCH USER ---------------- */
   useEffect(() => {
@@ -85,10 +80,9 @@ const [confirmModal, setConfirmModal] = useState({
 
       const token = localStorage.getItem("userToken");
 
-
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
-        { method: "POST", body: data }
+        { method: "POST", body: data },
       );
 
       const result = await res.json();
@@ -96,9 +90,7 @@ const [confirmModal, setConfirmModal] = useState({
         setSelectedImage(result.secure_url);
       }
     } catch (error) {
-
       console.error(error);
-
     } finally {
       setloading(false);
     }
@@ -109,19 +101,17 @@ const [confirmModal, setConfirmModal] = useState({
       setloading(true);
       const token = localStorage.getItem("userToken");
 
-
       await axios.post(
         "http://localhost:3001/user/upload",
         { img: selectedImage },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       seteditprofile(false);
     } catch (error) {
       console.error(error);
-
     } finally {
       setloading(false);
     }
@@ -129,78 +119,70 @@ const [confirmModal, setConfirmModal] = useState({
 
   /* ---------------- DELETE POST ---------------- */
   const handleDeletePost = async (postId) => {
-  try {
-    const token = localStorage.getItem("userToken");
+    try {
+      const token = localStorage.getItem("userToken");
 
-    const response = await axios.delete(
-      `http://localhost:3001/user/delete-post/${postId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.delete(
+        `http://localhost:3001/user/delete-post/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
-    );
-
-    if (response.data.success) {
-      // remove from UI immediately
-      setposts((prevPosts) =>
-        prevPosts.filter((post) => post._id !== postId)
       );
 
-      setselectedPost(null);
-    }
-  } catch (error) {
-    console.error("Delete error:", error.response?.data || error.message);
-  }
-};
+      if (response.data.success) {
+        // remove from UI immediately
+        setposts((prevPosts) =>
+          prevPosts.filter((post) => post._id !== postId),
+        );
 
+        setselectedPost(null);
+      }
+    } catch (error) {
+      console.error("Delete error:", error.response?.data || error.message);
+    }
+  };
 
   /* ---------------- EDIT POST ---------------- */
- const handleUpdatePost = async () => {
-  try {
-    const token = localStorage.getItem("userToken");
+  const handleUpdatePost = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
 
-    await axios.put(
-      `http://localhost:3001/user/update-post/${selectedPost._id}`,
-      { caption: editedCaption },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      await axios.put(
+        `http://localhost:3001/user/update-post/${selectedPost._id}`,
+        { caption: editedCaption },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
 
-    const updatedPosts = posts.map((p) =>
-      p._id === selectedPost._id
-        ? { ...p, caption: editedCaption }
-        : p
-    );
+      const updatedPosts = posts.map((p) =>
+        p._id === selectedPost._id ? { ...p, caption: editedCaption } : p,
+      );
 
-    setposts(updatedPosts);
-    setselectedPost({
-      ...selectedPost,
-      caption: editedCaption,
-    });
+      setposts(updatedPosts);
+      setselectedPost({
+        ...selectedPost,
+        caption: editedCaption,
+      });
 
-    setIsEditing(false);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
-
       <div className="flex h-screen w-full bg-black text-white">
-
-
         <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
-           <img
-  className="h-6 cursor-pointer"
-  src={settings}
-  alt="settings"
-  onClick={() => navigate("/settings")}
-/>
-
+            <img
+              className="h-6 cursor-pointer"
+              src={settings}
+              alt="settings"
+              onClick={() => setActive("SETTINGS")}
+            />
           </div>
 
           {/* PROFILE */}
@@ -232,9 +214,7 @@ const [confirmModal, setConfirmModal] = useState({
                   setShowConnections(true);
                 }}
               >
-                <p className="font-semibold cursor-pointer">
-                  {connected}
-                </p>
+                <p className="font-semibold cursor-pointer">{connected}</p>
                 <p className="text-xs text-gray-400">connected</p>
               </div>
 
@@ -245,9 +225,7 @@ const [confirmModal, setConfirmModal] = useState({
                   setShowConnections(true);
                 }}
               >
-                <p className="font-semibold cursor-pointer">
-                  {connecting}
-                </p>
+                <p className="font-semibold cursor-pointer">{connecting}</p>
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
@@ -255,7 +233,6 @@ const [confirmModal, setConfirmModal] = useState({
 
           {/* POSTS GRID */}
           <div className="grid grid-cols-3 gap-5 max-w-[90%] mx-auto">
-
             {posts.map((img, index) => (
               <img
                 key={index}
@@ -263,7 +240,6 @@ const [confirmModal, setConfirmModal] = useState({
                 alt="post"
                 className="w-full h-[400px] object-cover cursor-pointer"
                 onClick={() => setselectedPost(img)}
-
               />
             ))}
           </div>
@@ -272,12 +248,9 @@ const [confirmModal, setConfirmModal] = useState({
 
       {/* POST MODAL */}
       {selectedPost && (
-
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
           <div className="bg-[#0f0f0f] w-[800px] h-[500px] rounded-xl flex">
-
             <div className="w-1/2">
-
               <img
                 src={selectedPost.image}
                 alt=""
@@ -286,70 +259,61 @@ const [confirmModal, setConfirmModal] = useState({
             </div>
 
             <div className="w-1/2 p-4 flex flex-col">
-
-
               <div className="flex justify-between border-b border-gray-700 pb-3">
-                <span className="font-semibold">
-                  {userdetails.username}
-                </span>
+                <span className="font-semibold">{userdetails.username}</span>
 
                 <div className="flex gap-4">
-                 <button
-  onClick={() => {
-    setIsEditing(true);
-    setEditedCaption(selectedPost.caption);
-  }}
-  className="text-blue-400 text-sm"
->
-  Edit
-</button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(true);
+                      setEditedCaption(selectedPost.caption);
+                    }}
+                    className="text-blue-400 text-sm"
+                  >
+                    Edit
+                  </button>
 
-<button
-  onClick={() =>
-    setConfirmModal({ show: true, type: "delete" })
-  }
-  className="text-red-500 text-sm"
->
-  Delete
-</button>
-
-
-
+                  <button
+                    onClick={() =>
+                      setConfirmModal({ show: true, type: "delete" })
+                    }
+                    className="text-red-500 text-sm"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-<div className="flex-1 text-sm mt-3">
-  {isEditing ? (
-    <>
-      <textarea
-        value={editedCaption}
-        onChange={(e) => setEditedCaption(e.target.value)}
-        className="w-full bg-black border border-gray-600 p-2 rounded text-white"
-      />
+              <div className="flex-1 text-sm mt-3">
+                {isEditing ? (
+                  <>
+                    <textarea
+                      value={editedCaption}
+                      onChange={(e) => setEditedCaption(e.target.value)}
+                      className="w-full bg-black border border-gray-600 p-2 rounded text-white"
+                    />
 
-      <div className="flex gap-3 mt-3">
-       <button
-  onClick={() =>
-    setConfirmModal({ show: true, type: "update" })
-  }
-  className="bg-[#879F00] px-4 py-1 rounded text-sm"
->
-  Update
-</button>
+                    <div className="flex gap-3 mt-3">
+                      <button
+                        onClick={() =>
+                          setConfirmModal({ show: true, type: "update" })
+                        }
+                        className="bg-[#879F00] px-4 py-1 rounded text-sm"
+                      >
+                        Update
+                      </button>
 
-
-        <button
-          onClick={() => setIsEditing(false)}
-          className="bg-gray-600 px-4 py-1 rounded text-sm"
-        >
-          Cancel
-        </button>
-      </div>
-    </>
-  ) : (
-    selectedPost.caption
-  )}
-</div>
-
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="bg-gray-600 px-4 py-1 rounded text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  selectedPost.caption
+                )}
+              </div>
 
               <button
                 onClick={() => setselectedPost(null)}
@@ -366,9 +330,7 @@ const [confirmModal, setConfirmModal] = useState({
       {editprofile && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
           <div className="bg-[#0f0f0f] p-6 rounded-xl text-center w-[300px]">
-            <h2 className="mb-4 font-semibold">
-              Upload profile photo
-            </h2>
+            <h2 className="mb-4 font-semibold">Upload profile photo</h2>
 
             <input type="file" onChange={handleimage} />
 
@@ -410,12 +372,8 @@ const [confirmModal, setConfirmModal] = useState({
                   alt=""
                 />
                 <div>
-                  <p className="font-semibold text-sm">
-                    {user.username}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {user.name}
-                  </p>
+                  <p className="font-semibold text-sm">{user.username}</p>
+                  <p className="text-xs text-gray-400">{user.name}</p>
                 </div>
               </div>
             ))}
@@ -430,51 +388,44 @@ const [confirmModal, setConfirmModal] = useState({
         </div>
       )}
 
-
       {confirmModal.show && (
-  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div className="bg-[#0f0f0f] w-[350px] p-6 rounded-xl text-center">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[#0f0f0f] w-[350px] p-6 rounded-xl text-center">
+            <h2 className="text-lg font-semibold mb-4">
+              {confirmModal.type === "delete" ? "Delete Post?" : "Update Post?"}
+            </h2>
 
-      <h2 className="text-lg font-semibold mb-4">
-        {confirmModal.type === "delete"
-          ? "Delete Post?"
-          : "Update Post?"}
-      </h2>
+            <p className="text-sm text-gray-400 mb-6">
+              {confirmModal.type === "delete"
+                ? "This action cannot be undone."
+                : "Are you sure you want to save changes?"}
+            </p>
 
-      <p className="text-sm text-gray-400 mb-6">
-        {confirmModal.type === "delete"
-          ? "This action cannot be undone."
-          : "Are you sure you want to save changes?"}
-      </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={async () => {
+                  if (confirmModal.type === "delete") {
+                    await handleDeletePost(selectedPost._id);
+                  } else if (confirmModal.type === "update") {
+                    await handleUpdatePost();
+                  }
+                  setConfirmModal({ show: false, type: null });
+                }}
+                className="bg-red-600 px-5 py-2 rounded text-sm"
+              >
+                Confirm
+              </button>
 
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={async () => {
-            if (confirmModal.type === "delete") {
-              await handleDeletePost(selectedPost._id);
-            } else if (confirmModal.type === "update") {
-              await handleUpdatePost();
-            }
-            setConfirmModal({ show: false, type: null });
-          }}
-          className="bg-red-600 px-5 py-2 rounded text-sm"
-        >
-          Confirm
-        </button>
-
-        <button
-          onClick={() =>
-            setConfirmModal({ show: false, type: null })
-          }
-          className="bg-gray-600 px-5 py-2 rounded text-sm"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <button
+                onClick={() => setConfirmModal({ show: false, type: null })}
+                className="bg-gray-600 px-5 py-2 rounded text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

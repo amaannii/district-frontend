@@ -14,6 +14,9 @@ function EditProfile() {
   const [uploadshow, setuploadshow] = useState(false);
   const [savedGender, setSavedGender] = useState("");
   const [savedBio, setSavedBio] = useState("");
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [name, setName] = useState("");
+  const [savedName, setSavedName] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -41,6 +44,9 @@ function EditProfile() {
 
         setBio(user.bio || "");
         setSavedBio(user.bio || "");
+
+        setName(user.name || "");
+        setSavedName(user.name || "");
       } catch (error) {
         console.error("Error fetching user details:", error);
       } finally {
@@ -175,6 +181,32 @@ function EditProfile() {
     }
   };
 
+  const handleSaveName = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+
+    const res = await axios.post(
+      "http://localhost:3001/user/updateName",
+      { name },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (res.data.success) {
+      setSavedName(name);
+      setShowNameModal(false);
+      alert("Name updated successfully ✅");
+    }
+  } catch (error) {
+    console.log(error);
+    alert("Error updating name ❌");
+  }
+};
+
+
   return (
     <div className="w-full text-white play-regular relative">
       {/* Title */}
@@ -192,7 +224,18 @@ function EditProfile() {
 
           <div>
             <h2 className="font-semibold text-sm">{userdetails.username}</h2>
-            <p className="text-gray-500 text-xs">{userdetails.name}</p>
+            <div className="flex items-center gap-2">
+  <p className="text-gray-500 text-xs">{savedName}</p>
+
+  {/* Pen Button */}
+  <button
+    onClick={() => setShowNameModal(true)}
+    className="text-gray-400 hover:text-black transition"
+  >
+    🖊️
+  </button>
+</div>
+
           </div>
         </div>
 
@@ -362,6 +405,48 @@ function EditProfile() {
           ></div>
         </div>
       )}
+      {/* ================= NAME MODAL ================= */}
+{showNameModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+    <div className="bg-[#111] w-[420px] rounded-2xl p-6 border border-gray-700 shadow-xl">
+
+      {/* Title */}
+      <h2 className="text-center text-lg font-semibold mb-5 text-white">
+        Update Name
+      </h2>
+
+      {/* Input */}
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full px-4 py-3 rounded-xl bg-black border border-gray-600 text-white"
+        placeholder="Enter new name"
+      />
+
+      {/* Buttons */}
+      <div className="flex justify-between mt-6">
+        {/* Cancel */}
+        <button
+          onClick={() => setShowNameModal(false)}
+          className="px-5 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+
+        {/* Save */}
+        <button
+          onClick={handleSaveName}
+          disabled={name === savedName || name.length === 0}
+          className="px-5 py-2 rounded-xl bg-[#879F00] text-white hover:opacity-90"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
