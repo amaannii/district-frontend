@@ -5,6 +5,8 @@ import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
 import commentIcon from "../../../assets/images/icons8-comment-50.png";
 import send from "../../../assets/images/icons8-sent-50.png";
 import bookmark from "../../../assets/images/icons8-bookmark-30.png";
+import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
+
 
 function PostCard({ data, onShare }) {
   const token = localStorage.getItem("userToken");
@@ -17,32 +19,35 @@ function PostCard({ data, onShare }) {
   const [comments, setComments] = useState([]);
   const [saved, setSaved] = useState(false);
 
-  // Initialize post data
-  useEffect(() => {
+  // Delete modal state
+  const [commentToDelete, setCommentToDelete] = useState(null);
+
+ useEffect(() => {
     if (!data) return;
 
     setComments(data.comments || []);
     setLikeCount(data.likes || 0);
     setLiked(data.isLiked || false);
+
+    // If backend sends saved boolean
+    setSaved(data.isSaved || false);
   }, [data]);
 
   // LIKE POST
   const handleLike = async () => {
     if (!token) return alert("Login required");
-
     try {
       const res = await axios.post(
         "http://localhost:3001/user/like-post",
         { postId: data._id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (res.data.success) {
         setLikeCount(res.data.likes);
         setLiked(res.data.isLiked);
       }
     } catch (err) {
-      console.error("Like error:", err);
+      console.error(err);
     }
   };
 
@@ -57,36 +62,59 @@ function PostCard({ data, onShare }) {
         { postId: data._id, text: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (res.data.success) {
         setComments((prev) => [...prev, res.data.comment]);
         setCommentText("");
       }
     } catch (err) {
-      console.error("Add comment error:", err);
+      console.error(err);
     }
   };
 
   // DELETE COMMENT
-  const handleDeleteComment = async (commentId) => {
-    if (!token) return alert("Login required");
+  const handleDeleteComment = async () => {
+    if (!token || !commentToDelete) return;
 
     try {
       const res = await axios.delete(
         "http://localhost:3001/user/delete-comment",
         {
           headers: { Authorization: `Bearer ${token}` },
-          data: { postId: data._id, commentId },
+          data: { postId: data._id, commentId: commentToDelete._id },
         }
       );
-
       if (res.data.success) {
-        setComments((prev) => prev.filter((c) => c._id !== commentId));
+        setComments((prev) =>
+          prev.filter((c) => c._id !== commentToDelete._id)
+        );
+        setCommentToDelete(null); // close modal
       }
     } catch (err) {
-      console.error("Delete comment error:", err);
+      console.error(err);
     }
   };
+
+
+// Add function to save post
+const handleSave = async () => {
+  if (!token) return alert("Login required");
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/save-post",
+      { postId: data._id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res.data.success) {
+      setSaved(res.data.saved);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
 
   return (
     <div className="border-b border-neutral-800 mb-6">
@@ -145,47 +173,50 @@ function PostCard({ data, onShare }) {
           />
         </div>
 
-        {/* BOOKMARK */}
-        <img
-          src={bookmark}
-          className={`w-5 cursor-pointer ${saved ? "" : "opacity-50"}`}
-          onClick={() => setSaved(!saved)}
-          alt="bookmark"
-        />
+ <img
+  src={saved ? bookmarkFilled : bookmark}
+  className="w-6 cursor-pointer transition-transform duration-200"
+  onClick={handleSave}
+  alt="bookmark"
+/>
+
+
+
       </div>
 
-    { /* COMMENTS */ }
+      {/* COMMENTS */}
+      {/* COMMENTS */}
 {showComments && (
   <div className="px-6 pb-4">
     {comments.map((c) => (
-      <div key={c._id} className="flex justify-between items-start text-sm text-gray-300 mb-2">
+      <div
+        key={c._id}
+        className="flex justify-between items-start text-sm text-gray-300 mb-2"
+      >
         <div>
           <span className="font-semibold mr-2">{c.username}</span>
           {c.text}
-          <div className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(c.createdAt).toLocaleString()}
+          </div>
         </div>
 
-        {String(c.userId) === String(currentUser?.id) && (
-          <button
-            onClick={async () => {
-              try {
-                const res = await axios.delete("http://localhost:3001/user/delete-comment", {
-                  headers: { Authorization: `Bearer ${token}` },
-                  data: { postId: data._id, commentId: c._id },
-                });
-                if (res.data.success) setComments((prev) => prev.filter((cm) => cm._id !== c._id));
-              } catch (err) {
-                console.error(err);
-              }
-            }}
-            className="text-gray-400 hover:text-red-500 ml-3"
-          >
-            ✖
-          </button>
+        {/* THREE DOT MENU FOR DELETE */}
+        {(String(c.userId) === String(currentUser?.id) ||
+          String(data.userId?._id) === String(currentUser?.id)) && (
+          <div className="relative">
+            <button
+              className="text-gray-400 hover:text-white"
+              onClick={() => setCommentToDelete(c)}
+            >
+              ⋮
+            </button>
+          </div>
         )}
       </div>
     ))}
 
+    {/* Add Comment */}
     <div className="flex gap-2 mt-3">
       <input
         value={commentText}
@@ -193,22 +224,40 @@ function PostCard({ data, onShare }) {
         className="flex-1 bg-neutral-800 p-2 rounded"
         placeholder="Add a comment..."
       />
-      <button onClick={async () => {
-        if (!commentText.trim()) return;
-        try {
-          const res = await axios.post(
-            "http://localhost:3001/user/add-comment",
-            { postId: data._id, text: commentText },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          if (res.data.success) {
-            setComments((prev) => [...prev, res.data.comment]);
-            setCommentText("");
-          }
-        } catch (err) { console.error(err); }
-      }} className="text-blue-500 font-semibold">Post</button>
+      <button
+        onClick={handleComment}
+        className="text-blue-500 font-semibold"
+      >
+        Post
+      </button>
     </div>
-    
+  </div>
+)}
+
+
+      {/* DELETE CONFIRMATION MODAL */}
+    {/* DELETE CONFIRMATION MODAL */}
+{commentToDelete && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-neutral-900 p-5 rounded-lg w-80 text-white">
+      <p className="mb-4">
+        Delete comment by <strong>{commentToDelete.username}</strong>?
+      </p>
+      <div className="flex justify-end gap-3">
+        <button
+          className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
+          onClick={() => setCommentToDelete(null)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-3 py-1 bg-red-600 rounded hover:bg-red-500"
+          onClick={handleDeleteComment}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
   </div>
 )}
 

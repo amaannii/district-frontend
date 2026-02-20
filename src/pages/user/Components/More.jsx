@@ -16,12 +16,14 @@ function More({ setActive }) {
         Settings
       </button>
 
-      <button
-        onClick={() => setActive("SAVED")}
-        className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
-      >
-        Saved Posts
-      </button>
+      {/* SAVED POSTS */}
+<button
+  onClick={() => setActive("PROFILE")}
+  className="w-full text-left px-3 py-2 rounded hover:bg-gray-800 transition"
+>
+   Saved Posts
+</button>
+
 
      <button
   onClick={() => {
