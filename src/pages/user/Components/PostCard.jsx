@@ -23,15 +23,13 @@ function PostCard({ data, onShare }) {
   const [commentToDelete, setCommentToDelete] = useState(null);
 
  useEffect(() => {
-    if (!data) return;
+  if (!data) return;
 
-    setComments(data.comments || []);
-    setLikeCount(data.likes || 0);
-    setLiked(data.isLiked || false);
-
-    // If backend sends saved boolean
-    setSaved(data.isSaved || false);
-  }, [data]);
+  setComments(data.comments || []);
+  setLikeCount(data.likes || 0);
+  setLiked(data.isLiked || false);
+  setSaved(data.isSaved || false);
+}, [data]);
 
   // LIKE POST
   const handleLike = async () => {
@@ -102,18 +100,31 @@ const handleSave = async () => {
   try {
     const res = await axios.post(
       "http://localhost:3001/user/save-post",
-      { postId: data._id },
+      { postId: data._id, username: data.userId.username },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     if (res.data.success) {
-      setSaved(res.data.saved);
+      setSaved(res.data.saved); // backend should return { success: true, saved: true/false }
+
+      // Optional: update localStorage for faster access in other components
+      const savedPosts = JSON.parse(localStorage.getItem("savedPosts")) || [];
+      if (res.data.saved) {
+        localStorage.setItem(
+          "savedPosts",
+          JSON.stringify([...savedPosts, { postId: data._id }])
+        );
+      } else {
+        localStorage.setItem(
+          "savedPosts",
+          JSON.stringify(savedPosts.filter((p) => p.postId !== data._id))
+        );
+      }
     }
   } catch (err) {
     console.error(err);
   }
 };
-
 
 
   return (
@@ -173,9 +184,9 @@ const handleSave = async () => {
           />
         </div>
 
- <img
+<img
   src={saved ? bookmarkFilled : bookmark}
-  className="w-6 cursor-pointer transition-transform duration-200"
+  className="w-6 cursor-pointer"
   onClick={handleSave}
   alt="bookmark"
 />
