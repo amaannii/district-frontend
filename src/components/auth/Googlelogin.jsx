@@ -7,55 +7,64 @@ import CompleteProfile from "../CompleteProfile.jsx";
 
 function Googlelogin() {
   const navigate = useNavigate();
-  const [profile,setprofile]=useState(false)
-
-
+  const [profile, setprofile] = useState(false);
 
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleprovider);
       const user = result.user;
-      localStorage.setItem("googleEmail", user.email);
 
-      console.log("Google User:", user);
+      const res = await axios.post(
+        "http://localhost:3001/user/google-login",
+        {
+          name: user.displayName,
+          email: user.email,
+        }
+      );
 
-      const res = await axios.post("http://localhost:3001/user/google-login", {
-        name: user.displayName,
-        email: user.email,
-      });
-      if (res.data.status == true) {
-        setprofile(true)
-      } else {
-      }
-
-      if (res.data.success == true) {
+      if (res.data.success === true) {
+        localStorage.setItem("userToken", res.data.token);
+        localStorage.setItem("role", "User");
         navigate("/home");
       } else {
-        alert("complete your profile");
+        setprofile(true);
       }
+
     } catch (error) {
       console.error("Google Login Error:", error);
       alert("Google login failed");
     }
   };
 
-
   return (
     <>
       <button
         onClick={handleGoogleLogin}
-        className="w-[360px] mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition"
+        className="
+          w-full 
+          mt-4 
+          flex 
+          items-center 
+          justify-center 
+          gap-3 
+          rounded-lg 
+          border 
+          border-gray-300 
+          py-3 
+          text-sm sm:text-base
+          hover:bg-gray-50 
+          transition
+        "
       >
         <img
           src="https://www.svgrepo.com/show/475656/google-color.svg"
           alt="google"
-          className="w-5"
+          className="w-5 h-5"
         />
         <span>Log in with Google</span>
-
-
       </button>
-      {profile && (<CompleteProfile/>)}
+
+      {profile && <CompleteProfile />}
     </>
   );
 }
