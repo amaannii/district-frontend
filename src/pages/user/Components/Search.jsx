@@ -2,6 +2,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import saved from "../../../assets/images/icons8-bookmark-64.png";
 import post from "../../../assets/images/icons8-menu-50.png";
+import heart from "../../../assets/images/icons8-heart-24.png";
+import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
+import commentIcon from "../../../assets/images/icons8-comment-50.png";
+import send from "../../../assets/images/icons8-sent-50.png";
+import bookmark from "../../../assets/images/icons8-bookmark-30.png";
+import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 
 function Search() {
   const [users, setUsers] = useState([]);
@@ -11,8 +17,12 @@ function Search() {
   const [activeTab, setActiveTab] = useState("posts");
   const [loading, setLoading] = useState(false);
   const [requested, setRequested] = useState(false);
+
+  const [selectedPost, setSelectedPost] = useState(null);
+
   const [requestedUsers, setRequestedUsers] = useState([]);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+
 
   // Load recent users + Fetch all users
   useEffect(() => {
@@ -42,6 +52,38 @@ function Search() {
     fetchUsers();
   }, []);
 
+
+
+
+
+const fetchUserPosts = async (userId) => {
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("userToken");
+
+    // Fetch posts and saved posts for this user
+    const res = await axios.get(
+      `http://localhost:3001/user/${userId}/posts`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (res.data.success) {
+      setUserPosts(res.data.posts);       // posts created by the user
+      setUserSavedPosts(res.data.saved);  // posts they saved
+    } else {
+      setUserPosts([]);
+      setUserSavedPosts([]);
+    }
+  } catch (error) {
+    console.error(error);
+    setUserPosts([]);
+    setUserSavedPosts([]);
+  } finally {
+    setLoading(false);
+  }
+};
   // Save recent users
   useEffect(() => {
     localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
@@ -273,24 +315,25 @@ function Search() {
               </button>
             </div>
 
-            {activeTab === "posts" && (
-              <>
-                {selectedUser.post && selectedUser.post.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-2 max-w-[90%] mx-auto w-full">
-                    {selectedUser.post.map((img, index) => (
-                      <img
-                        key={index}
-                        src={img.image}
-                        alt="post"
-                        className="w-full h-[250px] object-cover"
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No posts available</p>
-                )}
-              </>
-            )}
+          {activeTab === "posts" && (
+  <>
+    {selectedUser.post && selectedUser.post.length > 0 ? (
+      <div className="grid grid-cols-3 gap-2 max-w-[90%] mx-auto w-full">
+        {selectedUser.post.map((post, index) => (
+          <img
+            key={index}
+            src={post.image}
+            alt="post"
+            className="w-full h-[250px] object-cover cursor-pointer"
+            onClick={() => setSelectedPost(post)}
+          />
+        ))}
+      </div>
+    ) : (
+      <p className="text-gray-500">No posts available</p>
+    )}
+  </>
+)}
 
             {activeTab === "saved" && (
               <p className="text-gray-500">
@@ -341,7 +384,113 @@ function Search() {
           <div className="chaotic-orbit"></div>
         </div>
       )}
-      
+
+      {selectedPost && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+    <div className="bg-black rounded-lg max-w-2xl w-full overflow-y-auto max-h-full relative">
+      {/* Close Button */}
+      <button
+        className="absolute top-3 right-3 text-white text-2xl font-bold"
+        onClick={() => setSelectedPost(null)}
+      >
+        ✕
+      </button>
+
+      {/* PostCard Content */}
+      <div className="border-b border-neutral-800 mb-6">
+
+        {/* USER INFO */}
+        <div className="px-6 py-3 flex items-center gap-2">
+          <img
+            src={selectedUser.img}
+            alt={selectedUser.name}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <span className="font-semibold">@{selectedUser.username}</span>
+        </div>
+
+        {/* IMAGE */}
+        <img
+          src={selectedPost.image}
+          alt="post"
+          className="w-full max-h-[450px] object-cover"
+        />
+
+        {/* CAPTION */}
+        <div className="px-6 py-2 text-gray-300">
+          <span className="font-semibold mr-2">@{selectedUser.username}</span>
+          {selectedPost.caption}
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex justify-between px-6 py-3">
+          <div className="flex gap-5 items-center">
+            {/* LIKE */}
+            <div className="flex items-center gap-1">
+              <img
+                src={selectedPost.isLiked ? heartRed : heart}
+                className="w-5 cursor-pointer"
+                onClick={() => handleLike(selectedPost)}
+                alt="like"
+              />
+              <span className="text-xs text-gray-400">{selectedPost.likes}</span>
+            </div>
+
+            {/* COMMENT */}
+            <img
+              src={commentIcon}
+              className="w-5 cursor-pointer"
+              onClick={() =>
+                setSelectedPost({ ...selectedPost, showComments: !selectedPost.showComments })
+              }
+              alt="comment"
+            />
+
+            {/* SHARE */}
+            <img
+              src={send}
+              className="w-5 cursor-pointer"
+              onClick={() => console.log("Share post")}
+              alt="share"
+            />
+          </div>
+
+          <img
+            src={selectedPost.isSaved ? bookmarkFilled : bookmark}
+            className="w-6 cursor-pointer"
+            onClick={() => handleSave(selectedPost)}
+            alt="bookmark"
+          />
+        </div>
+
+        {/* COMMENTS */}
+        {selectedPost.showComments && (
+          <div className="px-6 pb-4">
+            {(selectedPost.comments || []).map((c) => (
+              <div key={c._id} className="flex justify-between items-start text-sm text-gray-300 mb-2">
+                <div>
+                  <span className="font-semibold mr-2">{c.username}</span>
+                  {c.text}
+                  <div className="text-xs text-gray-500">
+                    {new Date(c.createdAt).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="flex gap-2 mt-3">
+              <input
+                className="flex-1 bg-neutral-800 p-2 rounded"
+                placeholder="Add a comment..."
+              />
+              <button className="text-blue-500 font-semibold">Post</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
