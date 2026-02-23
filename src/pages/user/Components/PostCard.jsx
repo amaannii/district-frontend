@@ -20,7 +20,7 @@ function PostCard({ data, onShare }) {
   const [saved, setSaved] = useState(false);
 
   // Delete modal state
-  const [commentToDelete, setCommentToDelete] = useState(null);
+const [commentToDelete, setCommentToDelete] = useState(null);
 
  useEffect(() => {
   if (!data) return;
@@ -70,28 +70,7 @@ function PostCard({ data, onShare }) {
   };
 
   // DELETE COMMENT
-  const handleDeleteComment = async () => {
-    if (!token || !commentToDelete) return;
-
-    try {
-      const res = await axios.delete(
-        "http://localhost:3001/user/delete-comment",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          data: { postId: data._id, commentId: commentToDelete._id },
-        }
-      );
-      if (res.data.success) {
-        setComments((prev) =>
-          prev.filter((c) => c._id !== commentToDelete._id)
-        );
-        setCommentToDelete(null); // close modal
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+  
 
 // Add function to save post
 const handleSave = async () => {
@@ -120,6 +99,30 @@ const handleSave = async () => {
           JSON.stringify(savedPosts.filter((p) => p.postId !== data._id))
         );
       }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleDeleteComment = async () => {
+  if (!commentToDelete) return;
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/delete-comment",
+      {
+        postId: data._id,
+        commentId: commentToDelete,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res.data.success) {
+      setComments((prev) =>
+        prev.filter((c) => c._id !== commentToDelete)
+      );
+      setCommentToDelete(null);
     }
   } catch (err) {
     console.error(err);
@@ -199,34 +202,28 @@ const handleSave = async () => {
       {/* COMMENTS */}
 {showComments && (
   <div className="px-6 pb-4">
-    {comments.map((c) => (
-      <div
-        key={c._id}
-        className="flex justify-between items-start text-sm text-gray-300 mb-2"
-      >
-        <div>
-          <span className="font-semibold mr-2">{c.username}</span>
-          {c.text}
-          <div className="text-xs text-gray-500">
-            {new Date(c.createdAt).toLocaleString()}
-          </div>
-        </div>
-
-        {/* THREE DOT MENU FOR DELETE */}
-        {(String(c.userId) === String(currentUser?.id) ||
-          String(data.userId?._id) === String(currentUser?.id)) && (
-          <div className="relative">
-            <button
-              className="text-gray-400 hover:text-white"
-              onClick={() => setCommentToDelete(c)}
-            >
-              ⋮
-            </button>
-          </div>
-        )}
+ {comments.map((c) => (
+  <div
+    key={c._id}
+    className="flex justify-between items-start text-sm text-gray-300 mb-2"
+  >
+    <div>
+      <span className="font-semibold mr-2">{c.username}</span>
+      {c.text}
+      <div className="text-xs text-gray-500">
+        {new Date(c.createdAt).toLocaleString()}
       </div>
-    ))}
+    </div>
 
+    {/* ✅ Show delete only if comment belongs to logged-in user */}
+      <button
+        onClick={() => setCommentToDelete(c._id)}
+        className="text-red-500 text-xs ml-3 hover:text-red-400"
+      >
+        Delete
+      </button>
+  </div>
+))}
     {/* Add Comment */}
     <div className="flex gap-2 mt-3">
       <input
@@ -244,26 +241,28 @@ const handleSave = async () => {
     </div>
   </div>
 )}
-
-
-      {/* DELETE CONFIRMATION MODAL */}
-    {/* DELETE CONFIRMATION MODAL */}
 {commentToDelete && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-neutral-900 p-5 rounded-lg w-80 text-white">
-      <p className="mb-4">
-        Delete comment by <strong>{commentToDelete.username}</strong>?
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+    <div className="bg-neutral-900 p-6 rounded-lg w-80 text-center shadow-lg">
+      <h3 className="text-lg font-semibold mb-4 text-white">
+        Delete Comment?
+      </h3>
+
+      <p className="text-gray-400 text-sm mb-6">
+        Are you sure you want to delete this comment?
       </p>
-      <div className="flex justify-end gap-3">
+
+      <div className="flex justify-between">
         <button
-          className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600"
           onClick={() => setCommentToDelete(null)}
+          className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500"
         >
           Cancel
         </button>
+
         <button
-          className="px-3 py-1 bg-red-600 rounded hover:bg-red-500"
           onClick={handleDeleteComment}
+          className="px-4 py-2 bg-red-600 rounded hover:bg-red-500"
         >
           Delete
         </button>
@@ -271,6 +270,7 @@ const handleSave = async () => {
     </div>
   </div>
 )}
+
 
     </div>
   );
