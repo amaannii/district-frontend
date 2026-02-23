@@ -1,191 +1,270 @@
 import { useEffect, useRef, useState } from "react";
+import socket from "../../../Socket";
+import axios from "axios";
 
-const EMOJIS = ["😀","😂","😍","🥰","😎","🤔","😢","😡","👍","🙏","🔥","🎉","❤️"];
+const EMOJIS = [
+  "😀",
+  "😂",
+  "😍",
+  "🥰",
+  "😎",
+  "🤔",
+  "😢",
+  "😡",
+  "👍",
+  "🙏",
+  "🔥",
+  "🎉",
+  "❤️",
+];
 
 function ChatBox({ district, onBack }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [showEmojis, setShowEmojis] = useState(false);
-
+  const [recording, setRecording] = useState(false);
+  const [currentUser, setcurrentUser] = useState(null);
   const fileInputRef = useRef(null);
-  const audioInputRef = useRef(null);
-const mediaRecorderRef = useRef(null);
-const audioChunksRef = useRef([]);
-const [recording, setRecording] = useState(false);
-
-const [loading, setloading] = useState(false);
-
-
   const docInputRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
-  const [previewIndex, setPreviewIndex] = useState(null);
+  /* ================= SOCKET ================= */
 
-  // Load messages from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(`chat_${district}`);
-    if (stored) setMessages(JSON.parse(stored));
+    const fetchDetails = async () => {
+      try {
+        const token = localStorage.getItem("userToken");
+
+        const res = await axios.post(
+          "http://localhost:3001/user/userdetails",
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        const user = res.data.user;
+        setcurrentUser(user);
+      } catch (error) {
+        console.log("Error fetching notification settings ❌", error);
+      }
+    };
+
+    fetchDetails();
+    if (!district) return;
+
+    setMessages([]);
+
+    // 🔥 Fetch old messages
+    fetch(`http://localhost:3001/messages/${district}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((msg) => ({
+          ...msg.message,
+          sender: msg.sender,
+          time: msg.createdAt,
+        }));
+
+        setMessages(formatted);
+      });
+
+    socket.emit("joinDistrict", district);
+
+    const receiveHandler = (msg) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          ...msg.message,
+          sender: msg.sender,
+          time: msg.createdAt,
+        },
+      ]);
+    };
+
+    socket.on("receiveMessage", receiveHandler);
+
+    return () => {
+      socket.off("receiveMessage", receiveHandler);
+      socket.emit("leaveDistrict", district);
+    };
   }, [district]);
 
-  // Save messages to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(`chat_${district}`, JSON.stringify(messages));
-  }, [messages, district]);
-
-  const formatTime = (sec) => {
-    const m = String(Math.floor(sec / 60)).padStart(2, "0");
-    const s = String(sec % 60).padStart(2, "0");
-    return `${m}:${s}`;
-  };
-
-
+  /* ================= SEND TEXT ================= */
 
   const sendMessage = () => {
     if (!message.trim()) return;
-  
-     const newMsg = { 
-      type: "text", 
-      content: message, 
-      time: new Date().toISOString() 
-    };
-    setMessages(prev => [...prev, newMsg]);
+    console.log(currentUser);
+
+    socket.emit("sendMessage", {
+      district,
+      message: {
+        type: "text",
+        content: message,
+      },
+
+      sender: currentUser.name, // 🔥 important
+    });
+
     setMessage("");
   };
 
+  /* ================= EMOJI ================= */
+
   const sendEmoji = (emoji) => {
-   setMessage(prev => prev + emoji);
+    setMessage((prev) => prev + emoji);
     setShowEmojis(false);
   };
+
+  /* ================= IMAGE ================= */
 
   const sendImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
-      const newMsg = { type: "image", content: url, time: new Date().toISOString() };
-    setMessages(prev => [...prev, newMsg]);
+
+    socket.emit("sendMessage", {
+      district,
+      message: {
+        type: "image",
+        content: url,
+      },
+      sender: currentUser.name,
+    });
   };
 
-   const sendDocument = (e) => {
+  /* ================= DOCUMENT ================= */
+
+  const sendDocument = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
-     const newMsg = { type: "document", content: url, name: file.name, time: new Date().toISOString() };
-    setMessages(prev => [...prev, newMsg]);
+
+    socket.emit("sendMessage", {
+      district,
+      message: {
+        type: "document",
+        content: url,
+        name: file.name,
+      },
+      sender: currentUser.name,
+    });
   };
+
+  /* ================= AUDIO ================= */
+
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
     mediaRecorderRef.current = new MediaRecorder(stream);
     audioChunksRef.current = [];
-    mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+
+    mediaRecorderRef.current.ondataavailable = (e) =>
+      audioChunksRef.current.push(e.data);
+
     mediaRecorderRef.current.start();
     setRecording(true);
-    setSeconds(0);
   };
 
-   const cancelRecording = () => {
+  const cancelRecording = () => {
     mediaRecorderRef.current.stop();
     setRecording(false);
-    setSeconds(0);
     audioChunksRef.current = [];
   };
 
- const sendRecording = () => {
+  const sendRecording = () => {
     mediaRecorderRef.current.stop();
+
     mediaRecorderRef.current.onstop = () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const newMsg = { type: "audio", content: audioUrl, time: new Date().toISOString() };
-      setMessages(prev => [...prev, newMsg]);
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      const url = URL.createObjectURL(blob);
+
+      socket.emit("sendMessage", {
+        district,
+        message: {
+          type: "audio",
+          content: url,
+        },
+        sender: currentUser.name,
+      });
+
       setRecording(false);
-      setSeconds(0);
     };
   };
 
+  /* ================= UI ================= */
+
   return (
-    <div className="flex flex-col h-[80vh] bg-[#0f0f0f] rounded-xl play-regular p-4 relative">
-
-      {/* Header */}
+    <div className="flex flex-col  h-[80vh] bg-[#0f0f0f] rounded-xl p-4 text-white">
       <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
-        <button onClick={onBack} className="text-white text-lg ">
-          ←
-        </button>
-        <h2 className="text-lg font-semibold">{district}</h2>
+        <button onClick={onBack}>←</button>
+        <h2>{district}</h2>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-4 flex flex-col">
-            {messages.map((msg, i) => (
-          <div key={i} className="flex flex-col items-end">
-            {msg.type === "text" && (
-              <div className="self-end bg-white px-4 py-2 text-black rounded-lg max-w-xs">
-                {msg.content}
-              </div>
-            )}
+      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 flex flex-col">
+        {messages.map((msg, i) => {
+          const isMe = msg.sender === currentUser?.name;
 
-       {msg.type === "image" && (
-              <img
-                
-                src={msg.content}
-                className="self-end max-w-xs rounded-lg cursor-pointer"
-                alt="sent"
-                onClick={() => setPreviewIndex(i)}
-              />
-       )}
+          return (
+            <div
+              key={i}
+              className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+            >
+              <span className="text-xs text-gray-400 mb-1">
+  {isMe ? "You" : msg.sender}
+</span>
 
-         {msg.type === "audio" && (
-              <audio controls className="self-end max-w-xs">
-                <source src={msg.content} />
-              </audio>
-               )}
+              {msg.type === "text" && (
+                <div
+                  className={`px-4 py-2 rounded-lg max-w-xs ${
+                    isMe ? "bg-[#879F00] text-white" : "bg-white text-black"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              )}
 
-            {msg.type === "document" && (
-              <div
-                className="self-end bg-gray-800 px-4 py-2 rounded-lg cursor-pointer"
-                onClick={() => setPreviewIndex(i)}
-              >
-                📄 {msg.name}
-              </div>
-            )}
+              {msg.type === "image" && (
+                <img src={msg.content} className="max-w-xs rounded-lg" alt="" />
+              )}
 
-            {/* Timestamp */}
-            <span className="text-gray-400 text-xs mt-1">
-              {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          </div>
-        ))}
+              {msg.type === "audio" && (
+                <audio controls>
+                  <source src={msg.content} />
+                </audio>
+              )}
+
+              {msg.type === "document" && (
+                <div className="bg-gray-800 px-4 py-2 rounded-lg">
+                  📄 {msg.name}
+                </div>
+              )}
+
+              <span className="text-gray-400 text-xs mt-1">
+                {new Date(msg.time).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      {showEmojis && (
-        <div className="flex flex-wrap gap-2 mb-2">
-          {EMOJIS.map((e, i) => (
-            <button key={i} onClick={() => sendEmoji(e)}>
-              {e}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Input Bar */}
       <div className="flex items-center gap-3 border-t border-gray-700 pt-3">
-           {!recording ? (
+        {!recording ? (
           <>
             <button onClick={() => setShowEmojis(!showEmojis)}>😊</button>
 
             <button onClick={() => fileInputRef.current.click()}>🖼️</button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={sendImage}
-            />
+            <input ref={fileInputRef} type="file" hidden onChange={sendImage} />
 
             <button onClick={() => docInputRef.current.click()}>📎</button>
             <input
               ref={docInputRef}
               type="file"
-              accept=".pdf,.doc,.docx,.txt,.xls,.xlsx"
               hidden
               onChange={sendDocument}
             />
@@ -194,11 +273,11 @@ const [loading, setloading] = useState(false);
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={`Message ${district}`}
-              className="flex-1 px-4 py-2 rounded-full bg-gray-800 outline-none"
+              className="flex-1 px-4 py-2 rounded-full bg-gray-800"
             />
 
             {message ? (
-              <button onClick={sendMessage} className="text-[#879F00] font-medium">
+              <button onClick={sendMessage} className="text-[#879F00]">
                 Send
               </button>
             ) : (
@@ -206,55 +285,13 @@ const [loading, setloading] = useState(false);
             )}
           </>
         ) : (
-          <div className="flex items-center justify-between w-full bg-gray-800 px-4 py-2 rounded-full">
-            <button onClick={cancelRecording} className="text-red-500">✖</button>
-            <div className="flex items-center gap-2 text-red-500">🔴 {formatTime(seconds)}</div>
-            <button onClick={sendRecording} className="text-[#879F00]">➤</button>
+          <div className="flex justify-between w-full bg-gray-800 px-4 py-2 rounded-full">
+            <button onClick={cancelRecording}>✖</button>
+            <span>🔴 Recording...</span>
+            <button onClick={sendRecording}>➤</button>
           </div>
         )}
       </div>
-{previewIndex !== null && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-          <div className="relative flex flex-col items-center">
-            <button
-              onClick={() => setPreviewIndex(null)}
-              className="absolute top-2 right-2 text-white text-2xl"
-            >
-              ✖
-            </button>
-
-            {messages[previewIndex].type === "image" && (
-              <img
-                src={messages[previewIndex].content}
-                className="max-h-[80vh] max-w-[80vw] rounded-lg"
-              />
-            )}
-
-            {messages[previewIndex].type === "document" && (
-              <div className="flex flex-col items-center gap-4 text-white">
-                <p>📄 {messages[previewIndex].name}</p>
-                <a
-                  href={messages[previewIndex].content}
-                  download={messages[previewIndex].name}
-                  className="px-4 py-2 bg-[#879F00] rounded"
-                >
-                  Download
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-       {loading && (
-        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
-          <div
-            className="chaotic-orbit
-       "
-          ></div>
-
-        </div>
-      )}
     </div>
   );
 }
