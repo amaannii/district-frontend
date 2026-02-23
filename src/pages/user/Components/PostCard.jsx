@@ -18,10 +18,11 @@ function PostCard({ data, onShare }) {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
   const [saved, setSaved] = useState(false);
-
+const [showShare, setShowShare] = useState(false);
+const [selectedDistrict, setSelectedDistrict] = useState(null);
   // Delete modal state
 const [commentToDelete, setCommentToDelete] = useState(null);
-
+const [selectedDistricts, setSelectedDistricts] = useState([]);
  useEffect(() => {
   if (!data) return;
 
@@ -30,6 +31,15 @@ const [commentToDelete, setCommentToDelete] = useState(null);
   setLiked(data.isLiked || false);
   setSaved(data.isSaved || false);
 }, [data]);
+
+
+const toggleDistrict = (district) => {
+  setSelectedDistricts((prev) =>
+    prev.includes(district)
+      ? prev.filter((d) => d !== district)
+      : [...prev, district]
+  );
+};
 
   // LIKE POST
   const handleLike = async () => {
@@ -128,7 +138,37 @@ const handleDeleteComment = async () => {
     console.error(err);
   }
 };
+const handleShareToChat = async () => {
+  if (!data?._id || !selectedDistricts.length) return;
 
+  try {
+    const res = await axios.post("/send-post-to-chats", {
+      postId: data._id,
+      chatIds: selectedDistricts
+    });
+  } catch (err) {
+    console.error("Share failed:", err);
+  }
+}
+
+const handleSendPost = async () => {
+  if (!selectedDistricts.length) return;
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/send-post-to-chats",
+      { chatIds: selectedDistricts, postId: data._id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res.data.success) {
+      setShowShare(false);         // close modal
+      setSelectedDistricts([]);    // reset selection
+    }
+  } catch (err) {
+    console.error("Share failed:", err);
+  }
+};
 
   return (
     <div className="border-b border-neutral-800 mb-6">
@@ -182,7 +222,7 @@ const handleDeleteComment = async () => {
           <img
             src={send}
             className="w-5 cursor-pointer"
-            onClick={() => onShare && onShare(data)}
+            onClick={() => setShowShare(true)}
             alt="share"
           />
         </div>
@@ -262,7 +302,7 @@ const handleDeleteComment = async () => {
 
         <button
           onClick={handleDeleteComment}
-          className="px-4 py-2 bg-red-600 rounded hover:bg-red-500"
+          className="px-4 py-2 bg-[#879F00] rounded hover:bg-[#879F00]"
         >
           Delete
         </button>
@@ -271,6 +311,59 @@ const handleDeleteComment = async () => {
   </div>
 )}
 
+
+{showShare && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+    <div className="bg-neutral-900 p-6 rounded-lg w-80 max-h-[70vh] overflow-y-auto">
+      <h2 className="text-lg font-semibold mb-4 text-white">
+        Share Post
+      </h2>
+
+      {[
+        "KASARGOD",
+        "KANNUR",
+        "ERNAKULAM",
+        "KOZHIKODE",
+        "IDUKKI",
+        "KOTTAYAM",
+        "WAYANAD",
+        "MALAPPURAM",
+        "PALAKKAD",
+        "THRISSUR",
+        "ALAPPUZHA",
+        "KOVALAM",
+        "PATHANAMTHITTA",
+        "THIRUVANANTHAPURAM",
+      ].map((district) => (
+        <div
+          key={district}
+          onClick={() => toggleDistrict(district)}
+          className={`p-3 cursor-pointer rounded text-white 
+            ${selectedDistricts.includes(district) ? "bg-[#879F00]" : "hover:bg-neutral-800"}
+          `}
+        >
+          {district}
+        </div>
+      ))}
+
+      <button
+        onClick={handleSendPost}
+        className="mt-4 w-full py-2 rounded bg-[#879F00] hover:bg-[#879F00]"
+      >
+        Send
+      </button>
+<button
+  onClick={() => {
+    setShowShare(false);
+    setSelectedDistricts([]); // optional: clear selection
+  }}
+  className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+>
+  Cancel
+</button>
+    </div>
+  </div>
+)}
 
     </div>
   );
