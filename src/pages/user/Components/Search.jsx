@@ -17,7 +17,12 @@ function Search() {
   const [activeTab, setActiveTab] = useState("posts");
   const [loading, setLoading] = useState(false);
   const [requested, setRequested] = useState(false);
+
   const [selectedPost, setSelectedPost] = useState(null);
+
+  const [requestedUsers, setRequestedUsers] = useState([]);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+
 
   // Load recent users + Fetch all users
   useEffect(() => {
@@ -26,12 +31,15 @@ function Search() {
       setRecentUsers(JSON.parse(stored));
     }
 
+    const storedRequests = localStorage.getItem("requestedUsers");
+    if (storedRequests) {
+      setRequestedUsers(JSON.parse(storedRequests));
+    }
+
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          "http://localhost:3001/user/allusers"
-        );
+        const res = await axios.get("http://localhost:3001/user/allusers");
         if (res.data.success) {
           setUsers(res.data.users);
         }
@@ -85,9 +93,7 @@ const fetchUserPosts = async (userId) => {
   const searchResults = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
-      (user.username || "")
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      (user.username || "").toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleSelectUser = (user) => {
@@ -112,6 +118,10 @@ const fetchUserPosts = async (userId) => {
   };
 
   const handleRequest = async () => {
+    if (!selectedUser || requestedUsers.includes(selectedUser._id)) {
+      return; // Prevent sending again
+    }
+
     try {
       const token = localStorage.getItem("userToken");
 
@@ -122,28 +132,61 @@ const fetchUserPosts = async (userId) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.success) {
-        alert("Request sent successfully");
+     
+
+        const updatedRequests = [...requestedUsers, selectedUser._id];
+        setRequestedUsers(updatedRequests);
+        localStorage.setItem("requestedUsers", JSON.stringify(updatedRequests));
+
         setRequested(true);
-      } else {
-        alert("Request failed");
       }
     } catch (error) {
       console.error(error);
     }
   };
 
+  const handleRemoveRequest = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+
+    // OPTIONAL: If backend delete route exists
+    await axios.post(
+      "http://localhost:3001/user/remove-request",
+      { username: selectedUser.username },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  // Remove locally
+  const updated = requestedUsers.filter(
+    (id) => id !== selectedUser._id
+  );
+
+  setRequestedUsers(updated);
+  localStorage.setItem("requestedUsers", JSON.stringify(updated));
+
+  setShowRemoveModal(false);
+};
+
+
+
   const listToShow = search ? searchResults : recentUsers;
 
   return (
     <div className="flex play-regular text-white bg-black w-full h-full">
-      
       {/* ================= LEFT SEARCH COLUMN ================= */}
       <div className="w-[320px] border-r border-gray-800 flex flex-col h-full">
-
         {/* Header + Input */}
         <div className="p-4">
           <h1 className="text-2xl font-semibold mb-4">Search</h1>
@@ -157,9 +200,7 @@ const fetchUserPosts = async (userId) => {
           />
 
           <div className="flex justify-between mb-2">
-            <span className="text-sm">
-              {search ? "Results" : "Recent"}
-            </span>
+            <span className="text-sm">{search ? "Results" : "Recent"}</span>
 
             {recentUsers.length > 0 && !search && (
               <span
@@ -191,9 +232,7 @@ const fetchUserPosts = async (userId) => {
                   />
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-xs text-gray-400">
-                      @{user.username}
-                    </p>
+                    <p className="text-xs text-gray-400">@{user.username}</p>
                   </div>
                 </div>
 
@@ -232,15 +271,22 @@ const fetchUserPosts = async (userId) => {
             </h2>
 
             <button
-              onClick={handleRequest}
-              disabled={requested}
+              onClick={() => {
+                if (requestedUsers.includes(selectedUser._id)) {
+                  setShowRemoveModal(true); // Show popup
+                } else {
+                  handleRequest();
+                }
+              }}
               className={`h-[35px] w-[160px] text-white rounded-md mb-6 ${
-                requested
-                  ? "bg-gray-600 cursor-not-allowed"
+                requestedUsers.includes(selectedUser._id)
+                  ? "bg-gray-600"
                   : "bg-[#879F00]"
               }`}
             >
-              {requested ? "Requested" : "Connect"}
+              {requestedUsers.includes(selectedUser._id)
+                ? "Requested"
+                : "Connect"}
             </button>
 
             <hr className="w-full mb-6 border-gray-700" />
@@ -302,14 +348,43 @@ const fetchUserPosts = async (userId) => {
             </p>
           </div>
         )}
+        {showRemoveModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+    <div className="bg-black border border-gray-700 rounded-xl p-6 w-[350px] text-center">
+      <h3 className="text-lg font-semibold mb-4">
+        Remove Request?
+      </h3>
+      <p className="text-gray-400 mb-6 text-sm">
+        Do you want to remove the connection request?
+      </p>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => setShowRemoveModal(false)}
+          className="px-4 py-2 bg-gray-600 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleRemoveRequest}
+          className="px-4 py-2 bg-red-600 rounded"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
 
       {/* Loading Overlay */}
       {loading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-70">
+        <div className="absolute inset-0 flex justify-center items-center bg-opacity-70">
           <div className="chaotic-orbit"></div>
         </div>
       )}
+
       {selectedPost && (
   <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
     <div className="bg-black rounded-lg max-w-2xl w-full overflow-y-auto max-h-full relative">
@@ -415,6 +490,7 @@ const fetchUserPosts = async (userId) => {
     </div>
   </div>
 )}
+
     </div>
   );
 }
