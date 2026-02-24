@@ -8,7 +8,7 @@ import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 
 
-function PostCard({ data, onShare }) {
+function PostCard({ data, onShare, user }) {
   const token = localStorage.getItem("userToken");
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
@@ -256,12 +256,15 @@ const handleSendPost = async () => {
     </div>
 
     {/* ✅ Show delete only if comment belongs to logged-in user */}
+    {c.username === user && (
       <button
         onClick={() => setCommentToDelete(c._id)}
         className="text-red-500 text-xs ml-3 hover:text-red-400"
       >
         Delete
       </button>
+    )}
+      
   </div>
 ))}
     {/* Add Comment */}
