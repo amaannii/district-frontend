@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.jpg";
 import login from "../assets/images/login.jpg";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Googlelogin from "./auth/Googlelogin";
 
 const Login = () => {
@@ -16,19 +15,14 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  /* ================= VALIDATION ================= */
   const validateLogin = () => {
     let newErrors = {};
 
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       newErrors.email = "Enter a valid email address";
-    }
 
-    if (!password) {
-      newErrors.password = "Password is required";
-    }
+    if (!password) newErrors.password = "Password is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -38,21 +32,15 @@ const Login = () => {
     if (!validateLogin()) return;
 
     setLoading(true);
-
     try {
-      const { data } = await axios.post("http://localhost:3001/user/login", {
-        email,
-        password,
-      }); 
+      const { data } = await axios.post(
+        "http://localhost:3001/user/login",
+        { email, password }
+      );
 
-      console.log("Response:", data.success);
-
-      if (data.success==true) {
-
+      if (data.success === true) {
         localStorage.setItem("userToken", data.token);
-        
         localStorage.setItem("role", data.role);
-
         navigate("/home");
       } else {
         alert(data.message || "Invalid credentials");
@@ -65,70 +53,107 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden play-regular relative">
+    <div className="flex flex-col lg:flex-row min-h-screen w-full bg-white">
+
       {/* LEFT IMAGE */}
-      <div className="hidden md:flex w-1/2 h-full bg-gray-300">
-        <img className="h-full w-full object-cover" src={login} alt="login" />
+      <div className="hidden lg:flex lg:w-1/2">
+        <img
+          className="h-full w-full object-cover"
+          src={login}
+          alt="login"
+        />
       </div>
 
       {/* RIGHT FORM */}
-      <div className="flex w-full lg:w-1/2 h-full items-center justify-center bg-white px-4">
-        <div className="w-full max-w-[360px]">
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-4 py-10">
+
+        <div className="w-full max-w-md">
+
           {/* LOGO */}
           <img
             src={logo}
             alt="DistriX"
-            className="w-36 mx-auto mb-8 h-[120px] object-contain"
+            className="w-28 sm:w-36 mx-auto mb-8 object-contain"
           />
 
-          {/* EMAIL */}
-          <div className="mb-4">
-            <label className="block text-sm text-gray-600 mb-1">Email</label>
-            <input
-              type="text"
-              placeholder="email"
-              value={email}
-              onChange={(e) => {
-                setemail(e.target.value);
-                setErrors({ ...errors, email: "" });
-              }}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-[10px] mt-1">{errors.email}</p>
-            )}
-          </div>
+          <div className="space-y-6">
 
-          {/* PASSWORD */}
-          <div className="mb-2">
-            <label className="block text-sm text-gray-600 mb-1">Password</label>
+            {/* EMAIL */}
+            <div className="relative">
+              <input
+                type="email"
+                placeholder=" "
+                value={email}
+                onChange={(e) => {
+                  setemail(e.target.value);
+                  setErrors({ ...errors, email: "" });
+                }}
+                className="peer w-full px-4 py-3 rounded-lg text-black border-2 border-gray-300 focus:outline-none focus:border-black transition"
+              />
+              <label
+                className="absolute left-4 top-4 px-2 bg-white text-gray-600
+                transition-all pointer-events-none
+                peer-focus:-top-3 peer-focus:left-3 peer-focus:text-sm
+                peer-focus:text-gray-500 peer-focus:font-semibold
+                peer-[:not(:placeholder-shown)]:-top-3
+                peer-[:not(:placeholder-shown)]:left-3
+                peer-[:not(:placeholder-shown)]:text-sm
+                peer-[:not(:placeholder-shown)]:font-semibold"
+              >
+                Email
+              </label>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* PASSWORD */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter password"
+                placeholder=" "
                 value={password}
                 onChange={(e) => {
                   setpassword(e.target.value);
                   setErrors({ ...errors, password: "" });
                 }}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-14 outline-none focus:ring-2 focus:ring-gray-400"
+                className="peer w-full px-4 py-3 pr-12 rounded-lg text-black border-2 border-gray-300 focus:outline-none focus:border-black transition"
               />
+              <label
+                className="absolute left-4 top-4 px-2 bg-white text-gray-600
+                transition-all pointer-events-none
+                peer-focus:-top-3 peer-focus:left-3 peer-focus:text-sm
+                peer-focus:text-gray-500 peer-focus:font-semibold
+                peer-[:not(:placeholder-shown)]:-top-3
+                peer-[:not(:placeholder-shown)]:left-3
+                peer-[:not(:placeholder-shown)]:text-sm
+                peer-[:not(:placeholder-shown)]:font-semibold"
+              >
+                Password
+              </label>
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
               </button>
+
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password}
+                </p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-[10px] mt-1">{errors.password}</p>
-            )}
+
           </div>
 
-          {/* FORGOT */}
+          {/* FORGOT PASSWORD */}
           <Link to="/forgetten">
-            <p className="text-sm text-gray-500 mb-6 cursor-pointer">
+            <p className="text-sm text-gray-500 mt-3 mb-6 cursor-pointer">
               Forgotten password?
             </p>
           </Link>
@@ -137,34 +162,24 @@ const Login = () => {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full rounded-lg bg-black py-3 text-white text-lg disabled:opacity-50"
+            className="w-full rounded-lg bg-black py-3 text-white text-lg hover:bg-gray-900 disabled:opacity-50 transition"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {/* GOOGLE */}
-          {/* <button
-  onClick={handleGoogleLogin}
-  className="w-full mt-4 flex items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 hover:bg-gray-50 transition"
->
-  <img
-    src="https://www.svgrepo.com/show/475656/google-color.svg"
-    alt="google"
-    className="w-5"
-  />
-  <span>Log in with Google</span>
-</button> */}
+          {/* GOOGLE LOGIN */}
           <Googlelogin />
 
           {/* SIGNUP */}
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link to="/signup">
-              <span className="text-[#879F00]  cursor-pointer hover:underline">
+              <span className="text-[#879F00] hover:underline">
                 Sign up
               </span>
             </Link>
           </p>
+
         </div>
       </div>
     </div>
