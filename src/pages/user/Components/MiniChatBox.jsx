@@ -1,4 +1,3 @@
-
 import ksg from "../../../assets/images/Bekal Fort Kasargod.jpeg";
 import knr from "../../../assets/images/Theyyam.jpeg";
 import ernklm from "../../../assets/images/fortkochi (1).jpeg";
@@ -13,6 +12,7 @@ import alpzha from "../../../assets/images/Alappuzha.jpeg";
 import kollm from "../../../assets/images/Kovalam.jpeg";
 import pathmtta from "../../../assets/images/Pathanamthitta.jpeg";
 import tvpm from "../../../assets/images/download (12).jpeg";
+
 const miniMessages = [
   { src: ksg, title: "KASARGOD" },
   { src: knr, title: "KANNUR" },
@@ -21,9 +21,9 @@ const miniMessages = [
   { src: idki, title: "IDUKKI" },
   { src: ktym, title: "KOTTAYAM" },
   { src: wyd, title: "WAYANAD" },
-  { src: mlpm, title: "MALAPURAM" },
+  { src: mlpm, title: "MALAPPURAM" },
   { src: plkd, title: "PALAKKAD" },
-  { src: tsr, title: "TRISSUR" },
+  { src: tsr, title: "THRISSUR" },
   { src: alpzha, title: "ALAPPUZHA" },
   { src: kollm, title: "KOLLAM" },
   { src: pathmtta, title: "PATHANAMTHITTA" },
@@ -32,29 +32,51 @@ const miniMessages = [
 
 function MiniChatBox({ openChat }) {
   return (
-    <div className="h-[100vh] play-regular bg-[#0f0f0f] border-l overflow-scroll scrollbar-hide border-neutral-800 px-4 py-6">
-      
+    <div
+      className="
+        w-full 
+        md:w-[320px] 
+        lg:w-[350px]
+        h-screen 
+        bg-[#0f0f0f] 
+        border-neutral-800 
+        md:border-l
+        overflow-y-auto 
+        scrollbar-hide
+        px-4 
+        py-6
+      "
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-semibold">Messages</h2>
-       
+      <div className="sticky top-0 bg-[#0f0f0f] z-10 pb-4">
+        <h2 className="text-lg font-semibold text-white">
+          Messages
+        </h2>
       </div>
 
       {/* Message List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {miniMessages.map((item, i) => (
           <div
             key={i}
-             onClick={() => openChat(item)}
-            className="flex items-center gap-4 cursor-pointer hover:bg-neutral-900 p-2 rounded-lg transition"
+            onClick={() => openChat(item)}
+            className="
+              flex items-center gap-4 
+              cursor-pointer 
+              hover:bg-neutral-900 
+              p-3 
+              rounded-xl 
+              transition duration-200
+            "
           >
             <img
               src={item.src}
-              alt=""
+              alt={item.title}
               className="w-12 h-12 rounded-full object-cover"
             />
+
             <div>
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-semibold text-white">
                 {item.title}
               </p>
               <p className="text-xs text-gray-400">

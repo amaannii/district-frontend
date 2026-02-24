@@ -120,86 +120,97 @@ if(response.data.success===true){
   };
 
   // 🔹 Notification Card
-  const NotificationItem = ({ item }) => (
-    <div className="flex items-center justify-between py-4 border-b border-white/10">
-      {/* Profile */}
-      <div
-        className="flex items-center gap-4 cursor-pointer"
-        onClick={() => navigate(`/profile/${item._id}`)}
-      >
-        <img
-          src={item.img}
-          alt="profile"
-          className="w-12 h-12 rounded-full object-cover"
-        />
+const NotificationItem = ({ item }) => (
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4 border-b border-white/10">
 
-        <div>
-          <p className="text-white text-sm">
-            <span className="font-semibold">{item.username}</span> sent you a
-            connection request
-          </p>
+    {/* Profile Section */}
+    <div
+      className="flex items-center gap-4 cursor-pointer"
+      onClick={() => navigate(`/profile/${item._id}`)}
+    >
+      <img
+        src={item.img}
+        alt="profile"
+        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+      />
 
-          <p className="text-gray-400 text-xs">
-            {new Date(item.Date).toLocaleString()}
-          </p>
-        </div>
+      <div>
+        <p className="text-sm">
+          <span className="font-semibold">{item.username}</span>{" "}
+          sent you a connection request
+        </p>
+
+        <p className="text-gray-400 text-xs">
+          {new Date(item.Date).toLocaleString()}
+        </p>
       </div>
+    </div>
 
-      {/* Actions */}
-      <div className="flex gap-3">
-        {!item.confirmed ? (
-          <>
-            <button
-              onClick={() => handleConfirm(item.username)}
-              className="px-4 py-1 bg-[#879F00] text-white rounded-sm text-sm font-medium"
-            >
-              Confirm
-            </button>
+    {/* Actions */}
+    <div className="flex gap-2 sm:gap-3">
+      {!item.confirmed ? (
+        <>
+          <button
+            onClick={() => handleConfirm(item.username)}
+            className="px-3 sm:px-4 py-1 bg-[#879F00] text-white rounded-md text-xs sm:text-sm"
+          >
+            Confirm
+          </button>
 
-            <button
-              onClick={() => handleDelete(item._id)}
-              className="px-4 py-1 bg-white text-black rounded-full text-sm"
-            >
-              Delete
-            </button>
-          </>
-        ) : (
           <button
             onClick={() => handleDelete(item._id)}
-            className="px-4 py-1 bg-white text-black rounded-full text-sm"
+            className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm"
           >
             Delete
           </button>
-        )}
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen play-regular bg-black flex py-6 border-r border-gray-600">
-      <div className="w-[450px] max-w-md px-2">
-        <h1 className="text-2xl font-semibold mb-6 text-white">
-          Notifications
-        </h1>
-
-        {notifications.length === 0 ? (
-          <p className="text-gray-400 text-sm">No notifications</p>
-        ) : (
-          notifications.map((item) => (
-            <NotificationItem key={item._id} item={item} />
-          ))
-        )}
-      </div>
-       {loading && (
-        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center ">
-          <div
-            className="chaotic-orbit
-       "
-          ></div>
-        </div>
+        </>
+      ) : (
+        <button
+          onClick={() => handleDelete(item._id)}
+          className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm"
+        >
+          Delete
+        </button>
       )}
     </div>
-  );
+  </div>
+);
+
+return (
+  <div className="min-h-screen bg-black text-white flex justify-center">
+
+    {/* Container */}
+    <div className="
+        w-full 
+        max-w-2xl 
+        px-4 sm:px-6 md:px-8 
+        pt-10 md:pt-10 
+        pb-24 md:pb-10
+      ">
+
+      <h1 className="text-xl sm:text-2xl font-semibold mb-6">
+        Notifications
+      </h1>
+
+      {notifications.length === 0 ? (
+        <p className="text-gray-400 text-sm">
+          No notifications
+        </p>
+      ) : (
+        notifications.map((item) => (
+          <NotificationItem key={item._id} item={item} />
+        ))
+      )}
+    </div>
+
+    {/* Loading Overlay */}
+    {loading && (
+      <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="chaotic-orbit"></div>
+      </div>
+    )}
+  </div>
+);
 }
 
 export default Notification;
