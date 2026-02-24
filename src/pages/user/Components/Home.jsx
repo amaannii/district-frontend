@@ -41,6 +41,7 @@ function Home({ openChat }) {
   const [myNote, setMyNote] = useState("");
   const [notes, setNotes] = useState([]);
   const [loading, setloading] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchimage = async () => {
@@ -101,6 +102,8 @@ function Home({ openChat }) {
         if (res.data.success) {
           setMyNote(res.data.myNote.note);
           setNotes(res.data.connectedNotes);
+          setUser(res.data.user);
+
         }
       } catch (err) {
         console.log(err);
@@ -199,7 +202,7 @@ function Home({ openChat }) {
                 No posts from connected users
               </p>
             ) : (
-              posts.map((p) => <PostCard key={p._id} data={p} />)
+              posts.map((p) => <PostCard key={p._id} data={p} user={user} />)
             )}
           </div>
         </div>
