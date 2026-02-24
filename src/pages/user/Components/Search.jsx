@@ -16,33 +16,22 @@ function Search() {
   const [recentUsers, setRecentUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [loading, setLoading] = useState(false);
-  const [requested, setRequested] = useState(false);
-
-  const [selectedPost, setSelectedPost] = useState(null);
-
   const [requestedUsers, setRequestedUsers] = useState([]);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
-
-  // Load recent users + Fetch all users
   useEffect(() => {
     const stored = localStorage.getItem("recentUsers");
-    if (stored) {
-      setRecentUsers(JSON.parse(stored));
-    }
+    if (stored) setRecentUsers(JSON.parse(stored));
 
     const storedRequests = localStorage.getItem("requestedUsers");
-    if (storedRequests) {
-      setRequestedUsers(JSON.parse(storedRequests));
-    }
+    if (storedRequests) setRequestedUsers(JSON.parse(storedRequests));
 
     const fetchUsers = async () => {
       setLoading(true);
       try {
         const res = await axios.get("http://localhost:3001/user/allusers");
-        if (res.data.success) {
-          setUsers(res.data.users);
-        }
+        if (res.data.success) setUsers(res.data.users);
       } catch (error) {
         console.error(error);
       }
@@ -52,44 +41,10 @@ function Search() {
     fetchUsers();
   }, []);
 
-
-
-
-
-const fetchUserPosts = async (userId) => {
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("userToken");
-
-    // Fetch posts and saved posts for this user
-    const res = await axios.get(
-      `http://localhost:3001/user/${userId}/posts`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    if (res.data.success) {
-      setUserPosts(res.data.posts);       // posts created by the user
-      setUserSavedPosts(res.data.saved);  // posts they saved
-    } else {
-      setUserPosts([]);
-      setUserSavedPosts([]);
-    }
-  } catch (error) {
-    console.error(error);
-    setUserPosts([]);
-    setUserSavedPosts([]);
-  } finally {
-    setLoading(false);
-  }
-};
-  // Save recent users
   useEffect(() => {
     localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
   }, [recentUsers]);
 
-  // Search filter
   const searchResults = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -98,13 +53,10 @@ const fetchUserPosts = async (userId) => {
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
-    setRequested(false);
-
     setRecentUsers((prev) => {
       const filtered = prev.filter((u) => u._id !== user._id);
       return [user, ...filtered].slice(0, 6);
     });
-
     setSearch("");
   };
 
@@ -118,76 +70,49 @@ const fetchUserPosts = async (userId) => {
   };
 
   const handleRequest = async () => {
-    if (!selectedUser || requestedUsers.includes(selectedUser._id)) {
-      return; // Prevent sending again
-    }
+    if (!selectedUser || requestedUsers.includes(selectedUser._id)) return;
 
     try {
       const token = localStorage.getItem("userToken");
-
       const response = await axios.post(
         "http://localhost:3001/user/request",
         { username: selectedUser.username },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.data.success) {
-     
-
-        const updatedRequests = [...requestedUsers, selectedUser._id];
-        setRequestedUsers(updatedRequests);
-        localStorage.setItem("requestedUsers", JSON.stringify(updatedRequests));
-
-        setRequested(true);
+        const updated = [...requestedUsers, selectedUser._id];
+        setRequestedUsers(updated);
+        localStorage.setItem("requestedUsers", JSON.stringify(updated));
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleRemoveRequest = async () => {
-  try {
-    const token = localStorage.getItem("userToken");
-
-    // OPTIONAL: If backend delete route exists
-    await axios.post(
-      "http://localhost:3001/user/remove-request",
-      { username: selectedUser.username },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  // Remove locally
-  const updated = requestedUsers.filter(
-    (id) => id !== selectedUser._id
-  );
-
-  setRequestedUsers(updated);
-  localStorage.setItem("requestedUsers", JSON.stringify(updated));
-
-  setShowRemoveModal(false);
-};
-
-
+  const handleRemoveRequest = () => {
+    const updated = requestedUsers.filter((id) => id !== selectedUser._id);
+    setRequestedUsers(updated);
+    localStorage.setItem("requestedUsers", JSON.stringify(updated));
+    setShowRemoveModal(false);
+  };
 
   const listToShow = search ? searchResults : recentUsers;
 
   return (
-    <div className="flex play-regular text-white bg-black w-full h-full">
-      {/* ================= LEFT SEARCH COLUMN ================= */}
-      <div className="w-[320px] border-r border-gray-800 flex flex-col h-full">
-        {/* Header + Input */}
+    <div className="flex bg-black text-white w-full min-h-screen">
+      {/* LEFT SECTION */}
+      <div
+        className={`
+        ${selectedUser ? "hidden lg:flex" : "flex"}
+        flex-col
+        w-full
+        lg:w-[320px]
+        lg:min-h-screen
+        border-b lg:border-b-0 lg:border-r
+        border-gray-800
+      `}
+      >
         <div className="p-4">
           <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
@@ -213,8 +138,7 @@ const fetchUserPosts = async (userId) => {
           </div>
         </div>
 
-        {/* Scrollable List */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-6">
           {listToShow.length > 0 ? (
             listToShow.map((user) => (
               <div
@@ -254,17 +178,31 @@ const fetchUserPosts = async (userId) => {
         </div>
       </div>
 
-      {/* ================= RIGHT PROFILE SECTION ================= */}
-      <div className="flex-1 h-full overflow-y-auto">
+      {/* RIGHT PROFILE SECTION */}
+      <div
+        className={`
+        ${selectedUser ? "flex" : "hidden lg:flex"}
+        flex-1
+        overflow-y-auto
+      `}
+      >
         {selectedUser ? (
-          <div className="w-full min-h-full flex flex-col items-center p-10 text-center">
+          <div className="w-full flex flex-col items-center p-6 sm:p-10 text-center">
+            {/* 🔙 Back Button (Mobile Only) */}
+            <button
+              onClick={() => setSelectedUser(null)}
+              className="lg:hidden self-start mb-4 text-sm text-[#879F00]"
+            >
+              ←
+            </button>
+
             <img
               src={selectedUser.img}
               alt={selectedUser.name}
-              className="w-28 h-28 rounded-full object-cover mb-4"
+              className="w-24 sm:w-28 aspect-square rounded-full object-cover border border-gray-700"
             />
 
-            <h2 className="text-xl mb-4">
+            <h2 className="text-lg sm:text-xl mb-4 break-words">
               <strong>@{selectedUser.username}</strong>
               <br />
               {selectedUser.name}
@@ -273,12 +211,12 @@ const fetchUserPosts = async (userId) => {
             <button
               onClick={() => {
                 if (requestedUsers.includes(selectedUser._id)) {
-                  setShowRemoveModal(true); // Show popup
+                  setShowRemoveModal(true);
                 } else {
                   handleRequest();
                 }
               }}
-              className={`h-[35px] w-[160px] text-white rounded-md mb-6 ${
+              className={`h-[35px] w-[140px] sm:w-[160px] text-white rounded-md mb-6 ${
                 requestedUsers.includes(selectedUser._id)
                   ? "bg-gray-600"
                   : "bg-[#879F00]"
@@ -291,206 +229,34 @@ const fetchUserPosts = async (userId) => {
 
             <hr className="w-full mb-6 border-gray-700" />
 
-            <div className="flex justify-center gap-20 mb-6">
-              <button
-                onClick={() => setActiveTab("posts")}
-                className={
-                  activeTab === "posts"
-                    ? "border-b-2 border-white"
-                    : "opacity-50"
-                }
-              >
-                <img className="h-6 w-5" src={post} alt="posts" />
-              </button>
-
-              <button
-                onClick={() => setActiveTab("saved")}
-                className={
-                  activeTab === "saved"
-                    ? "border-b-2 border-white"
-                    : "opacity-50"
-                }
-              >
-                <img className="h-6 w-7" src={saved} alt="saved" />
-              </button>
-            </div>
-
-          {activeTab === "posts" && (
-  <>
-    {selectedUser.post && selectedUser.post.length > 0 ? (
-      <div className="grid grid-cols-3 gap-2 max-w-[90%] mx-auto w-full">
-        {selectedUser.post.map((post, index) => (
-          <img
-            key={index}
-            src={post.image}
-            alt="post"
-            className="w-full h-[250px] object-cover cursor-pointer"
-            onClick={() => setSelectedPost(post)}
-          />
-        ))}
-      </div>
-    ) : (
-      <p className="text-gray-500">No posts available</p>
-    )}
-  </>
-)}
-
-            {activeTab === "saved" && (
-              <p className="text-gray-500">
-                Saved posts feature coming soon...
-              </p>
+            {activeTab === "posts" && (
+              <>
+                {selectedUser.post && selectedUser.post.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full max-w-5xl">
+                    {selectedUser.post.map((post, index) => (
+                      <img
+                        key={index}
+                        src={post.image}
+                        alt="post"
+                        className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
+                        onClick={() => setSelectedPost(post)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No posts available</p>
+                )}
+              </>
             )}
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <p className="text-gray-500 text-center">
+          <div className="hidden lg:flex w-full h-full items-center justify-center p-6 text-center">
+            <p className="text-gray-500">
               Search and select a user to view their profile
             </p>
           </div>
         )}
-        {showRemoveModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-    <div className="bg-black border border-gray-700 rounded-xl p-6 w-[350px] text-center">
-      <h3 className="text-lg font-semibold mb-4">
-        Remove Request?
-      </h3>
-      <p className="text-gray-400 mb-6 text-sm">
-        Do you want to remove the connection request?
-      </p>
-
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={() => setShowRemoveModal(false)}
-          className="px-4 py-2 bg-gray-600 rounded"
-        >
-          Cancel
-        </button>
-
-        <button
-          onClick={handleRemoveRequest}
-          className="px-4 py-2 bg-red-600 rounded"
-        >
-          Yes
-        </button>
       </div>
-    </div>
-  </div>
-)}
-      </div>
-
-      {/* Loading Overlay */}
-      {loading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-opacity-70">
-          <div className="chaotic-orbit"></div>
-        </div>
-      )}
-
-      {selectedPost && (
-  <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
-    <div className="bg-black rounded-lg max-w-2xl w-full overflow-y-auto max-h-full relative">
-      {/* Close Button */}
-      <button
-        className="absolute top-3 right-3 text-white text-2xl font-bold"
-        onClick={() => setSelectedPost(null)}
-      >
-        ✕
-      </button>
-
-      {/* PostCard Content */}
-      <div className="border-b border-neutral-800 mb-6">
-
-        {/* USER INFO */}
-        <div className="px-6 py-3 flex items-center gap-2">
-          <img
-            src={selectedUser.img}
-            alt={selectedUser.name}
-            className="w-8 h-8 rounded-full object-cover"
-          />
-          <span className="font-semibold">@{selectedUser.username}</span>
-        </div>
-
-        {/* IMAGE */}
-        <img
-          src={selectedPost.image}
-          alt="post"
-          className="w-full max-h-[450px] object-cover"
-        />
-
-        {/* CAPTION */}
-        <div className="px-6 py-2 text-gray-300">
-          <span className="font-semibold mr-2">@{selectedUser.username}</span>
-          {selectedPost.caption}
-        </div>
-
-        {/* ACTIONS */}
-        <div className="flex justify-between px-6 py-3">
-          <div className="flex gap-5 items-center">
-            {/* LIKE */}
-            <div className="flex items-center gap-1">
-              <img
-                src={selectedPost.isLiked ? heartRed : heart}
-                className="w-5 cursor-pointer"
-                onClick={() => handleLike(selectedPost)}
-                alt="like"
-              />
-              <span className="text-xs text-gray-400">{selectedPost.likes}</span>
-            </div>
-
-            {/* COMMENT */}
-            <img
-              src={commentIcon}
-              className="w-5 cursor-pointer"
-              onClick={() =>
-                setSelectedPost({ ...selectedPost, showComments: !selectedPost.showComments })
-              }
-              alt="comment"
-            />
-
-            {/* SHARE */}
-            <img
-              src={send}
-              className="w-5 cursor-pointer"
-              onClick={() => console.log("Share post")}
-              alt="share"
-            />
-          </div>
-
-          <img
-            src={selectedPost.isSaved ? bookmarkFilled : bookmark}
-            className="w-6 cursor-pointer"
-            onClick={() => handleSave(selectedPost)}
-            alt="bookmark"
-          />
-        </div>
-
-        {/* COMMENTS */}
-        {selectedPost.showComments && (
-          <div className="px-6 pb-4">
-            {(selectedPost.comments || []).map((c) => (
-              <div key={c._id} className="flex justify-between items-start text-sm text-gray-300 mb-2">
-                <div>
-                  <span className="font-semibold mr-2">{c.username}</span>
-                  {c.text}
-                  <div className="text-xs text-gray-500">
-                    {new Date(c.createdAt).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div className="flex gap-2 mt-3">
-              <input
-                className="flex-1 bg-neutral-800 p-2 rounded"
-                placeholder="Add a comment..."
-              />
-              <button className="text-blue-500 font-semibold">Post</button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
     </div>
   );
 }

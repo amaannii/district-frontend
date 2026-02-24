@@ -33,80 +33,105 @@ const images = [
   { src: pathmtta, title: "PATHANAMTHITTA" },
   { src: tvpm, title: "THIRUVANANTHAPURAM" },
 ];
- 
+
 function Messages({ selectedDistrict, setSelectedDistrict }) {
   const [search, setSearch] = useState("");
 
   const filteredImages = images.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase()),
+    item.title.toLowerCase().includes(search.toLowerCase())
   );
+
   return (
-    <>
-      <div className="flex h-screen w-full play-regular bg-black text-white play-regular space-y-2">
-        <div className="flex-1 px-8 py-6 overflow-y-auto">
-          {selectedDistrict && (
-            <div className="flex items-center gap-4 mb-6 animate-slideDown">
-              <img
-                src={selectedDistrict.src}
-                className="w-14 h-14 rounded-full object-cover"
-                alt=""
-              />
-              <h2 className="text-xl font-semibold">
-                {selectedDistrict.title}
-              </h2>
+    <div className="flex h-screen w-full bg-black text-white">
+
+      {/* Main Content */}
+      <div className="flex-1 
+                      px-4 sm:px-6 md:px-8 
+                      pt-20 md:pt-6   /* space for mobile top bar */
+                      pb-24 md:pb-6   /* space for mobile bottom nav */
+                      overflow-y-auto">
+
+        {/* Selected District Header */}
+        {selectedDistrict && (
+          <div className="flex items-center gap-4 mb-6">
+            <img
+              src={selectedDistrict.src}
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
+              alt=""
+            />
+            <h2 className="text-lg sm:text-xl font-semibold">
+              {selectedDistrict.title}
+            </h2>
+          </div>
+        )}
+
+        {/* District List View */}
+        {!selectedDistrict && (
+          <>
+            <h1 className="text-xl sm:text-2xl font-bold mb-3">
+              amani
+            </h1>
+
+            {/* Search Bar */}
+            <input
+              type="text"
+              placeholder="Search district..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full mb-6 px-4 py-2 rounded-lg bg-gray-200 text-black outline-none"
+            />
+
+            <div className="flex items-center gap-2 mb-5">
+              <img className="h-5" src={location} alt="location" />
+              <h2 className="text-lg font-semibold">Messages</h2>
             </div>
-          )}
 
-          {/* Image Grid */}
-          {!selectedDistrict && (
-            <>
-              <h1 className="text-2xl font-bold mb-1">amani</h1>
+            {/* Responsive Grid */}
+            <div className="
+                grid 
+                grid-cols-2 
+                sm:grid-cols-3 
+                lg:grid-cols-4 
+                gap-4 sm:gap-6
+                pb-6
+              ">
+              {filteredImages.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => setSelectedDistrict(item)}
+                  className="relative 
+                             h-32 sm:h-40 md:h-44 
+                             rounded-xl 
+                             overflow-hidden 
+                             cursor-pointer 
+                             group"
+                >
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/30" />
+                  <h1 className="absolute bottom-2 left-2 text-[10px] sm:text-xs font-bold tracking-widest">
+                    {item.title}
+                  </h1>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
-              {/* Search bar */}
-              <input
-                type="text"
-                placeholder="Search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full mb-6 px-4 py-2 rounded-lg bg-gray-200 text-black outline-none"
-              />
-              <div className="flex items-center gap-2 mb-5">
-                <img className="h-5" src={location} alt="location" />
-                <h2 className="text-lg font-semibold">Messages</h2>
-              </div>
-
-              <div className="grid grid-cols-3 gap-6 pb-10">
-                {filteredImages.map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => setSelectedDistrict(item)}
-                    className="relative h-44 rounded-xl overflow-hidden cursor-pointer group"
-                  >
-                    <img
-                      src={item.src}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition"
-                    />
-                    <div className="absolute inset-0 bg-black/30" />
-                    <h1 className="absolute bottom-3 left-3 text-xs font-bold tracking-widest">
-                      {item.title}
-                    </h1>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+        {/* Chat Section */}
         {selectedDistrict ? (
           <ChatBox
             district={selectedDistrict.title}
             onBack={() => setSelectedDistrict(null)}
           />
         ) : (
-          <p className="text-gray-400">Select a district</p>
+          <p className="text-gray-400 mt-4">Select a district</p>
         )}
-        </div>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -136,101 +136,106 @@ const ForgetPassword = () => {
       </div>
 
       {/* OTP Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4">
-          <div className="bg-black text-white w-full max-w-[420px] rounded-xl p-6 sm:p-8 text-center">
-            <h2 className="text-xl sm:text-2xl font-semibold mb-3">
-              OTP Verification
-            </h2>
+{showSuccess && (
+  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4">
+    <div className="bg-black text-white w-full max-w-md rounded-2xl p-6 sm:p-8 text-center">
 
-            <p className="text-gray-400 text-sm mb-6">
-              We’ve sent OTP to <span className="text-white">{maskEmail(email)}</span>
-            </p>
+      <h2 className="text-lg sm:text-2xl font-semibold mb-4">
+        OTP Verification
+      </h2>
 
-            <div className="flex justify-center gap-2 sm:gap-3 mb-6">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (otpRefs.current[index] = el)}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (!/^\d?$/.test(val)) return;
-                    const newOtp = [...otp];
-                    newOtp[index] = val;
-                    setOtp(newOtp);
-                    if (val && index < otp.length - 1) {
-                      otpRefs.current[index + 1]?.focus();
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Backspace" && !otp[index] && index > 0) {
-                      otpRefs.current[index - 1]?.focus();
-                    }
-                  }}
-                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg rounded-lg bg-white text-black"
-                />
-              ))}
-            </div>
+      <p className="text-gray-400 text-sm mb-6">
+        We’ve sent OTP to{" "}
+        <span className="text-white">{maskEmail(email)}</span>
+      </p>
 
-            <button
-              onClick={handleVerifyOtp}
-              className="w-full bg-[#879F00] py-3 rounded-lg mb-4"
-            >
-              Verify OTP
-            </button>
+      <div className="flex justify-center gap-2 sm:gap-3 mb-6">
+        {otp.map((digit, index) => (
+          <input
+            key={index}
+            ref={(el) => (otpRefs.current[index] = el)}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={digit}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (!/^\d?$/.test(val)) return;
+              const newOtp = [...otp];
+              newOtp[index] = val;
+              setOtp(newOtp);
+              if (val && index < otp.length - 1) {
+                otpRefs.current[index + 1]?.focus();
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Backspace" && !otp[index] && index > 0) {
+                otpRefs.current[index - 1]?.focus();
+              }
+            }}
+            className="w-9 h-9 sm:w-12 sm:h-12 text-center text-lg rounded-lg bg-white text-black"
+          />
+        ))}
+      </div>
 
-            <p className="text-sm text-gray-400">
-              Didn’t receive OTP?
-              <span className="text-[#879F00] cursor-pointer ml-1">Resend</span>
-            </p>
-          </div>
-        </div>
-      )}
+      <button
+        onClick={handleVerifyOtp}
+        className="w-full bg-[#879F00] py-3 rounded-lg mb-4"
+      >
+        Verify OTP
+      </button>
+
+      <p className="text-sm text-gray-400">
+        Didn’t receive OTP?
+        <span className="text-[#879F00] cursor-pointer ml-1">
+          Resend
+        </span>
+      </p>
+    </div>
+  </div>
+)}
 
       {/* Change Password Modal */}
-      {showChangePassword && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4">
-          <div className="bg-black text-white w-full max-w-[420px] rounded-xl p-6 sm:p-8">
-            <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4">
-              Change Password
-            </h2>
+   {showChangePassword && (
+  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4">
+    <div className="bg-black text-white w-full max-w-md rounded-2xl p-6 sm:p-8">
 
-            <input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full h-[44px] px-4 mb-4 bg-white rounded-lg text-black"
-            />
+      <h2 className="text-lg sm:text-2xl font-semibold text-center mb-6">
+        Change Password
+      </h2>
 
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-[44px] bg-white px-4 mb-6 rounded-lg text-black"
-            />
+      <input
+        type="password"
+        placeholder="New Password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        className="w-full h-11 px-4 mb-4 bg-white rounded-lg text-black text-sm sm:text-base"
+      />
 
-            <button
-              onClick={handleChangePassword}
-              className="w-full bg-[#879F00] py-3 rounded-lg mb-3"
-            >
-              Update Password
-            </button>
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        className="w-full h-11 bg-white px-4 mb-6 rounded-lg text-black text-sm sm:text-base"
+      />
 
-            <button
-              onClick={() => setShowChangePassword(false)}
-              className="w-full text-gray-400 text-sm"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      <button
+        onClick={handleChangePassword}
+        className="w-full bg-[#879F00] py-3 rounded-lg mb-3"
+      >
+        Update Password
+      </button>
+
+      <button
+        onClick={() => setShowChangePassword(false)}
+        className="w-full text-gray-400 text-sm"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

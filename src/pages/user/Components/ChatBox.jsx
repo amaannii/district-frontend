@@ -3,19 +3,7 @@ import socket from "../../../Socket";
 import axios from "axios";
 
 const EMOJIS = [
-  "😀",
-  "😂",
-  "😍",
-  "🥰",
-  "😎",
-  "🤔",
-  "😢",
-  "😡",
-  "👍",
-  "🙏",
-  "🔥",
-  "🎉",
-  "❤️",
+  "😀","😂","😍","🥰","😎","🤔","😢","😡","👍","🙏","🔥","🎉","❤️",
 ];
 
 function ChatBox({ district, onBack }) {
@@ -23,13 +11,15 @@ function ChatBox({ district, onBack }) {
   const [messages, setMessages] = useState([]);
   const [showEmojis, setShowEmojis] = useState(false);
   const [recording, setRecording] = useState(false);
-  const [currentUser, setcurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
   const fileInputRef = useRef(null);
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const messagesEndRef = useRef(null);
 
-  /* ================= SOCKET ================= */
+  /* ================= FETCH USER + SOCKET ================= */
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -39,24 +29,23 @@ function ChatBox({ district, onBack }) {
         const res = await axios.post(
           "http://localhost:3001/user/userdetails",
           {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const user = res.data.user;
-        setcurrentUser(user);
+        setCurrentUser(res.data.user);
       } catch (error) {
-        console.log("Error fetching notification settings ❌", error);
+        console.log("Error fetching user ❌", error);
       }
     };
 
     fetchDetails();
+  }, []);
+
+  useEffect(() => {
     if (!district) return;
 
     setMessages([]);
 
-    // 🔥 Fetch old messages
     fetch(`http://localhost:3001/messages/${district}`)
       .then((res) => res.json())
       .then((data) => {
@@ -65,7 +54,6 @@ function ChatBox({ district, onBack }) {
           sender: msg.sender,
           time: msg.createdAt,
         }));
-
         setMessages(formatted);
       });
 
@@ -90,20 +78,21 @@ function ChatBox({ district, onBack }) {
     };
   }, [district]);
 
+  /* ================= AUTO SCROLL ================= */
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   /* ================= SEND TEXT ================= */
 
   const sendMessage = () => {
-    if (!message.trim()) return;
-    console.log(currentUser);
+    if (!message.trim() || !currentUser) return;
 
     socket.emit("sendMessage", {
       district,
-      message: {
-        type: "text",
-        content: message,
-      },
-
-      sender: currentUser.name, // 🔥 important
+      message: { type: "text", content: message },
+      sender: currentUser.name,
     });
 
     setMessage("");
@@ -126,10 +115,7 @@ function ChatBox({ district, onBack }) {
 
     socket.emit("sendMessage", {
       district,
-      message: {
-        type: "image",
-        content: url,
-      },
+      message: { type: "image", content: url },
       sender: currentUser.name,
     });
   };
@@ -144,11 +130,7 @@ function ChatBox({ district, onBack }) {
 
     socket.emit("sendMessage", {
       district,
-      message: {
-        type: "document",
-        content: url,
-        name: file.name,
-      },
+      message: { type: "document", content: url, name: file.name },
       sender: currentUser.name,
     });
   };
@@ -157,7 +139,6 @@ function ChatBox({ district, onBack }) {
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
     mediaRecorderRef.current = new MediaRecorder(stream);
     audioChunksRef.current = [];
 
@@ -183,10 +164,7 @@ function ChatBox({ district, onBack }) {
 
       socket.emit("sendMessage", {
         district,
-        message: {
-          type: "audio",
-          content: url,
-        },
+        message: { type: "audio", content: url },
         sender: currentUser.name,
       });
 
@@ -197,47 +175,60 @@ function ChatBox({ district, onBack }) {
   /* ================= UI ================= */
 
   return (
-    <div className="flex flex-col  h-[80vh] bg-[#0f0f0f] rounded-xl p-4 text-white">
-      <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
-        <button onClick={onBack}>←</button>
-        <h2>{district}</h2>
+    <div className="flex flex-col h-full w-full bg-[#0f0f0f] text-white sm:rounded-xl sm:p-4 p-2">
+
+      {/* HEADER */}
+      <div className="flex items-center gap-3 mb-3 border-b border-gray-700 pb-3">
+        <button onClick={onBack} className="sm:hidden text-xl">
+          ←
+        </button>
+        <h2 className="text-lg sm:text-xl font-semibold">{district}</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 flex flex-col">
+      {/* MESSAGES */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 flex flex-col pr-1">
+
         {messages.map((msg, i) => {
           const isMe = msg.sender === currentUser?.name;
 
           return (
             <div
               key={i}
-              className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+              className={`flex flex-col ${
+                isMe ? "items-end" : "items-start"
+              }`}
             >
               <span className="text-xs text-gray-400 mb-1">
-  {isMe ? "You" : msg.sender}
-</span>
+                {isMe ? "You" : msg.sender}
+              </span>
 
               {msg.type === "text" && (
                 <div
-                  className={`px-4 py-2 rounded-lg max-w-xs ${
-                    isMe ? "bg-[#879F00] text-white" : "bg-white text-black"
-                  }`}
+                  className={`px-4 py-2 rounded-2xl break-words
+                  max-w-[75%] sm:max-w-md md:max-w-lg
+                  ${isMe ? "bg-[#879F00] text-white" : "bg-white text-black"}
+                  `}
                 >
                   {msg.content}
                 </div>
               )}
 
               {msg.type === "image" && (
-                <img src={msg.content} className="max-w-xs rounded-lg" alt="" />
+                <img
+                  src={msg.content}
+                  className="max-w-[75%] sm:max-w-sm md:max-w-md rounded-xl"
+                  alt=""
+                />
               )}
 
               {msg.type === "audio" && (
-                <audio controls>
+                <audio controls className="max-w-[75%]">
                   <source src={msg.content} />
                 </audio>
               )}
 
               {msg.type === "document" && (
-                <div className="bg-gray-800 px-4 py-2 rounded-lg">
+                <div className="bg-gray-800 px-4 py-2 rounded-lg max-w-[75%]">
                   📄 {msg.name}
                 </div>
               )}
@@ -251,46 +242,60 @@ function ChatBox({ district, onBack }) {
             </div>
           );
         })}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex items-center gap-3 border-t border-gray-700 pt-3">
+      {/* INPUT AREA */}
+      <div className="border-t border-gray-700 pt-3">
+
         {!recording ? (
-          <>
+          <div className="flex items-center gap-2 sm:gap-3 relative">
+
             <button onClick={() => setShowEmojis(!showEmojis)}>😊</button>
+
+            {showEmojis && (
+              <div className="absolute bottom-14 left-0 bg-gray-900 p-3 rounded-xl flex flex-wrap gap-2 w-60">
+                {EMOJIS.map((emoji, index) => (
+                  <button key={index} onClick={() => sendEmoji(emoji)}>
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <button onClick={() => fileInputRef.current.click()}>🖼️</button>
             <input ref={fileInputRef} type="file" hidden onChange={sendImage} />
 
             <button onClick={() => docInputRef.current.click()}>📎</button>
-            <input
-              ref={docInputRef}
-              type="file"
-              hidden
-              onChange={sendDocument}
-            />
+            <input ref={docInputRef} type="file" hidden onChange={sendDocument} />
 
             <input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={`Message ${district}`}
-              className="flex-1 px-4 py-2 rounded-full bg-gray-800"
+              className="flex-1 px-4 py-2 rounded-full bg-gray-800 text-sm sm:text-base"
             />
 
             {message ? (
-              <button onClick={sendMessage} className="text-[#879F00]">
+              <button
+                onClick={sendMessage}
+                className="text-[#879F00] text-sm sm:text-base"
+              >
                 Send
               </button>
             ) : (
               <button onClick={startRecording}>🎤</button>
             )}
-          </>
+          </div>
         ) : (
-          <div className="flex justify-between w-full bg-gray-800 px-4 py-2 rounded-full">
+          <div className="flex justify-between items-center w-full bg-gray-800 px-4 py-2 rounded-full">
             <button onClick={cancelRecording}>✖</button>
-            <span>🔴 Recording...</span>
+            <span className="text-sm">🔴 Recording...</span>
             <button onClick={sendRecording}>➤</button>
           </div>
         )}
+
       </div>
     </div>
   );
