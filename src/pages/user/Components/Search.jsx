@@ -84,11 +84,19 @@ function Search() {
         const updated = [...requestedUsers, selectedUser._id];
         setRequestedUsers(updated);
         localStorage.setItem("requestedUsers", JSON.stringify(updated));
+
       }
-    } catch (error) {
-      console.error(error);
+    );
+
+    if (response.data.success) {
+      const updated = [...requestedUsers, selectedUser._id];
+      setRequestedUsers(updated);
+      localStorage.setItem("requestedUsers", JSON.stringify(updated));
     }
-  };
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+  }
+};
 
   const handleRemoveRequest = () => {
     const updated = requestedUsers.filter(
