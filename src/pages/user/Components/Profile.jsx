@@ -109,6 +109,8 @@ function Profile({ setActive }) {
     }
   };
 
+  
+
   /* ---------------- DELETE POST ---------------- */
   const handleDeletePost = async (postId) => {
     try {
@@ -153,20 +155,22 @@ function Profile({ setActive }) {
   };
 
   /* ---------------- CONNECTIONS ---------------- */
-  const fetchConnections = async (type) => {
-    try {
-      const res = await axios.get(
-        `http://localhost:3001/user/${type}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+ const fetchConnections = async (type) => {
+  try {
+    const res = await axios.get(
+      `http://localhost:3001/user/${type}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      setConnectionList(res.data);
+    if (res.data.success) {
+      setConnectionList(res.data.users); // ✅ FIX HERE
       setConnectionType(type);
       setShowConnections(true);
-    } catch (error) {
-      console.error(error);
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   /* ---------------- UNSAVE / SAVE ---------------- */
   const handleUnsave = async () => {
@@ -344,20 +348,20 @@ function Profile({ setActive }) {
                 <p className="font-semibold">{posts.length}</p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
-              <div
-                className="cursor-pointer"
-                onClick={() => fetchConnections("connected")}
-              >
-                <p className="font-semibold">{connected}</p>
-                <p className="text-xs text-gray-400">connected</p>
-              </div>
-              <div
-                className="cursor-pointer"
-                onClick={() => fetchConnections("connecting")}
-              >
-                <p className="font-semibold">{connecting}</p>
-                <p className="text-xs text-gray-400">connecting</p>
-              </div>
+             <div
+  className="cursor-pointer"
+  onClick={() => fetchConnections("connected")}
+>
+  <p className="font-semibold">{connected}</p>
+  <p className="text-xs text-gray-400">connected</p>
+</div>
+<div
+  className="cursor-pointer"
+  onClick={() => fetchConnections("connecting")}
+>
+  <p className="font-semibold">{connecting}</p>
+  <p className="text-xs text-gray-400">connecting</p>
+</div>
             </div>
           </div>
 
@@ -650,41 +654,36 @@ function Profile({ setActive }) {
         </div>
       )}
 
-      {/* CONNECTION MODAL */}
-      {showConnections && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[400px] max-h-[500px] rounded-xl p-5 overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold capitalize">{connectionType}</h2>
-              <button onClick={() => setShowConnections(false)} className="text-gray-400">
-                ✕
-              </button>
+     {showConnections && (
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="bg-[#0f0f0f] w-[400px] max-h-[500px] rounded-xl p-5 overflow-y-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold capitalize">{connectionType}</h2>
+        <button onClick={() => setShowConnections(false)} className="text-gray-400">✕</button>
+      </div>
+
+      {connectionList.length === 0 ? (
+        <p className="text-gray-400 text-sm text-center">
+          No {connectionType} yet
+        </p>
+      ) : (
+        connectionList.map((user) => (
+          <div key={user._id} className="flex items-center gap-3 py-2 border-b border-gray-800">
+            <img
+              src={user.img || profile}
+              alt={user.username}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <p className="text-sm font-medium">{user.username}</p>
+              <p className="text-xs text-gray-400">{user.name}</p>
             </div>
-
-            {connectionList.length === 0 ? (
-              <p className="text-gray-400 text-sm text-center">No {connectionType} yet</p>
-            ) : (
-              connectionList.map((user) => (
-                <div
-                  key={user._id}
-                  className="flex items-center gap-3 py-2 border-b border-gray-800"
-                >
-                  <img
-                    src={user.img || profile}
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="text-sm font-medium">{user.username}</p>
-                    <p className="text-xs text-gray-400">{user.name}</p>
-                  </div>
-                </div>
-              ))
-            )}
           </div>
-        </div>
+        ))
       )}
-
+    </div>
+  </div>
+)}
       {/* SHARE MODAL */}
       {showShare && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">

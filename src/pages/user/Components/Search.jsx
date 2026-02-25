@@ -48,7 +48,7 @@ function Search() {
   const searchResults = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
-      (user.username || "").toLowerCase().includes(search.toLowerCase()),
+      (user.username || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelectUser = (user) => {
@@ -69,29 +69,36 @@ function Search() {
     localStorage.removeItem("recentUsers");
   };
 
-  const handleRequest = async () => {
-    if (!selectedUser || requestedUsers.includes(selectedUser._id)) return;
+const handleRequest = async () => {
+  if (!selectedUser || requestedUsers.includes(selectedUser._id)) return;
 
-    try {
-      const token = localStorage.getItem("userToken");
-      const response = await axios.post(
-        "http://localhost:3001/user/request",
-        { username: selectedUser.username },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+  try {
+    const token = localStorage.getItem("userToken");
 
-      if (response.data.success) {
-        const updated = [...requestedUsers, selectedUser._id];
-        setRequestedUsers(updated);
-        localStorage.setItem("requestedUsers", JSON.stringify(updated));
+    const response = await axios.post(
+      "http://localhost:3001/user/request",
+      { username: selectedUser.username },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ FIXED
+        },
       }
-    } catch (error) {
-      console.error(error);
+    );
+
+    if (response.data.success) {
+      const updated = [...requestedUsers, selectedUser._id];
+      setRequestedUsers(updated);
+      localStorage.setItem("requestedUsers", JSON.stringify(updated));
     }
-  };
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+  }
+};
 
   const handleRemoveRequest = () => {
-    const updated = requestedUsers.filter((id) => id !== selectedUser._id);
+    const updated = requestedUsers.filter(
+      (id) => id !== selectedUser._id
+    );
     setRequestedUsers(updated);
     localStorage.setItem("requestedUsers", JSON.stringify(updated));
     setShowRemoveModal(false);
@@ -100,19 +107,11 @@ function Search() {
   const listToShow = search ? searchResults : recentUsers;
 
   return (
-    <div className="flex bg-black text-white w-full min-h-screen">
+    <div className="flex flex-col lg:flex-row bg-black text-white w-full min-h-screen">
+
       {/* LEFT SECTION */}
-      <div
-        className={`
-        ${selectedUser ? "hidden lg:flex" : "flex"}
-        flex-col
-        w-full
-        lg:w-[320px]
-        lg:min-h-screen
-        border-b lg:border-b-0 lg:border-r
-        border-gray-800
-      `}
-      >
+      <div className="w-full lg:w-[320px] lg:min-h-screen border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-col">
+
         <div className="p-4">
           <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
@@ -125,7 +124,9 @@ function Search() {
           />
 
           <div className="flex justify-between mb-2">
-            <span className="text-sm">{search ? "Results" : "Recent"}</span>
+            <span className="text-sm">
+              {search ? "Results" : "Recent"}
+            </span>
 
             {recentUsers.length > 0 && !search && (
               <span
@@ -156,7 +157,9 @@ function Search() {
                   />
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-xs text-gray-400">@{user.username}</p>
+                    <p className="text-xs text-gray-400">
+                      @{user.username}
+                    </p>
                   </div>
                 </div>
 
@@ -179,27 +182,14 @@ function Search() {
       </div>
 
       {/* RIGHT PROFILE SECTION */}
-      <div
-        className={`
-        ${selectedUser ? "flex" : "hidden lg:flex"}
-        flex-1
-        overflow-y-auto
-      `}
-      >
+      <div className="flex-1 overflow-y-auto">
         {selectedUser ? (
           <div className="w-full flex flex-col items-center p-6 sm:p-10 text-center">
-            {/* 🔙 Back Button (Mobile Only) */}
-            <button
-              onClick={() => setSelectedUser(null)}
-              className="lg:hidden self-start mb-4 text-sm text-[#879F00]"
-            >
-              ←
-            </button>
 
             <img
               src={selectedUser.img}
               alt={selectedUser.name}
-              className="w-24 sm:w-28 aspect-square rounded-full object-cover border border-gray-700"
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mb-4"
             />
 
             <h2 className="text-lg sm:text-xl mb-4 break-words">
@@ -244,19 +234,58 @@ function Search() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No posts available</p>
+                  <p className="text-gray-500">
+                    No posts available
+                  </p>
                 )}
               </>
             )}
           </div>
         ) : (
-          <div className="hidden lg:flex w-full h-full items-center justify-center p-6 text-center">
+          <div className="w-full h-full flex items-center justify-center p-6 text-center">
             <p className="text-gray-500">
               Search and select a user to view their profile
             </p>
           </div>
         )}
       </div>
+
+      {/* REMOVE REQUEST MODAL */}
+      {showRemoveModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50 p-4">
+          <div className="bg-black border border-gray-700 rounded-xl p-6 w-full max-w-sm text-center">
+            <h3 className="text-lg font-semibold mb-4">
+              Remove Request?
+            </h3>
+
+            <p className="text-gray-400 mb-6 text-sm">
+              Do you want to remove the connection request?
+            </p>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowRemoveModal(false)}
+                className="px-4 py-2 bg-gray-600 rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleRemoveRequest}
+                className="px-4 py-2 bg-red-600 rounded"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/60 z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 }
