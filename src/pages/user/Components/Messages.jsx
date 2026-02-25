@@ -16,6 +16,8 @@ import tvpm from "../../../assets/images/download (12).jpeg";
 import ernklm from "../../../assets/images/fortkochi (1).jpeg";
 import location from "../../../assets/images/icons8-location-24.png";
 import ChatBox from "./ChatBox";
+import { useEffect } from "react";
+import axios from "axios";
 
 const images = [
   { src: ksg, title: "KASARGOD" },
@@ -36,21 +38,48 @@ const images = [
 
 function Messages({ selectedDistrict, setSelectedDistrict }) {
   const [search, setSearch] = useState("");
+  const [userdetails, setuserdetails] = useState({});
+
+
+   const token = localStorage.getItem("userToken");
+   
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/user/userdetails",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      const user = response.data.user;
+
+      setuserdetails(user);
+
+      // store id for owner check
+      localStorage.setItem("userId", user._id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const filteredImages = images.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
+    item.title.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="flex h-screen w-full bg-black text-white">
-
       {/* Main Content */}
-      <div className="flex-1 
+      <div
+        className="flex-1 
                       px-4 sm:px-6 md:px-8 
                       pt-20 md:pt-6   /* space for mobile top bar */
                       pb-24 md:pb-6   /* space for mobile bottom nav */
-                      overflow-y-auto">
-
+                      overflow-y-auto"
+      >
         {/* Selected District Header */}
         {selectedDistrict && (
           <div className="flex items-center gap-4 mb-6">
@@ -69,7 +98,7 @@ function Messages({ selectedDistrict, setSelectedDistrict }) {
         {!selectedDistrict && (
           <>
             <h1 className="text-xl sm:text-2xl font-bold mb-3">
-              amani
+              {userdetails.username}
             </h1>
 
             {/* Search Bar */}
@@ -87,14 +116,16 @@ function Messages({ selectedDistrict, setSelectedDistrict }) {
             </div>
 
             {/* Responsive Grid */}
-            <div className="
+            <div
+              className="
                 grid 
                 grid-cols-2 
                 sm:grid-cols-3 
                 lg:grid-cols-4 
                 gap-4 sm:gap-6
                 pb-6
-              ">
+              "
+            >
               {filteredImages.map((item, index) => (
                 <div
                   key={index}

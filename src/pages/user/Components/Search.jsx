@@ -69,19 +69,22 @@ function Search() {
     localStorage.removeItem("recentUsers");
   };
 
-const handleRequest = async () => {
-  if (!selectedUser || requestedUsers.includes(selectedUser._id)) return;
+  const handleRequest = async () => {
+    if (!selectedUser || requestedUsers.includes(selectedUser._id)) return;
 
-  try {
-    const token = localStorage.getItem("userToken");
+    try {
+      const token = localStorage.getItem("userToken");
+      const response = await axios.post(
+        "http://localhost:3001/user/request",
+        { username: selectedUser.username },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    const response = await axios.post(
-      "http://localhost:3001/user/request",
-      { username: selectedUser.username },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // ✅ FIXED
-        },
+      if (response.data.success) {
+        const updated = [...requestedUsers, selectedUser._id];
+        setRequestedUsers(updated);
+        localStorage.setItem("requestedUsers", JSON.stringify(updated));
+
       }
     );
 

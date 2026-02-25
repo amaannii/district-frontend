@@ -50,7 +50,7 @@ function Explore() {
 
       {/* ===== Loading Overlay ===== */}
       {loading && (
-        <div className="fixed inset-0 bg-black/70 
+        <div className="fixed inset-0 
                         flex justify-center items-center z-40">
           <div className="animate-spin rounded-full 
                           h-12 w-12 border-t-2 
