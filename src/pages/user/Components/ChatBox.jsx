@@ -57,18 +57,32 @@ function ChatBox({ district, onBack }) {
     setMessages([]);
 
     // 🔥 Fetch old messages
-    fetch(`http://localhost:3001/messages/${district}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formatted = data.map((msg) => ({
-          ...msg.message,
+fetch(`http://localhost:3001/messages/${district}`)
+  .then((res) => res.json())
+  .then((data) => {
+    const formatted = data.messages.map((msg) => {
+      // 🔥 If it is a shared post
+      if (msg.post) {
+        return {
+          type: "post",
+          post: msg.post,
+          postOwner: msg.postOwner,
           sender: msg.sender,
           time: msg.createdAt,
-        }));
+        };
+      }
 
-        setMessages(formatted);
-      });
+      // 🔥 Normal text message
+      return {
+        type: msg.type,
+        content: msg.message?.content,
+        sender: msg.sender,
+        time: msg.createdAt,
+      };
+    });
 
+    setMessages(formatted);
+  });
     socket.emit("joinDistrict", district);
 
     const receiveHandler = (msg) => {
@@ -213,8 +227,33 @@ function ChatBox({ district, onBack }) {
               className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
             >
               <span className="text-xs text-gray-400 mb-1">
-  {isMe ? "You" : msg.sender}
-</span>
+                {isMe ? "You" : msg.sender}
+              </span>
+
+              {msg.type === "post" && (
+  <div className="bg-white text-black rounded-lg p-2 max-w-lg">
+    <div className="flex items-center gap-2 mb-2">
+      <img
+        src={msg.postOwner?.avatar}
+        className="w-6 h-6 rounded-full"
+        alt=""
+      />
+      <span className="text-xs font-semibold">
+        {msg.postOwner?.username}
+      </span>
+    </div>
+
+    <img
+      src={msg.post.image}
+      className="rounded-lg max-w-xs"
+      alt="shared post"
+    />
+
+    {msg.post.caption && (
+      <p className="text-xs mt-1">{msg.post.caption}</p>
+    )}
+  </div>
+)}
 
               {msg.type === "text" && (
                 <div
