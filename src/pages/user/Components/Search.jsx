@@ -86,7 +86,7 @@ function Search() {
         localStorage.setItem("requestedUsers", JSON.stringify(updated));
 
       }
-    );
+  
 
     if (response.data.success) {
       const updated = [...requestedUsers, selectedUser._id];
