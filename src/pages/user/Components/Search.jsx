@@ -100,11 +100,13 @@ const handleRequest = async () => {
   try {
     const token = localStorage.getItem("userToken");
 
+
     const response = await axios.post(
       "http://localhost:3001/user/request",
       { username: selectedUser.username },
       { headers: { Authorization: `Bearer ${token}` } }
     );
+
 
     if (response.data.success) {
       setrequested(true);
