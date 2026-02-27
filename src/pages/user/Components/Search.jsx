@@ -19,6 +19,8 @@ function Search() {
   const [requestedUsers, setRequestedUsers] = useState([]);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [connecting, setconnecting] = useState(false);
+  const [requested, setrequested] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("recentUsers");
@@ -48,17 +50,40 @@ function Search() {
   const searchResults = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
-      (user.username || "").toLowerCase().includes(search.toLowerCase())
+      (user.username || "").toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleSelectUser = (user) => {
-    setSelectedUser(user);
-    setRecentUsers((prev) => {
-      const filtered = prev.filter((u) => u._id !== user._id);
-      return [user, ...filtered].slice(0, 6);
-    });
-    setSearch("");
-  };
+const handleSelectUser = async (user) => {
+  setSelectedUser(user);
+
+  // reset first
+  setconnecting(false);
+  setrequested(false);
+
+  const token = localStorage.getItem("userToken");
+
+  try {
+    const res = await axios.get(
+      `http://localhost:3001/user/connection-status/${user.username}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res.data.status === "connected") {
+      setconnecting(true);
+    } else if (res.data.status === "requested") {
+      setrequested(true);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  setRecentUsers((prev) => {
+    const filtered = prev.filter((u) => u._id !== user._id);
+    return [user, ...filtered].slice(0, 6);
+  });
+
+  setSearch("");
+};
 
   const handleDeleteRecent = (id) => {
     setRecentUsers((prev) => prev.filter((user) => user._id !== id));
@@ -69,52 +94,50 @@ function Search() {
     localStorage.removeItem("recentUsers");
   };
 
-  const handleRequest = async () => {
-    if (!selectedUser || requestedUsers.includes(selectedUser._id)) return;
+const handleRequest = async () => {
+  if (!selectedUser) return;
 
-    try {
-      const token = localStorage.getItem("userToken");
-      const response = await axios.post(
-        "http://localhost:3001/user/request",
-        { username: selectedUser.username },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  try {
+    const token = localStorage.getItem("userToken");
 
-      if (response.data.success) {
-        const updated = [...requestedUsers, selectedUser._id];
-        setRequestedUsers(updated);
-        localStorage.setItem("requestedUsers", JSON.stringify(updated));
-
-      }
-  
+    const response = await axios.post(
+      "http://localhost:3001/user/request",
+      { username: selectedUser.username },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
     if (response.data.success) {
-      const updated = [...requestedUsers, selectedUser._id];
-      setRequestedUsers(updated);
-      localStorage.setItem("requestedUsers", JSON.stringify(updated));
+      setrequested(true);
     }
   } catch (error) {
     console.error(error.response?.data || error.message);
   }
 };
 
-  const handleRemoveRequest = () => {
-    const updated = requestedUsers.filter(
-      (id) => id !== selectedUser._id
+const handleRemoveRequest = async () => {
+  const token = localStorage.getItem("userToken");
+
+  try {
+    await axios.post(
+      "http://localhost:3001/user/remove-connection",
+      { username: selectedUser.username },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
-    setRequestedUsers(updated);
-    localStorage.setItem("requestedUsers", JSON.stringify(updated));
+
+    setconnecting(false);
+    setrequested(false);
     setShowRemoveModal(false);
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const listToShow = search ? searchResults : recentUsers;
 
   return (
     <div className="flex flex-col lg:flex-row bg-black text-white w-full min-h-screen">
-
       {/* LEFT SECTION */}
       <div className="w-full lg:w-[320px] lg:min-h-screen border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-col">
-
         <div className="p-4">
           <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
@@ -127,9 +150,7 @@ function Search() {
           />
 
           <div className="flex justify-between mb-2">
-            <span className="text-sm">
-              {search ? "Results" : "Recent"}
-            </span>
+            <span className="text-sm">{search ? "Results" : "Recent"}</span>
 
             {recentUsers.length > 0 && !search && (
               <span
@@ -160,9 +181,7 @@ function Search() {
                   />
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-xs text-gray-400">
-                      @{user.username}
-                    </p>
+                    <p className="text-xs text-gray-400">@{user.username}</p>
                   </div>
                 </div>
 
@@ -188,7 +207,6 @@ function Search() {
       <div className="flex-1 overflow-y-auto">
         {selectedUser ? (
           <div className="w-full flex flex-col items-center p-6 sm:p-10 text-center">
-
             <img
               src={selectedUser.img}
               alt={selectedUser.name}
@@ -203,21 +221,19 @@ function Search() {
 
             <button
               onClick={() => {
-                if (requestedUsers.includes(selectedUser._id)) {
-                  setShowRemoveModal(true);
+                if (connecting) {
+                  setShowRemoveModal(true); // ✅ open modal if connected
+                } else if (requested) {
+                  setShowRemoveModal(true); // ✅ open modal if requested
                 } else {
-                  handleRequest();
+                  handleRequest(); // ✅ send request
                 }
               }}
-              className={`h-[35px] w-[140px] sm:w-[160px] text-white rounded-md mb-6 ${
-                requestedUsers.includes(selectedUser._id)
-                  ? "bg-gray-600"
-                  : "bg-[#879F00]"
-              }`}
+              className={`h-[35px] w-[140px] sm:w-[160px] text-white rounded-md mb-6
+    ${connecting ? "bg-[#4a5218]" : requested ? "bg-gray-600" : "bg-[#879F00]"}
+  `}
             >
-              {requestedUsers.includes(selectedUser._id)
-                ? "Requested"
-                : "Connect"}
+              {connecting ? "Connected" : requested ? "Requested" : "Connect"}
             </button>
 
             <hr className="w-full mb-6 border-gray-700" />
@@ -237,9 +253,7 @@ function Search() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">
-                    No posts available
-                  </p>
+                  <p className="text-gray-500">No posts available</p>
                 )}
               </>
             )}
@@ -258,11 +272,13 @@ function Search() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50 p-4">
           <div className="bg-black border border-gray-700 rounded-xl p-6 w-full max-w-sm text-center">
             <h3 className="text-lg font-semibold mb-4">
-              Remove Request?
+              {connecting ? "Remove Connection?" : "Remove Request?"}
             </h3>
 
             <p className="text-gray-400 mb-6 text-sm">
-              Do you want to remove the connection request?
+              {connecting
+                ? "Do you want to remove this connection?"
+                : "Do you want to remove the connection request?"}
             </p>
 
             <div className="flex justify-center gap-4">
