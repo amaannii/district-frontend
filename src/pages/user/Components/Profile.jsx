@@ -58,11 +58,16 @@ function Profile({ setActive }) {
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      
 
       const user = response.data.user;
 
       setuserdetails(user);
-      setposts(user.post || []);
+     setposts(
+  (user.post || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
+);
       setconnected(user.connected?.length || 0);
       setconnecting(user.connecting?.length || 0);
       setSelectedImage(user.img);
@@ -72,6 +77,11 @@ function Profile({ setActive }) {
     } catch (error) {
       console.error(error);
     }
+    setposts(
+  (user.post || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
+);
   };
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */

@@ -178,6 +178,8 @@ function PostCard({ data, onShare, user }) {
     }
   };
 
+
+
 return (
   <div className="border-b border-neutral-800 mb-6 w-full max-w-2xl mx-auto">
 
