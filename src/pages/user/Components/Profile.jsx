@@ -45,7 +45,7 @@ function Profile({ setActive }) {
   });
 
   const token = localStorage.getItem("userToken");
-  
+
   /* ---------------- FETCH USER ---------------- */
   useEffect(() => {
     fetchUserDetails();
@@ -56,13 +56,18 @@ function Profile({ setActive }) {
       const response = await axios.post(
         "http://localhost:3001/user/userdetails",
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
+      
 
       const user = response.data.user;
 
       setuserdetails(user);
-      setposts(user.post || []);
+     setposts(
+  (user.post || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
+);
       setconnected(user.connected?.length || 0);
       setconnecting(user.connecting?.length || 0);
       setSelectedImage(user.img);
@@ -72,6 +77,11 @@ function Profile({ setActive }) {
     } catch (error) {
       console.error(error);
     }
+    setposts(
+  (user.post || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
+);
   };
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */
@@ -94,13 +104,14 @@ function Profile({ setActive }) {
   }, [activeTab]);
 
   const isPostOwner =
-    activeTab === "posts" || selectedPost?.postOwner?.username === userdetails.username;
+    activeTab === "posts" ||
+    selectedPost?.postOwner?.username === userdetails.username;
 
   const fetchSavedPost = async () => {
     try {
       const res = await axios.get(
         "http://localhost:3001/user/get-saved-posts",
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (res.data) setSavedPost(res.data);
@@ -109,15 +120,12 @@ function Profile({ setActive }) {
     }
   };
 
-  
-
   /* ---------------- DELETE POST ---------------- */
   const handleDeletePost = async (postId) => {
     try {
-      await axios.delete(
-        `http://localhost:3001/user/delete-post/${postId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`http://localhost:3001/user/delete-post/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setposts((prev) => prev.filter((p) => p._id !== postId));
       setselectedPost(null);
@@ -132,15 +140,13 @@ function Profile({ setActive }) {
       await axios.put(
         `http://localhost:3001/user/update-post/${selectedPost._id}`,
         { caption: editedCaption },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       setposts((prev) =>
         prev.map((p) =>
-          p._id === selectedPost._id
-            ? { ...p, caption: editedCaption }
-            : p
-        )
+          p._id === selectedPost._id ? { ...p, caption: editedCaption } : p,
+        ),
       );
 
       setselectedPost({
@@ -155,29 +161,28 @@ function Profile({ setActive }) {
   };
 
   /* ---------------- CONNECTIONS ---------------- */
- const fetchConnections = async (type) => {
-  try {
-    const res = await axios.get(
-      `http://localhost:3001/user/${type}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  const fetchConnections = async (type) => {
+    try {
+      const res = await axios.get(`http://localhost:3001/user/${type}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    if (res.data.success) {
-      setConnectionList(res.data.users); // ✅ FIX HERE
-      setConnectionType(type);
-      setShowConnections(true);
+      if (res.data.success) {
+        setConnectionList(res.data.users); // ✅ FIX HERE
+        setConnectionType(type);
+        setShowConnections(true);
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
   /* ---------------- UNSAVE / SAVE ---------------- */
   const handleUnsave = async () => {
     try {
       await axios.delete(
         `http://localhost:3001/user/unsave/${selectedPost._id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       setSaved(false);
@@ -192,7 +197,7 @@ function Profile({ setActive }) {
       const res = await axios.post(
         "http://localhost:3001/user/save-post",
         { postId: selectedPost._id },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (res.data.success) {
@@ -213,7 +218,7 @@ function Profile({ setActive }) {
       const res = await axios.post(
         "http://localhost:3001/user/like-post",
         { postId: selectedPost._id },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (res.data.success) {
@@ -233,7 +238,7 @@ function Profile({ setActive }) {
       const res = await axios.post(
         "http://localhost:3001/user/add-comment",
         { postId: selectedPost._id, text: commentText },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (res.data.success) {
@@ -257,7 +262,7 @@ function Profile({ setActive }) {
       const res = await axios.post(
         "http://localhost:3001/user/delete-comment",
         { postId: selectedPost._id, commentId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (res.data.success) {
@@ -279,7 +284,7 @@ function Profile({ setActive }) {
 
     const res = await fetch(
       "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
-      { method: "POST", body: data }
+      { method: "POST", body: data },
     );
     const result = await res.json();
 
@@ -288,7 +293,7 @@ function Profile({ setActive }) {
       await axios.post(
         "http://localhost:3001/user/upload",
         { img: result.secure_url },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       fetchUserDetails();
@@ -302,7 +307,7 @@ function Profile({ setActive }) {
       const res = await axios.post(
         "http://localhost:3001/user/send-post-to-chats",
         { postId: selectedPost._id, chatIds },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.data.success) setShowShare(false);
     } catch (err) {
@@ -348,20 +353,20 @@ function Profile({ setActive }) {
                 <p className="font-semibold">{posts.length}</p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
-             <div
-  className="cursor-pointer"
-  onClick={() => fetchConnections("connected")}
->
-  <p className="font-semibold">{connected}</p>
-  <p className="text-xs text-gray-400">connected</p>
-</div>
-<div
-  className="cursor-pointer"
-  onClick={() => fetchConnections("connecting")}
->
-  <p className="font-semibold">{connecting}</p>
-  <p className="text-xs text-gray-400">connecting</p>
-</div>
+              <div
+                className="cursor-pointer"
+                onClick={() => fetchConnections("connected")}
+              >
+                <p className="font-semibold">{connected}</p>
+                <p className="text-xs text-gray-400">connected</p>
+              </div>
+              <div
+                className="cursor-pointer"
+                onClick={() => fetchConnections("connecting")}
+              >
+                <p className="font-semibold">{connecting}</p>
+                <p className="text-xs text-gray-400">connecting</p>
+              </div>
             </div>
           </div>
 
@@ -393,53 +398,55 @@ function Profile({ setActive }) {
 
           {/* GRID */}
           <div className="grid grid-cols-3 gap-5 max-w-[90%] mx-auto mt-4">
-            {(activeTab === "posts" ? posts : savedPost).map(
-              (item, index) => (
-                <div key={index} className="relative">
+            {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={item.image}
+                  alt=""
+                  className="w-full h-[400px] object-cover cursor-pointer"
+                  onClick={() => setselectedPost(item)}
+                />
+
+                {/* HEART / COMMENT / SHARE / SAVE ICONS overlay */}
+                <div className="absolute bottom-2 left-2 flex gap-2">
                   <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-[400px] object-cover cursor-pointer"
+                    src={item.isLiked ? heartRed : heart}
+                    className="w-5 cursor-pointer"
+                    onClick={() => {
+                      setselectedPost(item);
+                      handleLike();
+                    }}
+                  />
+                  <img
+                    src={commentIcon}
+                    className="w-5 cursor-pointer"
                     onClick={() => setselectedPost(item)}
                   />
-
-                  {/* HEART / COMMENT / SHARE / SAVE ICONS overlay */}
-                  <div className="absolute bottom-2 left-2 flex gap-2">
-                    <img
-                      src={item.isLiked ? heartRed : heart}
-                      className="w-5 cursor-pointer"
-                      onClick={() => {
-                        setselectedPost(item);
-                        handleLike();
-                      }}
-                    />
-                    <img
-                      src={commentIcon}
-                      className="w-5 cursor-pointer"
-                      onClick={() => setselectedPost(item)}
-                    />
-                    <img
-                      src={send}
-                      className="w-5 cursor-pointer"
-                      onClick={() => {
-                        setselectedPost(item);
-                        setShowShare(true);
-                      }}
-                    />
-                    <img
-                      src={savedPost.some(p => p._id === item._id) ? bookmarkFilled : bookmark}
-                      className="w-5 cursor-pointer"
-                      onClick={() => {
-                        setselectedPost(item);
-                        savedPost.some(p => p._id === item._id)
-                          ? handleUnsave()
-                          : handleSave();
-                      }}
-                    />
-                  </div>
+                  <img
+                    src={send}
+                    className="w-5 cursor-pointer"
+                    onClick={() => {
+                      setselectedPost(item);
+                      setShowShare(true);
+                    }}
+                  />
+                  <img
+                    src={
+                      savedPost.some((p) => p._id === item._id)
+                        ? bookmarkFilled
+                        : bookmark
+                    }
+                    className="w-5 cursor-pointer"
+                    onClick={() => {
+                      setselectedPost(item);
+                      savedPost.some((p) => p._id === item._id)
+                        ? handleUnsave()
+                        : handleSave();
+                    }}
+                  />
                 </div>
-              )
-            )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -512,7 +519,7 @@ function Profile({ setActive }) {
                     <div className="flex gap-4 text-xs">
                       <button
                         onClick={handleUpdatePost}
-                        className="text-green-500"
+                        className="text-[#879F00]"
                       >
                         Save
                       </button>
@@ -609,7 +616,7 @@ function Profile({ setActive }) {
                   />
                   <button
                     onClick={handleComment}
-                    className="text-sm text-green-500"
+                    className="text-sm text-[#879F00]"
                   >
                     Post
                   </button>
@@ -654,36 +661,46 @@ function Profile({ setActive }) {
         </div>
       )}
 
-     {showConnections && (
-  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div className="bg-[#0f0f0f] w-[400px] max-h-[500px] rounded-xl p-5 overflow-y-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold capitalize">{connectionType}</h2>
-        <button onClick={() => setShowConnections(false)} className="text-gray-400">✕</button>
-      </div>
-
-      {connectionList.length === 0 ? (
-        <p className="text-gray-400 text-sm text-center">
-          No {connectionType} yet
-        </p>
-      ) : (
-        connectionList.map((user) => (
-          <div key={user._id} className="flex items-center gap-3 py-2 border-b border-gray-800">
-            <img
-              src={user.img || profile}
-              alt={user.username}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <div>
-              <p className="text-sm font-medium">{user.username}</p>
-              <p className="text-xs text-gray-400">{user.name}</p>
+      {showConnections && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[#0f0f0f] w-[400px] max-h-[500px] rounded-xl p-5 overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold capitalize">
+                {connectionType}
+              </h2>
+              <button
+                onClick={() => setShowConnections(false)}
+                className="text-gray-400"
+              >
+                ✕
+              </button>
             </div>
+
+            {connectionList.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center">
+                No {connectionType} yet
+              </p>
+            ) : (
+              connectionList.map((user) => (
+                <div
+                  key={user._id}
+                  className="flex items-center gap-3 py-2 border-b border-gray-800"
+                >
+                  <img
+                    src={user.img || profile}
+                    alt={user.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="text-sm font-medium">{user.username}</p>
+                    <p className="text-xs text-gray-400">{user.name}</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        ))
+        </div>
       )}
-    </div>
-  </div>
-)}
       {/* SHARE MODAL */}
       {showShare && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -692,7 +709,7 @@ function Profile({ setActive }) {
             <p className="text-sm text-gray-400 mb-4">Select chats to share</p>
             <button
               onClick={() => handleShare([])}
-              className="bg-green-500 px-4 py-2 rounded"
+              className="bg-[#879F00] px-4 py-2 rounded"
             >
               Share
             </button>

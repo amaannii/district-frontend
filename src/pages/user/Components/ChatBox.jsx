@@ -57,32 +57,32 @@ function ChatBox({ district, onBack }) {
     setMessages([]);
 
     // 🔥 Fetch old messages
-fetch(`http://localhost:3001/messages/${district}`)
-  .then((res) => res.json())
-  .then((data) => {
-    const formatted = data.messages.map((msg) => {
-      // 🔥 If it is a shared post
-      if (msg.post) {
-        return {
-          type: "post",
-          post: msg.post,
-          postOwner: msg.postOwner,
-          sender: msg.sender,
-          time: msg.createdAt,
-        };
-      }
+    fetch(`http://localhost:3001/messages/${district}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.messages.map((msg) => {
+          // 🔥 If it is a shared post
+          if (msg.post) {
+            return {
+              type: "post",
+              post: msg.post,
+              postOwner: msg.postOwner,
+              sender: msg.sender,
+              time: msg.createdAt,
+            };
+          }
 
-      // 🔥 Normal text message
-      return {
-        type: msg.type,
-        content: msg.message?.content,
-        sender: msg.sender,
-        time: msg.createdAt,
-      };
-    });
+          // 🔥 Normal text message
+          return {
+            type: msg.type,
+            content: msg.message?.content,
+            sender: msg.sender,
+            time: msg.createdAt,
+          };
+        });
 
-    setMessages(formatted);
-  });
+        setMessages(formatted);
+      });
     socket.emit("joinDistrict", district);
 
     const receiveHandler = (msg) => {
@@ -132,21 +132,54 @@ fetch(`http://localhost:3001/messages/${district}`)
 
   /* ================= IMAGE ================= */
 
-  const sendImage = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+ const sendImage = async (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    console.log("No file selected");
+    return;
+  }
 
-    const url = URL.createObjectURL(file);
+  console.log("File selected:", file);
+
+  const data = new FormData();
+  data.append("file", file);
+  data.append("upload_preset", "newuploads");
+
+  try {
+    console.log("Uploading to Cloudinary...");
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+
+    const result = await res.json();
+    console.log("Cloudinary response:", result);
+
+    if (!result.secure_url) {
+      console.log("No secure_url received");
+      return;
+    }
+
+    console.log("Sending socket message...");
 
     socket.emit("sendMessage", {
+  
       district,
       message: {
         type: "image",
-        content: url,
+        content: result.secure_url,
       },
-      sender: currentUser.name,
+      sender: currentUser?.name,
     });
-  };
+
+  } catch (error) {
+    console.error("Upload error:", error);
+  }
+};
 
   /* ================= DOCUMENT ================= */
 
@@ -231,29 +264,29 @@ fetch(`http://localhost:3001/messages/${district}`)
               </span>
 
               {msg.type === "post" && (
-  <div className="bg-white text-black rounded-lg p-2 max-w-lg">
-    <div className="flex items-center gap-2 mb-2">
-      <img
-        src={msg.postOwner?.avatar}
-        className="w-6 h-6 rounded-full"
-        alt=""
-      />
-      <span className="text-xs font-semibold">
-        {msg.postOwner?.username}
-      </span>
-    </div>
+                <div className="bg-white text-black rounded-lg p-2 max-w-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={msg.postOwner?.avatar}
+                      className="w-6 h-6 rounded-full"
+                      alt=""
+                    />
+                    <span className="text-xs font-semibold">
+                      {msg.postOwner?.username}
+                    </span>
+                  </div>
 
-    <img
-      src={msg.post.image}
-      className="rounded-lg max-w-xs"
-      alt="shared post"
-    />
+                  <img
+                    src={msg.post.image}
+                    className="rounded-lg max-w-xs"
+                    alt="shared post"
+                  />
 
-    {msg.post.caption && (
-      <p className="text-xs mt-1">{msg.post.caption}</p>
-    )}
-  </div>
-)}
+                  {msg.post.caption && (
+                    <p className="text-xs mt-1">{msg.post.caption}</p>
+                  )}
+                </div>
+              )}
 
               {msg.type === "text" && (
                 <div
@@ -331,6 +364,19 @@ fetch(`http://localhost:3001/messages/${district}`)
           </div>
         )}
       </div>
+      {showEmojis && (
+        <div className="flex flex-wrap gap-2 bg-gray-800 p-3 rounded-lg mb-2 max-w-xs">
+          {EMOJIS.map((emoji, index) => (
+            <button
+              key={index}
+              onClick={() => sendEmoji(emoji)}
+              className="text-xl hover:scale-125 transition"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
