@@ -28,6 +28,10 @@ function ChatBox({ district, onBack }) {
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [openImageMenuId, setOpenImageMenuId] = useState(null);
 
   /* ================= SOCKET ================= */
 
@@ -61,7 +65,6 @@ function ChatBox({ district, onBack }) {
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.messages.map((msg) => {
-          // 🔥 If it is a shared post
           if (msg.post) {
             return {
               type: "post",
@@ -72,10 +75,11 @@ function ChatBox({ district, onBack }) {
             };
           }
 
-          // 🔥 Normal text message
           return {
-            type: msg.type,
+            _id: msg._id, // ✅ VERY IMPORTANT
+            type: msg.message?.type,
             content: msg.message?.content,
+            name: msg.message?.name,
             sender: msg.sender,
             time: msg.createdAt,
           };
@@ -89,6 +93,7 @@ function ChatBox({ district, onBack }) {
       setMessages((prev) => [
         ...prev,
         {
+          _id: msg._id,
           ...msg.message,
           sender: msg.sender,
           time: msg.createdAt,
@@ -132,72 +137,88 @@ function ChatBox({ district, onBack }) {
 
   /* ================= IMAGE ================= */
 
- const sendImage = async (e) => {
-  const file = e.target.files[0];
-  if (!file) {
-    console.log("No file selected");
-    return;
-  }
-
-  console.log("File selected:", file);
-
-  const data = new FormData();
-  data.append("file", file);
-  data.append("upload_preset", "newuploads");
-
-  try {
-    console.log("Uploading to Cloudinary...");
-
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
-
-    const result = await res.json();
-    console.log("Cloudinary response:", result);
-
-    if (!result.secure_url) {
-      console.log("No secure_url received");
+  const sendImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      console.log("No file selected");
       return;
     }
 
-    console.log("Sending socket message...");
+    console.log("File selected:", file);
 
-    socket.emit("sendMessage", {
-  
-      district,
-      message: {
-        type: "image",
-        content: result.secure_url,
-      },
-      sender: currentUser?.name,
-    });
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "newuploads");
 
-  } catch (error) {
-    console.error("Upload error:", error);
-  }
-};
+    try {
+      console.log("Uploading to Cloudinary...");
+
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
+        {
+          method: "POST",
+          body: data,
+        },
+      );
+
+      const result = await res.json();
+      console.log("Cloudinary response:", result);
+
+      if (!result.secure_url) {
+        console.log("No secure_url received");
+        return;
+      }
+
+      console.log("Sending socket message...");
+
+      socket.emit("sendMessage", {
+        district,
+        message: {
+          type: "image",
+          content: result.secure_url,
+        },
+        sender: currentUser?.name,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+  };
 
   /* ================= DOCUMENT ================= */
 
-  const sendDocument = (e) => {
+  const sendDocument = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "newuploads");
 
-    socket.emit("sendMessage", {
-      district,
-      message: {
-        type: "document",
-        content: url,
-        name: file.name,
-      },
-      sender: currentUser.name,
-    });
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dlxxxangl/raw/upload",
+        {
+          method: "POST",
+          body: data,
+        },
+      );
+
+      const result = await res.json();
+
+      if (!result.secure_url) return;
+
+      socket.emit("sendMessage", {
+        district,
+        message: {
+          type: "document",
+          content: result.secure_url,
+          name: file.name,
+        },
+        sender: currentUser?.name,
+      });
+    } catch (error) {
+      console.error("Document upload error:", error);
+    }
   };
 
   /* ================= AUDIO ================= */
@@ -241,6 +262,36 @@ function ChatBox({ district, onBack }) {
     };
   };
 
+  const deleteMessage = (id) => {
+    socket.emit("deleteMessage", {
+      district,
+      messageId: id,
+    });
+
+    setMessages((prev) => prev.filter((m) => m._id !== id));
+    setOpenMenuId(null);
+  };
+
+  const downloadImage = async (url) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = blobUrl;
+      a.download = "image.jpg"; // you can customize
+      document.body.appendChild(a);
+      a.click();
+
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed ❌", error);
+    }
+  };
+
   /* ================= UI ================= */
 
   return (
@@ -257,8 +308,52 @@ function ChatBox({ district, onBack }) {
           return (
             <div
               key={i}
-              className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+              className={`relative group flex flex-col ${isMe ? "items-end" : "items-start"}`}
             >
+              {isMe && (
+                <div className="absolute -right-6 top-5">
+                  <button
+                    onClick={() =>
+                      setOpenMenuId(openMenuId === msg._id ? null : msg._id)
+                    }
+                    className="text-gray-400 relative right-6 hover:text-white font-bold px-2 opacity-0 group-hover:opacity-100 "
+                  >
+                    ⋮
+                  </button>
+                </div>
+              )}
+              {isMe && openMenuId === msg._id && (
+                <div className="absolute right-0 mt-6 w-40 bg-[#1f1f1f] rounded-xl shadow-lg z-50 overflow-hidden">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(msg.content || "");
+                      setOpenMenuId(null);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-700 "
+                  >
+                    Copy
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      console.log("Forward clicked");
+                      setOpenMenuId(null);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                  >
+                    Forward
+                  </button>
+
+                  {msg.sender === currentUser?.name && (
+                    <button
+                      onClick={() => deleteMessage(msg._id)}
+                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700"
+                    >
+                      Unsend
+                    </button>
+                  )}
+                </div>
+              )}
               <span className="text-xs text-gray-400 mb-1">
                 {isMe ? "You" : msg.sender}
               </span>
@@ -297,9 +392,40 @@ function ChatBox({ district, onBack }) {
                   {msg.content}
                 </div>
               )}
-
               {msg.type === "image" && (
-                <img src={msg.content} className="max-w-xs rounded-lg" alt="" />
+                <div className="relative">
+                  <img
+                    src={msg.content}
+                    onClick={() =>
+                      setOpenImageMenuId(
+                        openImageMenuId === msg._id ? null : msg._id,
+                      )
+                    }
+                    className="max-w-xs rounded-lg cursor-pointer"
+                    alt="chat"
+                  />
+
+                  {openImageMenuId === msg._id && (
+                    <div className="absolute right-0 mt-2 w-32 bg-[#1f1f1f] rounded-xl shadow-lg z-50 overflow-hidden">
+                      <button
+                        onClick={() => {
+                          downloadImage(msg.content);
+                          setOpenImageMenuId(null);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                      >
+                        Download
+                      </button>
+
+                      <button
+                        onClick={() => setOpenImageMenuId(null)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
 
               {msg.type === "audio" && (
@@ -309,8 +435,27 @@ function ChatBox({ district, onBack }) {
               )}
 
               {msg.type === "document" && (
-                <div className="bg-gray-800 px-4 py-2 rounded-lg">
-                  📄 {msg.name}
+                <div
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg max-w-xs ${
+                    isMe ? "bg-[#879F00] text-white" : "bg-gray-800 text-white"
+                  }`}
+                >
+                  <div className="text-3xl">📄</div>
+
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-sm font-semibold truncate">
+                      {msg.name}
+                    </span>
+
+                    <a
+                      href={msg.content}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs underline opacity-80"
+                    >
+                      Download
+                    </a>
+                  </div>
                 </div>
               )}
 
@@ -375,6 +520,29 @@ function ChatBox({ district, onBack }) {
               {emoji}
             </button>
           ))}
+        </div>
+      )}
+      {showPopup && (
+        <div className="fixed inset-0  bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-[#1c1c1c] rounded-xl p-6 w-72 text-center space-y-4">
+            <h3 className="text-lg font-semibold">Message Options</h3>
+
+            {selectedMessage?.sender === currentUser?.name && (
+              <button
+                onClick={deleteMessage}
+                className="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg"
+              >
+                Unsend
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowPopup(false)}
+              className="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>
