@@ -9,17 +9,21 @@ import Create from "./Components/Create";
 import Profile from "./Components/Profile";
 import Settings from "./Components/Settings";
 import More from "./Components/More";
+import Userprofile from "./Components/Userprofile";
 // ✅ NEW SETTINGS PAGE
 
 function UserDashboard() {
   const [activePage, setActivePage] = useState("HOME");
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedUsername, setSelectedUsername] = useState(null);
 
   const renderContent = () => {
     switch (activePage) {
       case "HOME":
         return (
           <Home
+          setSelectedUsername={setSelectedUsername}
+          setActivePage={setActivePage}
             openChat={(district) => {
               setSelectedDistrict(district);
               setActivePage("MESSAGES");
@@ -32,6 +36,8 @@ function UserDashboard() {
 
       case "EXPLORE":
         return <Explore />;
+      case "UPROFILE":
+        return <Userprofile selectedUsername={selectedUsername} />;
 
       case "MESSAGES":
         return (

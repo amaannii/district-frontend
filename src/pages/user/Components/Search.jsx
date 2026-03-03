@@ -55,7 +55,6 @@ function Search() {
 
 const handleSelectUser = async (user) => {
   setSelectedUser(user);
-
   // reset first
   setconnecting(false);
   setrequested(false);

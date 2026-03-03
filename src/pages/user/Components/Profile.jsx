@@ -10,7 +10,7 @@ import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function Profile({ setActive }) {
+function Profile({ setActive, userId }) {
   const navigate = useNavigate();
 
   const [userdetails, setuserdetails] = useState({});
@@ -45,44 +45,39 @@ function Profile({ setActive }) {
   });
 
   const token = localStorage.getItem("userToken");
-
+const idToFetch = userId || localStorage.getItem("userId");
   /* ---------------- FETCH USER ---------------- */
-  useEffect(() => {
-    fetchUserDetails();
-  }, []);
+useEffect(() => {
+  fetchUserDetails();
+}, [userId]);
 
-  const fetchUserDetails = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3001/user/userdetails",
-        {},
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      
+ const fetchUserDetails = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3001/user/userdetails",
+      {},
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
 
-      const user = response.data.user;
+    const user = response.data.user;
 
-      setuserdetails(user);
-     setposts(
-  (user.post || []).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-);
-      setconnected(user.connected?.length || 0);
-      setconnecting(user.connecting?.length || 0);
-      setSelectedImage(user.img);
+    setuserdetails(user);
 
-      // store id for owner check
-      localStorage.setItem("userId", user._id);
-    } catch (error) {
-      console.error(error);
-    }
     setposts(
-  (user.post || []).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-);
-  };
+      (user.post || []).sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )
+    );
+
+    setconnected(user.connected?.length || 0);
+    setconnecting(user.connecting?.length || 0);
+    setSelectedImage(user.img);
+
+    
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */
   useEffect(() => {
@@ -321,6 +316,7 @@ function Profile({ setActive }) {
   return (
     <>
       <div className="flex h-screen w-full bg-black text-white">
+      <button onClick={() => setActive()}>back</button>
         <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
