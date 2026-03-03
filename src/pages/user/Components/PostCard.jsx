@@ -8,7 +8,7 @@ import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import socket from "../../../Socket";
 
-function PostCard({ data, onShare, user }) {
+function PostCard({setSelectedUsername,setActivePage, data, user, setActive, setSelectedUserId }) {
   const token = localStorage.getItem("userToken");
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
@@ -23,6 +23,30 @@ function PostCard({ data, onShare, user }) {
   // Delete modal state
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [selectedDistricts, setSelectedDistricts] = useState([]);
+
+
+
+
+
+
+
+// const fetchProfile = async () => {
+//   try {
+//     const token = localStorage.getItem("userToken");
+
+//     const res = await axios.get(
+//       `http://localhost:3001/user/profile/${selectedUserId}`,
+//       {
+//         headers: { Authorization: `Bearer ${token}` },
+//       }
+//     );
+
+//     setProfileData(res.data);
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
   useEffect(() => {
     if (!data) return;
 
@@ -184,15 +208,27 @@ return (
   <div className="border-b border-neutral-800 mb-6 w-full max-w-2xl mx-auto">
 
     {/* USER INFO */}
-    <div className="px-4 sm:px-6 py-3 flex items-center gap-3">
-      <img
-        src={data.userId?.img || "/default-avatar.png"}
-        alt="user"
-        className="w-8 h-8 rounded-full object-cover"
-      />
-      <span className="font-semibold text-sm sm:text-base">
-        {data.userId?.username}
-      </span>
+    <div className="px-4 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
+<img
+  onClick={() => {
+    setSelectedUserId(data.userId._id);
+
+  }}
+  src={data.userId?.img || "/default-avatar.png"}
+  className="w-8 h-8 rounded-full object-cover cursor-pointer"
+/>
+
+<span
+  onClick={() => {
+    setActivePage("UPROFILE");
+    setSelectedUsername(data.userId?.username);
+
+    
+  }}
+  className="font-semibold cursor-pointer"
+>
+  {data.userId?.username}
+</span>
     </div>
 
     {/* IMAGE */}
@@ -200,7 +236,7 @@ return (
       src={data.image}
       alt="post"
       className="w-full max-h-[300px] sm:max-h-[450px] object-cover"
-    />
+    /> 
 
     {/* CAPTION */}
     <div className="px-4 sm:px-6 py-2 text-gray-300 text-sm sm:text-base">
@@ -254,49 +290,54 @@ return (
     </div>
 
     {/* COMMENTS */}
-    {showComments && (
-      <div className="px-4 sm:px-6 pb-4">
-        {comments.map((c) => (
-          <div
-            key={c._id}
-            className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-sm text-gray-300 mb-3"
-          >
-            <div>
-              <span className="font-semibold mr-2">
-                {c.username}
-              </span>
-              {c.text}
-              <div className="text-xs text-gray-500">
-                {new Date(c.createdAt).toLocaleString()}
-              </div>
+   {showComments && (
+  <div className="px-4 sm:px-6 pb-4">
+    
+    {/* Scrollable Comments */}
+    <div className="max-h-48 overflow-y-auto pr-2 mb-3  scrollbar-hide">
+      {comments.map((c) => (
+        <div
+          key={c._id}
+          className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-sm text-gray-300 mb-3"
+        >
+          <div>
+            <span className="font-semibold mr-2">
+              {c.username}
+            </span>
+            {c.text}
+            <div className="text-xs text-gray-500">
+              {new Date(c.createdAt).toLocaleString()}
             </div>
-
-            <button
-              onClick={() => setCommentToDelete(c._id)}
-              className="text-red-500 text-xs mt-1 sm:mt-0 hover:text-red-400"
-            >
-              Delete
-            </button>
           </div>
-        ))}
 
-        {/* Add Comment */}
-        <div className="flex flex-col sm:flex-row gap-2 mt-3">
-          <input
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className="flex-1 bg-neutral-800 p-2 rounded text-sm"
-            placeholder="Add a comment..."
-          />
           <button
-            onClick={handleComment}
-            className="text-blue-500 font-semibold text-sm"
+            onClick={() => setCommentToDelete(c._id)}
+            className="text-red-500 text-xs mt-1 sm:mt-0 hover:text-red-400"
           >
-            Post
+            Delete
           </button>
         </div>
-      </div>
-    )}
+      ))}
+    </div>
+
+    {/* Add Comment */}
+    <div className="flex flex-col sm:flex-row gap-2">
+      <input
+        value={commentText}
+        onChange={(e) => setCommentText(e.target.value)}
+        className="flex-1 bg-neutral-800 p-2 rounded text-sm"
+        placeholder="Add a comment..."
+      />
+      <button
+        onClick={handleComment}
+        className="text-blue-500 font-semibold text-sm"
+      >
+        send
+      </button>
+    </div>
+
+  </div>
+)}
 
     {/* DELETE MODAL */}
     {commentToDelete && (
@@ -375,6 +416,9 @@ return (
         </div>
       </div>
     )}
+
+
+
 
   </div>
 );
