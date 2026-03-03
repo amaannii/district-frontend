@@ -44,7 +44,7 @@ function Userprofile({ selectedUsername }) {
         console.error(err);
         setError(err);
       } finally {
-        setLoading(false);
+        setLoading(false); 
       }
     };
 
@@ -88,13 +88,16 @@ function Userprofile({ selectedUsername }) {
   if (!userData) return <div>No user selected</div>;
 
   return (
-    <div className="flex flex-col items-center p-6 sm:p-10 text-center">
+    <div className="flex flex-col items-center p-6 sm:p-10 text-center overflow-auto  scrollbar-hide">
       {/* Profile Image */}
+      <div >
+
       <img
         src={userData.img}
         alt={userData.name}
         className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mb-4"
       />
+      </div>
 
       {/* Username and Name */}
       <h2 className="text-lg sm:text-xl mb-2 break-words">
@@ -107,14 +110,19 @@ function Userprofile({ selectedUsername }) {
       {userData.bio && <p className="text-gray-400 mb-4">{userData.bio}</p>}
 
       {/* Connections and Posts Info */}
-      <div className="flex gap-6 mb-4 text-sm text-gray-300">
-        <span>
-          <strong>{connectionsCount}</strong> {connectionsCount === 1 ? "connection" : "connections"}
-        </span>
-        <span>
-          <strong>{userData.post?.length || 0}</strong> {userData.post?.length === 1 ? "post" : "posts"}
-        </span>
-      </div>
+      <div className="flex gap-8 mb-4 text-sm text-gray-300">
+  <span>
+    <strong>{userData.post?.length || 0}</strong> posts
+  </span>
+
+  <span>
+    <strong>{userData.connected?.length || 0}</strong> connected
+  </span>
+
+  <span>
+    <strong>{userData.connecting?.length || 0}</strong> connecting
+  </span>
+</div>
 
       {/* Connect / Requested / Connected Button */}
       <button
@@ -122,7 +130,7 @@ function Userprofile({ selectedUsername }) {
           if (connecting || requested) setShowRemoveModal(true);
           else handleRequest();
         }}
-        className={`h-[35px] w-[140px] sm:w-[160px] text-white rounded-md mb-6
+        className={`h-[36px] w-[140px] sm:w-[160px] text-white rounded-md mb-6
           ${connecting ? "bg-[#4a5218]" : requested ? "bg-gray-600" : "bg-[#879F00]"}
         `}
       >
