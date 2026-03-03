@@ -41,7 +41,7 @@ function ChatBox({ district, onBack }) {
   const [liked, setLiked] = useState(false);
   const messagesEndRef = useRef(null);
   const [commentText, setCommentText] = useState("");
-  const [showComments, setShowComments] = useState(false);
+  const [showCommentInput, setShowCommentInput] = useState(false);
 
   /* ================= SOCKET ================= */
 
@@ -128,7 +128,7 @@ function ChatBox({ district, onBack }) {
       socket.off("receiveMessage", receiveHandler);
       socket.emit("leaveDistrict", district);
     };
-  }, [district]);
+  }, [district, showCommentInput]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -358,55 +358,66 @@ function ChatBox({ district, onBack }) {
   };
 
   const handleLike = async () => {
-    try {
-      const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("userToken");
+    if (!token) return alert("Login required");
 
-      const res = await axios.put(
-        `http://localhost:3001/post/like/${selectedPost.post._id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+    try {
+      const res = await axios.post(
+        "http://localhost:3001/user/like-post",
+        { postId: selectedPost.post._id },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      // Update modal instantly
-      setSelectedPost((prev) => ({
-        ...prev,
-        post: {
-          ...prev.post,
-          likes: res.data.likes,
-        },
-      }));
-    } catch (error) {
-      console.log("Like error", error);
+      if (res.data.success) {
+        setSelectedPost((prev) => ({
+          ...prev,
+          post: {
+            ...prev.post,
+            likes: res.data.likes, // updated likes array from backend
+          },
+        }));
+
+        socket.emit("likePost", {
+          postId: selectedPost.post._id,
+          user: currentUser.username,
+        });
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleComment = async () => {
+    const token = localStorage.getItem("userToken"); // ✅ ADD THIS
+
+    if (!token) return alert("Login required");
     if (!commentText.trim()) return;
 
     try {
-      const token = localStorage.getItem("userToken");
-
       const res = await axios.post(
-        `http://localhost:3001/post/comment/${selectedPost.post._id}`,
-        { text: commentText },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        "http://localhost:3001/user/add-comment",
+        { postId: selectedPost.post._id, text: commentText },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      setSelectedPost((prev) => ({
-        ...prev,
-        post: {
-          ...prev.post,
-          comments: res.data.comments,
-        },
-      }));
+      if (res.data.success) {
+        setSelectedPost((prev) => ({
+          ...prev,
+          post: {
+            ...prev.post,
+            comments: [...(prev.post.comments || []), res.data.comment],
+          },
+        }));
 
-      setCommentText("");
-    } catch (error) {
-      console.log("Comment error", error);
+        setCommentText("");
+
+        socket.emit("newComment", {
+          postId: selectedPost.post._id,
+          comment: res.data.comment,
+        });
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -689,7 +700,7 @@ function ChatBox({ district, onBack }) {
       {selectedPost && (
         <div
           onClick={() => setSelectedPost(null)}
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          className="fixed inset-0 overflow-scroll srcollbar-hide bg-black bg-opacity-80 flex items-center justify-center z-50"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -727,7 +738,9 @@ function ChatBox({ district, onBack }) {
                 <img
                   src={
                     Array.isArray(selectedPost.post.likes) &&
-                    selectedPost.post.likes.includes(currentUser?._id)
+                    selectedPost.post.likes.some(
+                      (id) => id.toString() === currentUser?._id?.toString(),
+                    )
                       ? heartRed
                       : heart
                   }
@@ -741,6 +754,7 @@ function ChatBox({ district, onBack }) {
                   src={commentIcon}
                   alt="comment"
                   className="w-6 h-6 cursor-pointer hover:scale-110 transition"
+                  onClick={() => setShowCommentInput((prev) => !prev)}
                 />
               </div>
             </div>
@@ -750,42 +764,53 @@ function ChatBox({ district, onBack }) {
               {selectedPost.post.likes || 0} likes
             </div>
             <div className="px-4 pt-2 text-xs text-gray-400">
-              {selectedPost.post.comments?.length || 0} comments
+              {selectedPost.post.comments.length || 0} comments
             </div>
 
             {/* Caption */}
             <div className="px-4 pt-1 text-sm">
-              <span className="font-semibold">
+              <span className="font-semibold ">
                 {selectedPost.postOwner?.username}
               </span>{" "}
               {selectedPost.post.caption}
             </div>
 
             {/* Comments */}
-            <div className="px-4 pt-3 max-h-40 overflow-y-auto space-y-2">
-              {selectedPost.post.comments?.map((comment) => (
-                <div key={comment._id} className="text-sm">
-                  <span className="font-semibold">
-                    {comment.user?.username}
-                  </span>{" "}
-                  {comment.text}
-                </div>
-              ))}
-              <div className="flex items-center border-t border-gray-700 mt-3 px-4 py-3">
-                <input
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="flex-1 bg-transparent outline-none text-sm"
-                />
+            <div className="px-4 pt-3 max-h-40 overflow-scroll scrollbar-hide space-y-2">
+              {/* ✅ Always show existing comments */}
+              {selectedPost.post.comments?.length > 0 ? (
+                selectedPost.post.comments.map((comment) => (
+                  <div key={comment._id} className="text-sm">
+                    <span className="font-semibold">
+                      {comment.user?.toString() === currentUser?._id?.toString()
+                        ? "You"
+                        : comment.username || "User"}
+                    </span>{" "}
+                    {comment.text}
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-gray-400">No comments yet</p>
+              )}
 
-                <button
-                  onClick={handleComment}
-                  className="text-[#879F00] text-sm font-semibold"
-                >
-                  Post
-                </button>
-              </div>
+              {/* ✅ Only toggle the input box */}
+              {showCommentInput && (
+                <div className="flex items-center border-t border-gray-700 mt-3 pt-2">
+                  <input
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Add a comment..."
+                    className="flex-1 bg-transparent outline-none text-sm"
+                  />
+
+                  <button
+                    onClick={handleComment}
+                    className="text-[#879F00] text-sm font-semibold"
+                  >
+                    Post
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           {/* Add Comment */}
