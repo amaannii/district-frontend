@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import socket from "../../../Socket";
 import axios from "axios";
+import heart from "../../../assets/images/icons8-heart-24.png";
+import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
+import commentIcon from "../../../assets/images/icons8-comment-50.png";
 
 const EMOJIS = [
   "😀",
@@ -32,6 +35,13 @@ function ChatBox({ district, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [openImageMenuId, setOpenImageMenuId] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const emojiRef = useRef(null);
+  const menuRef = useRef(null);
+  const [liked, setLiked] = useState(false);
+  const messagesEndRef = useRef(null);
+  const [commentText, setCommentText] = useState("");
+  const [showComments, setShowComments] = useState(false);
 
   /* ================= SOCKET ================= */
 
@@ -53,6 +63,17 @@ function ChatBox({ district, onBack }) {
       } catch (error) {
         console.log("Error fetching notification settings ❌", error);
       }
+      const handleDelete = (messageId) => {
+        setMessages((prev) =>
+          prev.filter((m) => m._id === undefined || m._id !== messageId),
+        );
+      };
+
+      socket.on("messageDeleted", handleDelete);
+
+      return () => {
+        socket.off("messageDeleted", handleDelete);
+      };
     };
 
     fetchDetails();
@@ -109,7 +130,32 @@ function ChatBox({ district, onBack }) {
     };
   }, [district]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setShowEmojis(false);
+      }
+    };
+    const handleoutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    scrollToBottom();
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleoutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleoutside);
+    };
+  }, [messages]);
+
   /* ================= SEND TEXT ================= */
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView();
+  };
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -263,13 +309,14 @@ function ChatBox({ district, onBack }) {
   };
 
   const deleteMessage = (id) => {
+    console.log("Deleting id:", id);
+
     socket.emit("deleteMessage", {
       district,
       messageId: id,
     });
 
     setMessages((prev) => prev.filter((m) => m._id !== id));
-    setOpenMenuId(null);
   };
 
   const downloadImage = async (url) => {
@@ -289,6 +336,77 @@ function ChatBox({ district, onBack }) {
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error("Download failed ❌", error);
+    }
+  };
+
+  const downloadDocument = async (url, name) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed ❌", error);
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
+
+      const res = await axios.put(
+        `http://localhost:3001/post/like/${selectedPost.post._id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      // Update modal instantly
+      setSelectedPost((prev) => ({
+        ...prev,
+        post: {
+          ...prev.post,
+          likes: res.data.likes,
+        },
+      }));
+    } catch (error) {
+      console.log("Like error", error);
+    }
+  };
+
+  const handleComment = async () => {
+    if (!commentText.trim()) return;
+
+    try {
+      const token = localStorage.getItem("userToken");
+
+      const res = await axios.post(
+        `http://localhost:3001/post/comment/${selectedPost.post._id}`,
+        { text: commentText },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      setSelectedPost((prev) => ({
+        ...prev,
+        post: {
+          ...prev.post,
+          comments: res.data.comments,
+        },
+      }));
+
+      setCommentText("");
+    } catch (error) {
+      console.log("Comment error", error);
     }
   };
 
@@ -323,7 +441,10 @@ function ChatBox({ district, onBack }) {
                 </div>
               )}
               {isMe && openMenuId === msg._id && (
-                <div className="absolute right-0 mt-6 w-40 bg-[#1f1f1f] rounded-xl shadow-lg z-50 overflow-hidden">
+                <div
+                  ref={menuRef}
+                  className="absolute right-0 mt-6 w-40 bg-[#1f1f1f] rounded-xl shadow-lg z-50 overflow-hidden"
+                >
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(msg.content || "");
@@ -359,7 +480,10 @@ function ChatBox({ district, onBack }) {
               </span>
 
               {msg.type === "post" && (
-                <div className="bg-white text-black rounded-lg p-2 max-w-lg">
+                <div
+                  onClick={() => setSelectedPost(msg)}
+                  className="bg-white text-black rounded-lg p-2 max-w-lg cursor-pointer hover:opacity-90 transition"
+                >
                   <div className="flex items-center gap-2 mb-2">
                     <img
                       src={msg.postOwner?.avatar}
@@ -417,6 +541,19 @@ function ChatBox({ district, onBack }) {
                         Download
                       </button>
 
+                      {/* 🔥 NEW UNSEND BUTTON */}
+                      {msg.sender === currentUser?.name && (
+                        <button
+                          onClick={() => {
+                            deleteMessage(msg._id); // delete from DB + UI
+                            setOpenImageMenuId(null); // close menu
+                          }}
+                          className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700"
+                        >
+                          Unsend
+                        </button>
+                      )}
+
                       <button
                         onClick={() => setOpenImageMenuId(null)}
                         className="w-full text-left px-4 py-2 hover:bg-gray-700"
@@ -447,14 +584,12 @@ function ChatBox({ district, onBack }) {
                       {msg.name}
                     </span>
 
-                    <a
-                      href={msg.content}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => downloadDocument(msg.content, msg.name)}
                       className="text-xs underline opacity-80"
                     >
                       Download
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}
@@ -468,9 +603,10 @@ function ChatBox({ district, onBack }) {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex items-center gap-3 border-t border-gray-700 pt-3">
+      <div className="relative flex items-center gap-3 border-t border-gray-700 pt-3">
         {!recording ? (
           <>
             <button onClick={() => setShowEmojis(!showEmojis)}>😊</button>
@@ -510,16 +646,21 @@ function ChatBox({ district, onBack }) {
         )}
       </div>
       {showEmojis && (
-        <div className="flex flex-wrap gap-2 bg-gray-800 p-3 rounded-lg mb-2 max-w-xs">
-          {EMOJIS.map((emoji, index) => (
-            <button
-              key={index}
-              onClick={() => sendEmoji(emoji)}
-              className="text-xl hover:scale-125 transition"
-            >
-              {emoji}
-            </button>
-          ))}
+        <div
+          ref={emojiRef}
+          className="absolute bottom-14 mb-10 bg-gray-800 p-3 rounded-lg max-w-xs shadow-lg z-50"
+        >
+          <div className="flex flex-wrap gap-2">
+            {EMOJIS.map((emoji, index) => (
+              <button
+                key={index}
+                onClick={() => sendEmoji(emoji)}
+                className="text-xl hover:scale-125 transition"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       {showPopup && (
@@ -543,6 +684,111 @@ function ChatBox({ district, onBack }) {
               Cancel
             </button>
           </div>
+        </div>
+      )}
+      {selectedPost && (
+        <div
+          onClick={() => setSelectedPost(null)}
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#0f0f0f] text-white rounded-xl w-[95%] max-w-lg overflow-hidden"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <div className="flex items-center gap-3">
+                <img
+                  src={selectedPost.postOwner?.avatar}
+                  className="w-8 h-8 rounded-full"
+                  alt=""
+                />
+                <span className="font-semibold">
+                  {selectedPost.postOwner?.username}
+                </span>
+              </div>
+
+              <button onClick={() => setSelectedPost(null)} className="text-xl">
+                ✖
+              </button>
+            </div>
+
+            {/* Image */}
+            <img
+              src={selectedPost.post.image}
+              className="w-full max-h-[400px] object-cover"
+              alt="post"
+            />
+
+            {/* Action Row */}
+            <div className="flex items-center justify-between px-4 pt-3">
+              <div className="flex items-center gap-5">
+                {/* ❤️ Like */}
+                <img
+                  src={
+                    Array.isArray(selectedPost.post.likes) &&
+                    selectedPost.post.likes.includes(currentUser?._id)
+                      ? heartRed
+                      : heart
+                  }
+                  alt="like"
+                  className="w-6 h-6 cursor-pointer hover:scale-110 transition"
+                  onClick={handleLike}
+                />
+
+                {/* 💬 Comment */}
+                <img
+                  src={commentIcon}
+                  alt="comment"
+                  className="w-6 h-6 cursor-pointer hover:scale-110 transition"
+                />
+              </div>
+            </div>
+
+            {/* Like Count */}
+            <div className="px-4 pt-2 text-sm font-semibold">
+              {selectedPost.post.likes || 0} likes
+            </div>
+            <div className="px-4 pt-2 text-xs text-gray-400">
+              {selectedPost.post.comments?.length || 0} comments
+            </div>
+
+            {/* Caption */}
+            <div className="px-4 pt-1 text-sm">
+              <span className="font-semibold">
+                {selectedPost.postOwner?.username}
+              </span>{" "}
+              {selectedPost.post.caption}
+            </div>
+
+            {/* Comments */}
+            <div className="px-4 pt-3 max-h-40 overflow-y-auto space-y-2">
+              {selectedPost.post.comments?.map((comment) => (
+                <div key={comment._id} className="text-sm">
+                  <span className="font-semibold">
+                    {comment.user?.username}
+                  </span>{" "}
+                  {comment.text}
+                </div>
+              ))}
+              <div className="flex items-center border-t border-gray-700 mt-3 px-4 py-3">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 bg-transparent outline-none text-sm"
+                />
+
+                <button
+                  onClick={handleComment}
+                  className="text-[#879F00] text-sm font-semibold"
+                >
+                  Post
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Add Comment */}
         </div>
       )}
     </div>
