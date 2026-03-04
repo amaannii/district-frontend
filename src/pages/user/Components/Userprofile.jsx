@@ -13,6 +13,7 @@ function Userprofile({ selectedUsername }) {
   const [selectedPost, setSelectedPost] = useState(null);
 
 
+  
   useEffect(() => {
   if (selectedPost) {
     document.body.style.overflow = "hidden";
@@ -25,45 +26,45 @@ function Userprofile({ selectedUsername }) {
   };
 }, [selectedPost]);
 
-  useEffect(() => {
-    if (!selectedUsername) return;
+ useEffect(() => {
+  const usernameToFetch = selectedUsername || localStorage.getItem("username");
 
-    const fetchUserData = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("userToken");
+  if (!usernameToFetch) return;
+  
 
-        // Fetch user profile
-        const response = await axios.post(
-          "http://localhost:3001/user/selecteduser",
-          { username: selectedUsername },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("userToken");
 
-        const user = response.data.user || response.data;
-        setUserData(user);
+      const response = await axios.post(
+        "http://localhost:3001/user/selecteduser",
+        { username: usernameToFetch },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-        // Fetch connection status
-        const statusRes = await axios.get(
-          `http://localhost:3001/user/connection-status/${selectedUsername}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      const user = response.data.user || response.data;
+      setUserData(user);
 
-        if (statusRes.data.status === "connected") setConnecting(true);
-        else if (statusRes.data.status === "requested") setRequested(true);
+      const statusRes = await axios.get(
+        `http://localhost:3001/user/connection-status/${usernameToFetch}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-        // Set number of connections
-        setConnectionsCount(user.connections?.length || 0);
-      } catch (err) {
-        console.error(err);
-        setError(err);
-      } finally {
-        setLoading(false); 
-      }
-    };
+      if (statusRes.data.status === "connected") setConnecting(true);
+      else if (statusRes.data.status === "requested") setRequested(true);
 
-    fetchUserData();
-  }, [selectedUsername]);
+      setConnectionsCount(user.connections?.length || 0);
+    } catch (err) {
+      console.error(err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUserData();
+}, [selectedUsername]);
 
 
   const fetchFullPost = async (postId) => {
