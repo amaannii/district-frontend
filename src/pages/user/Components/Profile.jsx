@@ -10,7 +10,7 @@ import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function Profile({ setSelectedUsername, setActive }) {
+function Profile({ setSelectedUsername, setActive, data, user }) {
   const navigate = useNavigate();
 
   const [userdetails, setuserdetails] = useState({});
@@ -38,11 +38,14 @@ function Profile({ setSelectedUsername, setActive }) {
   const [commentText, setCommentText] = useState("");
   const [saved, setSaved] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  const [selectedDistricts, setSelectedDistricts] = useState([]);
 
   const [confirmModal, setConfirmModal] = useState({
     show: false,
     type: null,
   });
+
+    const [like,setLike]=useState(0)
 
   const token = localStorage.getItem("userToken");
 
@@ -58,16 +61,15 @@ function Profile({ setSelectedUsername, setActive }) {
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      
 
       const user = response.data.user;
 
       setuserdetails(user);
-     setposts(
-  (user.post || []).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-);
+      setposts(
+        (user.post || []).sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        ),
+      );
       setconnected(user.connected?.length || 0);
       setconnecting(user.connecting?.length || 0);
       setSelectedImage(user.img);
@@ -77,11 +79,7 @@ function Profile({ setSelectedUsername, setActive }) {
     } catch (error) {
       console.error(error);
     }
-    setposts(
-  (user.post || []).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-);
+
   };
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */
@@ -94,7 +92,7 @@ function Profile({ setSelectedUsername, setActive }) {
       const isSaved = savedPost.some((p) => p._id === selectedPost._id);
       setSaved(isSaved);
     }
-  }, [selectedPost, savedPost]);
+  }, [selectedPost, savedPost,]);
 
   /* ---------------- FETCH SAVED POSTS ---------------- */
   useEffect(() => {
@@ -118,6 +116,23 @@ function Profile({ setSelectedUsername, setActive }) {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  useEffect(() => {
+    if (!data) return;
+
+    setComments(data.comments || []);
+    setLikeCount(data.likes || 0);
+    setLiked(data.isLiked || false);
+    setSaved(data.isSaved || false);
+  }, [data]);
+
+  const toggleDistrict = (district) => {
+    setSelectedDistricts((prev) =>
+      prev.includes(district)
+        ? prev.filter((d) => d !== district)
+        : [...prev, district],
+    );
   };
 
   /* ---------------- DELETE POST ---------------- */
@@ -302,18 +317,65 @@ function Profile({ setSelectedUsername, setActive }) {
   };
 
   /* ---------------- POST SHARE ---------------- */
-  const handleShare = async (chatIds) => {
+const handleSendPost = async () => {
+  if (!selectedDistricts.length || !selectedPost?._id) {
+    console.log("No districts or no post selected");
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/send-post-to-chats",
+      {
+        chatIds: selectedDistricts,
+        postId: selectedPost._id,   // ✅ FIXED
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    console.log("Share response:", res.data);
+
+    if (res.data.success) {
+      setShowShare(false);
+      setSelectedDistricts([]);
+    }
+  } catch (err) {
+    console.error("Share failed:", err.response?.data || err.message);
+  }
+};
+
+useEffect(() => {
+  const fetchLikeStatus = async () => {
+    if (!userdetails) return;
+
     try {
+             const token = localStorage.getItem("userToken");
+             console.log(selectedPost._id);
+             
+
       const res = await axios.post(
-        "http://localhost:3001/user/send-post-to-chats",
-        { postId: selectedPost._id, chatIds },
-        { headers: { Authorization: `Bearer ${token}` } },
+        "http://localhost:3001/user/checkisliked",
+        { postId: selectedPost._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      if (res.data.success) setShowShare(false);
+
+      if (res.data.success) {
+        setLiked(res.data.isLiked);
+        setLike(res.data.likes);
+      }
     } catch (err) {
       console.error(err);
     }
   };
+
+  fetchLikeStatus();
+}, [selectedPost]);
 
   const isOwner = userdetails._id === localStorage.getItem("userId");
 
@@ -321,7 +383,6 @@ function Profile({ setSelectedUsername, setActive }) {
   return (
     <>
       <div className="flex h-screen w-full bg-black text-white">
-
         <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
@@ -348,7 +409,6 @@ function Profile({ setSelectedUsername, setActive }) {
 
             <h1 className="text-xl font-semibold">{userdetails.username}</h1>
             <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
-         
 
             <div className="flex gap-10 mb-5">
               <div>
@@ -429,7 +489,7 @@ function Profile({ setSelectedUsername, setActive }) {
                     className="w-5 cursor-pointer"
                     onClick={() => {
                       setselectedPost(item);
-                      setShowShare(true);
+                     setShowShare(true)
                     }}
                   />
                   <img
@@ -687,7 +747,6 @@ function Profile({ setSelectedUsername, setActive }) {
                 <div
                   key={user._id}
                   className="flex items-center gap-3 py-2 border-b border-gray-800"
-                    
                 >
                   <img
                     src={user.img || profile}
@@ -695,10 +754,15 @@ function Profile({ setSelectedUsername, setActive }) {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <p onClick={()=>{setActive("UPROFILE")
-                      setSelectedUsername(user.username)
-                    }}
-                     className="text-sm font-medium">{user.username}</p>
+                    <p
+                      onClick={() => {
+                        setActive("UPROFILE");
+                        setSelectedUsername(user.username);
+                      }}
+                      className="text-sm font-medium"
+                    >
+                      {user.username}
+                    </p>
                     <p className="text-xs text-gray-400">{user.name}</p>
                   </div>
                 </div>
@@ -709,19 +773,56 @@ function Profile({ setSelectedUsername, setActive }) {
       )}
       {/* SHARE MODAL */}
       {showShare && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[400px] p-6 rounded-xl text-center">
-            <h2 className="text-lg font-semibold mb-4">Share Post</h2>
-            <p className="text-sm text-gray-400 mb-4">Select chats to share</p>
+        <div className="fixed  inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+          <div className="bg-neutral-900 overflow-scroll scrollbar-hide p-5 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <h2 className="text-lg font-semibold mb-4 text-white">
+              Share Post
+            </h2>
+
+            {[
+              "KASARGOD",
+              "KANNUR",
+              "ERNAKULAM",
+              "KOZHIKODE",
+              "IDUKKI",
+              "KOTTAYAM",
+              "WAYANAD",
+              "MALAPPURAM",
+              "PALAKKAD",
+              "THRISSUR",
+              "ALAPPUZHA",
+              "KOVALAM",
+              "PATHANAMTHITTA",
+              "THIRUVANANTHAPURAM",
+            ].map((district) => (
+              <div
+                key={district}
+                onClick={() => toggleDistrict(district)}
+                className={`p-3 cursor-pointer rounded text-sm
+                ${
+                  selectedDistricts.includes(district)
+                    ? "bg-[#879F00]"
+                    : "hover:bg-neutral-800"
+                }
+              `}
+              >
+                {district}
+              </div>
+            ))}
+
             <button
-              onClick={() => handleShare([])}
-              className="bg-[#879F00] px-4 py-2 rounded"
+              onClick={handleSendPost}
+              className="mt-4 w-full py-2 rounded bg-[#879F00]"
             >
-              Share
+              Send
             </button>
+
             <button
-              onClick={() => setShowShare(false)}
-              className="bg-gray-600 px-4 py-2 rounded ml-2"
+              onClick={() => {
+                setShowShare(false);
+                setSelectedDistricts([]);
+              }}
+              className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
             >
               Cancel
             </button>

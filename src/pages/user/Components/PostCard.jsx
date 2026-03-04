@@ -19,7 +19,7 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
   const [comments, setComments] = useState([]);
   const [saved, setSaved] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
+
   // Delete modal state
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [selectedDistricts, setSelectedDistricts] = useState([]);
@@ -371,7 +371,7 @@ stroke="white"
     {/* SHARE MODAL */}
     {showShare && (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-        <div className="bg-neutral-900 p-5 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+        <div className="bg-neutral-900 p-5 overflow-scroll scrollbar-hide rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
           <h2 className="text-lg font-semibold mb-4 text-white">
             Share Post
           </h2>

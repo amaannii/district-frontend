@@ -119,7 +119,7 @@ function Userprofile({ selectedUsername }) {
   if (!userData) return <div>No user selected</div>;
 
   return (
-    <div className="flex flex-col items-center p-6 sm:p-10 text-center overflow-auto  scrollbar-hide">
+    <div className="flex play-regular flex-col items-center p-6 sm:p-10 text-center overflow-auto  scrollbar-hide">
       {/* Profile Image */}
       <div >
 
