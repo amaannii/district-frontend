@@ -151,6 +151,8 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
     };
   }, [messages]);
 
+  
+
   /* ================= SEND TEXT ================= */
 
   const scrollToBottom = () => {
