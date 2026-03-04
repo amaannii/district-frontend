@@ -114,38 +114,31 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
 
   // DELETE COMMENT
 
-  // Add function to save post
   const handleSave = async () => {
-    if (!token) return alert("Login required");
+  if (!token) return alert("Login required");
 
-    try {
-      const res = await axios.post(
-        "http://localhost:3001/user/save-post",
-        { postId: data._id, username: data.userId.username },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+  // 🔥 instantly toggle UI
+  const newSavedState = !saved;
+  setSaved(newSavedState);
 
-      if (res.data.success) {
-        setSaved(res.data.saved); // backend should return { success: true, saved: true/false }
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/user/save-post",
+      { postId: data._id, username: data.userId.username },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-        // Optional: update localStorage for faster access in other components
-        const savedPosts = JSON.parse(localStorage.getItem("savedPosts")) || [];
-        if (res.data.saved) {
-          localStorage.setItem(
-            "savedPosts",
-            JSON.stringify([...savedPosts, { postId: data._id }]),
-          );
-        } else {
-          localStorage.setItem(
-            "savedPosts",
-            JSON.stringify(savedPosts.filter((p) => p.postId !== data._id)),
-          );
-        }
-      }
-    } catch (err) {
-      console.error(err);
+    if (!res.data.success) {
+      // rollback if something failed
+      setSaved(!newSavedState);
     }
-  };
+
+  } catch (err) {
+    console.error(err);
+    // rollback on error
+    setSaved(!newSavedState);
+  }
+};
 
   const handleDeleteComment = async () => {
     if (!commentToDelete) return;
@@ -286,8 +279,8 @@ return (
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
-  fill={saved ? "#879F00" : "none"}
-  stroke="#879F00"
+ fill={saved ? "white" : "none"}
+stroke="white"
   strokeWidth="2"
 >
   <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
