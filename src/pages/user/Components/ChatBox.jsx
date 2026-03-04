@@ -21,7 +21,7 @@ const EMOJIS = [
   "❤️",
 ];
 
-function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
+function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [showEmojis, setShowEmojis] = useState(false);
@@ -39,9 +39,10 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
   const emojiRef = useRef(null);
   const menuRef = useRef(null);
   const [liked, setLiked] = useState(false);
+  const [like,setLike]=useState(0)
   const messagesEndRef = useRef(null);
   const [commentText, setCommentText] = useState("");
-  const [showCommentInput, setShowCommentInput] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   /* ================= SOCKET ================= */
 
@@ -80,6 +81,18 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
     if (!district) return;
 
     setMessages([]);
+        
+
+    // const fetchpost=async()=>{
+    //   const token = localStorage.getItem("userToken");
+    //   const res = await axios.post(
+    //     "http://localhost:3001/user/postdetails",
+    //     { postId: selectedPost.post._id },
+    //     { headers: { Authorization: `Bearer ${token}` } },
+    //   );
+
+    // }
+    // fetchpost()
 
     // 🔥 Fetch old messages
     fetch(`http://localhost:3001/messages/${district}`)
@@ -128,7 +141,7 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
       socket.off("receiveMessage", receiveHandler);
       socket.emit("leaveDistrict", district);
     };
-  }, [district, showCommentInput]);
+  }, [district, showComments, liked]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -150,8 +163,6 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
       document.removeEventListener("mousedown", handleoutside);
     };
   }, [messages]);
-
-  
 
   /* ================= SEND TEXT ================= */
 
@@ -268,6 +279,34 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
       console.error("Document upload error:", error);
     }
   };
+useEffect(() => {
+  const fetchLikeStatus = async () => {
+    if (!selectedPost?.post?._id) return;
+
+    try {
+             const token = localStorage.getItem("userToken");
+
+      const res = await axios.post(
+        "http://localhost:3001/user/checkisliked",
+        { postId: selectedPost.post._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        setLiked(res.data.isLiked);
+        setLike(res.data.likes);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchLikeStatus();
+}, [selectedPost?.post?._id]);
 
   /* ================= AUDIO ================= */
 
@@ -369,21 +408,9 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
         { postId: selectedPost.post._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      setLiked(res.data.isLiked)
+      setLike(res.data.likes)
 
-      if (res.data.success) {
-        setSelectedPost((prev) => ({
-          ...prev,
-          post: {
-            ...prev.post,
-            likes: res.data.likes, // updated likes array from backend
-          },
-        }));
-
-        socket.emit("likePost", {
-          postId: selectedPost.post._id,
-          user: currentUser.username,
-        });
-      }
     } catch (err) {
       console.error(err);
     }
@@ -714,16 +741,14 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
                 <img
                   src={selectedPost.postOwner?.avatar}
                   className="w-8 h-8 rounded-full"
-                  alt="" 
-                   onClick={()=>{
-                      setActive("UPROFILE")
-                      setSelectedUsername(selectedPost.postOwner.username)
-                    }}
-                  
+                  alt=""
+                  onClick={() => {
+                    setActive("UPROFILE");
+                    setSelectedUsername(selectedPost.postOwner.username);
+                  }}
                 />
                 <span className="font-semibold">
                   {selectedPost.postOwner?.username}
-                  
                 </span>
               </div>
 
@@ -737,19 +762,16 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
               src={selectedPost.post.image}
               className="w-full max-h-[400px] object-cover"
               alt="post"
-            
             />
 
             {/* Action Row */}
             <div className="flex items-center justify-between px-4 pt-3">
               <div className="flex items-center gap-5">
                 {/* ❤️ Like */}
+
                 <img
                   src={
-                    Array.isArray(selectedPost.post.likes) &&
-                    selectedPost.post.likes.some(
-                      (id) => id.toString() === currentUser?._id?.toString(),
-                    )
+                    liked
                       ? heartRed
                       : heart
                   }
@@ -763,14 +785,14 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
                   src={commentIcon}
                   alt="comment"
                   className="w-6 h-6 cursor-pointer hover:scale-110 transition"
-                  onClick={() => setShowCommentInput((prev) => !prev)}
+                  onClick={() => setShowComments((prev) => !prev)}
                 />
               </div>
             </div>
 
             {/* Like Count */}
             <div className="px-4 pt-2 text-sm font-semibold">
-              {selectedPost.post.likes || 0} likes
+              {like || 0} likes
             </div>
             <div className="px-4 pt-2 text-xs text-gray-400">
               {selectedPost.post.comments.length || 0} comments
@@ -784,26 +806,26 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
               {selectedPost.post.caption}
             </div>
 
-            {/* Comments */}
-            <div className="px-4 pt-3 max-h-40 overflow-scroll scrollbar-hide space-y-2">
-              {/* ✅ Always show existing comments */}
-              {selectedPost.post.comments?.length > 0 ? (
-                selectedPost.post.comments.map((comment) => (
-                  <div key={comment._id} className="text-sm">
-                    <span className="font-semibold">
-                      {comment.user?.toString() === currentUser?._id?.toString()
-                        ? "You"
-                        : comment.username || "User"}
-                    </span>{" "}
-                    {comment.text}
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-gray-400">No comments yet</p>
-              )}
+            {/* Comments Section */}
+            {showComments && (
+              <div className="px-4 pt-3 max-h-40 overflow-scroll scrollbar-hide space-y-2">
+                {selectedPost.post.comments?.length > 0 ? (
+                  selectedPost.post.comments.map((comment) => (
+                    <div key={comment._id} className="text-sm">
+                      <span className="font-semibold">
+                        {comment.user?.toString() ===
+                        currentUser?._id?.toString()
+                          ? "You"
+                          : comment.username || "User"}
+                      </span>{" "}
+                      {comment.text}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-400">No comments yet</p>
+                )}
 
-              {/* ✅ Only toggle the input box */}
-              {showCommentInput && (
+                {/* Input */}
                 <div className="flex items-center border-t border-gray-700 mt-3 pt-2">
                   <input
                     value={commentText}
@@ -811,7 +833,6 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
                     placeholder="Add a comment..."
                     className="flex-1 bg-transparent outline-none text-sm"
                   />
-
                   <button
                     onClick={handleComment}
                     className="text-[#879F00] text-sm font-semibold"
@@ -819,8 +840,8 @@ function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
                     Post
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
           {/* Add Comment */}
         </div>
