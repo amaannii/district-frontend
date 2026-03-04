@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import PostCard from "../Components/PostCard"; 
 
 function Userprofile({ selectedUsername }) {
   const [userData, setUserData] = useState(null);
@@ -10,6 +11,19 @@ function Userprofile({ selectedUsername }) {
   const [connectionsCount, setConnectionsCount] = useState(0);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+
+
+  useEffect(() => {
+  if (selectedPost) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "hidden";
+  };
+}, [selectedPost]);
 
   useEffect(() => {
     if (!selectedUsername) return;
@@ -50,6 +64,22 @@ function Userprofile({ selectedUsername }) {
 
     fetchUserData();
   }, [selectedUsername]);
+
+
+  const fetchFullPost = async (postId) => {
+  try {
+    const token = localStorage.getItem("userToken");
+
+    const res = await axios.get(
+      `http://localhost:3001/user/post/${postId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    setSelectedPost(res.data.post);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleRequest = async () => {
     if (!userData) return;
@@ -142,15 +172,15 @@ function Userprofile({ selectedUsername }) {
       {/* Posts Grid */}
       {userData.post?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full max-w-5xl mx-auto">
-          {userData.post.map((post, index) => (
-            <img
-              key={index}
-              src={post.image}
-              alt="post"
-              className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
-              onClick={() => setSelectedPost(post)}
-            />
-          ))}
+         {userData.post.map((post, index) => (
+  <img
+    key={index}
+    src={post.image}
+    alt="post"
+    className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
+    onClick={() => fetchFullPost(post._id)}
+  />
+))}
         </div>
       ) : (
         <p className="text-gray-500">No posts available</p>
@@ -185,6 +215,38 @@ function Userprofile({ selectedUsername }) {
           </div>
         </div>
       )}
+       
+     {selectedPost && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+
+    {/* Click outside to close */}
+    <div
+      className="absolute inset-0"
+      onClick={() => setSelectedPost(null)}
+    ></div>
+
+    {/* Modal Content */}
+    <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
+
+      {/* Close Button */}
+      <button
+        onClick={() => setSelectedPost(null)}
+        className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
+      >
+        ✕
+      </button>
+
+      {/* PostCard */}
+      <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <PostCard
+          data={selectedPost}
+          user={userData}
+        />
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
