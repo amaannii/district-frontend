@@ -8,6 +8,7 @@ import commentIcon from "../../../assets/images/icons8-comment-50.png";
 import send from "../../../assets/images/icons8-sent-50.png";
 import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
+import PostCard from "../Components/PostCard";
 
 function Search() {
   const [users, setUsers] = useState([]);
@@ -42,6 +43,28 @@ function Search() {
 
     fetchUsers();
   }, []);
+
+  const fetchFullPost = async (postId) => {
+  if (!postId) return;
+
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("userToken");
+
+    const res = await axios.get(
+      `http://localhost:3001/user/post/${postId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setSelectedPost(res.data.post);
+  } catch (error) {
+    console.error("Failed to fetch full post:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
@@ -250,7 +273,7 @@ const handleRemoveRequest = async () => {
                         src={post.image}
                         alt="post"
                         className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
-                        onClick={() => setSelectedPost(post)}
+                        onClick={() => fetchFullPost(post._id)}
                       />
                     ))}
                   </div>
@@ -307,6 +330,39 @@ const handleRemoveRequest = async () => {
           <div className="chaotic-orbit"></div>
         </div>
       )}
+      {selectedPost && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+
+    {/* Click outside to close */}
+    <div
+      className="absolute inset-0"
+      onClick={() => setSelectedPost(null)}
+    ></div>
+
+    <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
+
+      {/* Close Button */}
+      <button
+        onClick={() => setSelectedPost(null)}
+        className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
+      >
+        ✕
+      </button>
+
+      <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <PostCard
+          data={selectedPost}
+          user={null}
+          setSelectedUsername={() => {}}
+          setActivePage={() => {}}
+          setActive={() => {}}
+          setSelectedUserId={() => {}}
+        />
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
