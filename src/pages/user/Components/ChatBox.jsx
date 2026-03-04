@@ -21,7 +21,7 @@ const EMOJIS = [
   "❤️",
 ];
 
-function ChatBox({ district, onBack }) {
+function ChatBox({ district, onBack,setSelectedUsername,setActive  }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [showEmojis, setShowEmojis] = useState(false);
@@ -712,10 +712,16 @@ function ChatBox({ district, onBack }) {
                 <img
                   src={selectedPost.postOwner?.avatar}
                   className="w-8 h-8 rounded-full"
-                  alt=""
+                  alt="" 
+                   onClick={()=>{
+                      setActive("UPROFILE")
+                      setSelectedUsername(selectedPost.postOwner.username)
+                    }}
+                  
                 />
                 <span className="font-semibold">
                   {selectedPost.postOwner?.username}
+                  
                 </span>
               </div>
 
@@ -729,6 +735,7 @@ function ChatBox({ district, onBack }) {
               src={selectedPost.post.image}
               className="w-full max-h-[400px] object-cover"
               alt="post"
+            
             />
 
             {/* Action Row */}

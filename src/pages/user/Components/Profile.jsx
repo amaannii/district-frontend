@@ -10,7 +10,7 @@ import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function Profile({ setActive, userId }) {
+function Profile({ setSelectedUsername, setActive }) {
   const navigate = useNavigate();
 
   const [userdetails, setuserdetails] = useState({});
@@ -45,39 +45,44 @@ function Profile({ setActive, userId }) {
   });
 
   const token = localStorage.getItem("userToken");
-const idToFetch = userId || localStorage.getItem("userId");
+
   /* ---------------- FETCH USER ---------------- */
-useEffect(() => {
-  fetchUserDetails();
-}, [userId]);
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
- const fetchUserDetails = async () => {
-  try {
-    const response = await axios.post(
-      "http://localhost:3001/user/userdetails",
-      {},
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/user/userdetails",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      
 
-    const user = response.data.user;
+      const user = response.data.user;
 
-    setuserdetails(user);
+      setuserdetails(user);
+     setposts(
+  (user.post || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
+);
+      setconnected(user.connected?.length || 0);
+      setconnecting(user.connecting?.length || 0);
+      setSelectedImage(user.img);
 
+      // store id for owner check
+      localStorage.setItem("userId", user._id);
+    } catch (error) {
+      console.error(error);
+    }
     setposts(
-      (user.post || []).sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      )
-    );
-
-    setconnected(user.connected?.length || 0);
-    setconnecting(user.connecting?.length || 0);
-    setSelectedImage(user.img);
-
-    
-  } catch (error) {
-    console.error(error);
-  }
-};
+  (user.post || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
+);
+  };
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */
   useEffect(() => {
@@ -316,7 +321,7 @@ useEffect(() => {
   return (
     <>
       <div className="flex h-screen w-full bg-black text-white">
-    
+
         <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
@@ -343,6 +348,7 @@ useEffect(() => {
 
             <h1 className="text-xl font-semibold">{userdetails.username}</h1>
             <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
+         
 
             <div className="flex gap-10 mb-5">
               <div>
@@ -681,6 +687,7 @@ useEffect(() => {
                 <div
                   key={user._id}
                   className="flex items-center gap-3 py-2 border-b border-gray-800"
+                    
                 >
                   <img
                     src={user.img || profile}
@@ -688,7 +695,10 @@ useEffect(() => {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <p className="text-sm font-medium">{user.username}</p>
+                    <p onClick={()=>{setActive("UPROFILE")
+                      setSelectedUsername(user.username)
+                    }}
+                     className="text-sm font-medium">{user.username}</p>
                     <p className="text-xs text-gray-400">{user.name}</p>
                   </div>
                 </div>
