@@ -36,12 +36,12 @@ const images = [
   { src: tvpm, title: "THIRUVANANTHAPURAM" },
 ];
 
-function Messages({ selectedDistrict, setSelectedDistrict }) {
+function Messages({ selectedDistrict, setSelectedDistrict,  setSelectedUsername,setActive }) {
   const [search, setSearch] = useState("");
   const [userdetails, setuserdetails] = useState({});
 
 
-   const token = localStorage.getItem("userToken");
+ const token = localStorage.getItem("userToken");
    
   useEffect(() => {
     fetchUserDetails();
@@ -157,6 +157,8 @@ function Messages({ selectedDistrict, setSelectedDistrict }) {
           <ChatBox
             district={selectedDistrict.title}
             onBack={() => setSelectedDistrict(null)}
+                setSelectedUsername={setSelectedUsername}
+            setActive={setActive}
           />
         ) : (
           <p className="text-gray-400 mt-4">Select a district</p>

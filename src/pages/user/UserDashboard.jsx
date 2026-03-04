@@ -44,6 +44,8 @@ function UserDashboard() {
           <Messages
             selectedDistrict={selectedDistrict}
             setSelectedDistrict={setSelectedDistrict}
+            setSelectedUsername={setSelectedUsername}
+            setActive={setActivePage} 
           />
         );
 
@@ -54,7 +56,7 @@ function UserDashboard() {
         return <Create />;
 
       case "PROFILE":
-        return <Profile setActive={setActivePage}  />;
+        return <Profile setSelectedUsername={setSelectedUsername} setActive={setActivePage}  />;
 
       case "SETTINGS":
         return <Settings />;
