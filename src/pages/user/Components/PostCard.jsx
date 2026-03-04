@@ -4,8 +4,8 @@ import heart from "../../../assets/images/icons8-heart-24.png";
 import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
 import commentIcon from "../../../assets/images/icons8-comment-50.png";
 import send from "../../../assets/images/icons8-sent-50.png";
-import bookmark from "../../../assets/images/icons8-bookmark-30.png";
-import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
+// import bookmark from "../../../assets/images/icons8-bookmark-30.png";
+// import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import socket from "../../../Socket";
 
 function PostCard({setSelectedUsername,setActivePage, data, user, setActive, setSelectedUserId }) {
@@ -281,12 +281,17 @@ return (
       </div>
 
       {/* SAVE */}
-      <img
-        src={saved ? bookmarkFilled : bookmark}
-        className="w-6 cursor-pointer"
-        onClick={handleSave}
-        alt="bookmark"
-      />
+     <svg
+  onClick={handleSave}
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+  fill={saved ? "#879F00" : "none"}
+  stroke="#879F00"
+  strokeWidth="2"
+>
+  <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+</svg>
     </div>
 
     {/* COMMENTS */}

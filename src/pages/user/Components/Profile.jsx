@@ -316,7 +316,7 @@ useEffect(() => {
   return (
     <>
       <div className="flex h-screen w-full bg-black text-white">
-      <button onClick={() => setActive()}>back</button>
+    
         <div className="flex-1 overflow-y-auto px-10 py-8">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
