@@ -186,7 +186,7 @@ function Home({setSelectedUsername, setActivePage,openChat }) {
                 {!myNote && (
                   <button
                     onClick={addMyNote}
-                    className="absolute bottom-2 right-1 w-5 h-5 rounded-full bg-[#879F00] text-xs"
+                    className="absolute bottom-2 right-1 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold"
                   >
                     +
                   </button>
