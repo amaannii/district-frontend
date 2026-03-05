@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PostCard from "../Components/PostCard";
 
-function Explore() {
+function Explore({ setSelectedUsername, setActive }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -38,14 +38,10 @@ function Explore() {
 
   return (
     <div className="min-h-screen w-full bg-black text-white px-2 sm:px-4 md:px-6 py-3">
-
       {/* ===== Masonry Grid ===== */}
       <div className="columns-2 sm:columns-3 lg:columns-4 gap-2">
         {posts.map((post, index) => (
-          <div
-            key={index}
-            className="mb-2 break-inside-avoid group"
-          >
+          <div key={index} className="mb-2 break-inside-avoid group">
             <img
               src={post.image}
               alt="post"
@@ -68,7 +64,6 @@ function Explore() {
       {/* ===== Post Modal with PostCard ===== */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-
           {/* Click outside to close */}
           <div
             className="absolute inset-0"
@@ -76,7 +71,6 @@ function Explore() {
           ></div>
 
           <div className="relative w-full max-w-3xl mx-auto bg-black rounded-xl overflow-hidden shadow-2xl">
-            
             {/* Close Button */}
             <button
               onClick={() => setSelectedPost(null)}
@@ -87,13 +81,15 @@ function Explore() {
 
             {/* PostCard */}
             <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
-              <PostCard data={selectedPost} />
+              <PostCard
+                data={selectedPost}
+                setSelectedUsername={setSelectedUsername}
+                setActive={setActive}
+              />
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }

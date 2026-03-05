@@ -207,7 +207,7 @@ function PostCard({
 
         <span
           onClick={() => {
-            setActivePage("UPROFILE");
+            setActive("UPROFILE");
             setSelectedUsername(data.userId?.username);
           }}
           className="font-semibold cursor-pointer"

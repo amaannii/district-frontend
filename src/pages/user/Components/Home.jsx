@@ -5,7 +5,7 @@ import PostCard from "./PostCard";
 import axios from "axios";
 import Profile from "./Profile";
 
-function Home({setSelectedUsername, setActivePage,openChat }) {
+function Home({setSelectedUsername,setActive,openChat }) {
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [sharePost, setSharePost] = useState(null);
   const [shareNote, setShareNote] = useState(null);
@@ -22,8 +22,6 @@ function Home({setSelectedUsername, setActivePage,openChat }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
 
-  const [active, setActive] = useState("HOME");
-  const [selectedUserId, setSelectedUserId] = useState(null);
   
 
   /* ================= INITIAL FETCH ================= */
@@ -234,14 +232,12 @@ function Home({setSelectedUsername, setActivePage,openChat }) {
             </p>
           ) : (
             posts.map((p) => (
-              <PostCard
-              setSelectedUsername={setSelectedUsername}
-              setActivePage={setActivePage}
+              <PostCard 
   key={p._id}
   data={p}
   user={user}
   setActive={setActive}
-  setSelectedUserId={setSelectedUserId}
+setSelectedUsername={setSelectedUsername}
 />
             ))
           )}

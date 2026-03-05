@@ -83,18 +83,6 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
     setMessages([]);
 
-    // const fetchpost=async()=>{
-    //   const token = localStorage.getItem("userToken");
-    //   const res = await axios.post(
-    //     "http://localhost:3001/user/postdetails",
-    //     { postId: selectedPost.post._id },
-    //     { headers: { Authorization: `Bearer ${token}` } },
-    //   );
-
-    // }
-    // fetchpost()
-
-    // 🔥 Fetch old messages
     fetch(`http://localhost:3001/messages/${district}`)
       .then((res) => res.json())
       .then((data) => {
