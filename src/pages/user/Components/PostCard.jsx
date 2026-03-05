@@ -7,6 +7,7 @@ import send from "../../../assets/images/icons8-sent-50.png";
 // import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 // import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import socket from "../../../Socket";
+import Swal from "sweetalert2";
 
 function PostCard({
   setSelectedUsername,
@@ -181,6 +182,15 @@ function PostCard({
 
       if (res.data.success) {
         setShowShare(false);
+        Swal.fire({
+  toast: true,
+  position: "top-end",
+  icon: "success",
+  title: "Post Shared",
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+});
         socket.emit("sharePost", {
           postId: data._id,
           districts: selectedDistricts,
@@ -355,63 +365,75 @@ function PostCard({
       )}
 
       {/* SHARE MODAL */}
-      {showShare && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-          <div className="bg-neutral-900 p-5 overflow-scroll scrollbar-hide rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4 text-white">
-              Share Post
-            </h2>
+ {showShare && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+    
+    <div className="bg-neutral-900 rounded-lg w-full max-w-md max-h-[80vh] flex flex-col">
 
-            {[
-              "KASARGOD",
-              "KANNUR",
-              "ERNAKULAM",
-              "KOZHIKODE",
-              "IDUKKI",
-              "KOTTAYAM",
-              "WAYANAD",
-              "MALAPPURAM",
-              "PALAKKAD",
-              "THRISSUR",
-              "ALAPPUZHA",
-              "KOVALAM",
-              "PATHANAMTHITTA",
-              "THIRUVANANTHAPURAM",
-            ].map((district) => (
-              <div
-                key={district}
-                onClick={() => toggleDistrict(district)}
-                className={`p-3 cursor-pointer rounded text-sm
-                ${
-                  selectedDistricts.includes(district)
-                    ? "bg-[#879F00]"
-                    : "hover:bg-neutral-800"
-                }
-              `}
-              >
-                {district}
-              </div>
-            ))}
+      {/* Header */}
+      <div className="p-5 border-b border-neutral-700">
+        <h2 className="text-lg font-semibold text-white">
+          Share Post
+        </h2>
+      </div>
 
-            <button
-              onClick={handleSendPost}
-              className="mt-4 w-full py-2 rounded bg-[#879F00]"
-            >
-              Send
-            </button>
-
-            <button
-              onClick={() => {
-                setShowShare(false);
-                setSelectedDistricts([]);
-              }}
-              className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
-            >
-              Cancel
-            </button>
+      {/* Scrollable District List */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
+        {[
+          "KASARGOD",
+          "KANNUR",
+          "ERNAKULAM",
+          "KOZHIKODE",
+          "IDUKKI",
+          "KOTTAYAM",
+          "WAYANAD",
+          "MALAPPURAM",
+          "PALAKKAD",
+          "THRISSUR",
+          "ALAPPUZHA",
+          "KOVALAM",
+          "PATHANAMTHITTA",
+          "THIRUVANANTHAPURAM",
+        ].map((district) => (
+          <div
+            key={district}
+            onClick={() => toggleDistrict(district)}
+            className={`p-3 cursor-pointer rounded text-sm mb-2
+              ${
+                selectedDistricts.includes(district)
+                  ? "bg-[#879F00]"
+                  : "hover:bg-neutral-800"
+              }
+            `}
+          >
+            {district}
           </div>
-        </div>
-      )}
+        ))}
+      </div>
+
+      {/* Sticky Footer Buttons */}
+      <div className="p-4 border-t border-neutral-700 bg-neutral-900">
+        <button
+          onClick={handleSendPost}
+          className="w-full py-2 rounded bg-[#879F00]"
+        >
+          Send
+        </button>
+
+        <button
+          onClick={() => {
+            setShowShare(false);
+            setSelectedDistricts([]);
+          }}
+          className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
