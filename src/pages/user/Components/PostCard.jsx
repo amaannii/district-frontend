@@ -204,7 +204,7 @@ return (
 
 <span
  onClick={() => {
-    if (data.userId?._id === currentUser?._id) {
+    if  (data.userId?._id === currentUser?._id) {
       setActivePage("PROFILE");
     } else {
       setSelectedUsername(data.userId?.username);

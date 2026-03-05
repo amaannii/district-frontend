@@ -39,10 +39,11 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const emojiRef = useRef(null);
   const menuRef = useRef(null);
   const [liked, setLiked] = useState(false);
-  const [like,setLike]=useState(0)
+  const [like, setLike] = useState(0);
   const messagesEndRef = useRef(null);
   const [commentText, setCommentText] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   /* ================= SOCKET ================= */
 
@@ -81,7 +82,6 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
     if (!district) return;
 
     setMessages([]);
-        
 
     // const fetchpost=async()=>{
     //   const token = localStorage.getItem("userToken");
@@ -279,34 +279,34 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       console.error("Document upload error:", error);
     }
   };
-useEffect(() => {
-  const fetchLikeStatus = async () => {
-    if (!selectedPost?.post?._id) return;
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if (!selectedPost?.post?._id) return;
 
-    try {
-             const token = localStorage.getItem("userToken");
+      try {
+        const token = localStorage.getItem("userToken");
 
-      const res = await axios.post(
-        "http://localhost:3001/user/checkisliked",
-        { postId: selectedPost.post._id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const res = await axios.post(
+          "http://localhost:3001/user/checkisliked",
+          { postId: selectedPost.post._id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
+        );
+
+        if (res.data.success) {
+          setLiked(res.data.isLiked);
+          setLike(res.data.likes);
         }
-      );
-
-      if (res.data.success) {
-        setLiked(res.data.isLiked);
-        setLike(res.data.likes);
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    };
 
-  fetchLikeStatus();
-}, [selectedPost?.post?._id]);
+    fetchLikeStatus();
+  }, [selectedPost?.post?._id]);
 
   /* ================= AUDIO ================= */
 
@@ -408,9 +408,8 @@ useEffect(() => {
         { postId: selectedPost.post._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      setLiked(res.data.isLiked)
-      setLike(res.data.likes)
-
+      setLiked(res.data.isLiked);
+      setLike(res.data.likes);
     } catch (err) {
       console.error(err);
     }
@@ -447,6 +446,35 @@ useEffect(() => {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleSave = async () => {
+    const token = localStorage.getItem("userToken"); // ✅ ADD THIS
+    if (!token) return alert("Login required");
+
+    // 🔥 instantly toggle UI
+    const newSavedState = !saved;
+    setSaved(newSavedState);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:3001/user/save-post",
+        {
+          postId: selectedPost.post._id,
+          username: selectedPost.postOwner?.username,
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (!res.data.success) {
+        // rollback if something failed
+        setSaved(!newSavedState);
+      }
+    } catch (err) {
+      console.error(err);
+      // rollback on error
+      setSaved(!newSavedState);
     }
   };
 
@@ -729,11 +757,11 @@ useEffect(() => {
       {selectedPost && (
         <div
           onClick={() => setSelectedPost(null)}
-          className="fixed inset-0 overflow-scroll srcollbar-hide bg-black bg-opacity-80 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#0f0f0f] text-white rounded-xl w-[95%] max-w-lg overflow-hidden"
+            className="bg-[#0f0f0f] text-white overflow-scroll scrollbar-hide rounded-xl w-[95%] max-w-lg"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -770,11 +798,7 @@ useEffect(() => {
                 {/* ❤️ Like */}
 
                 <img
-                  src={
-                    liked
-                      ? heartRed
-                      : heart
-                  }
+                  src={liked ? heartRed : heart}
                   alt="like"
                   className="w-6 h-6 cursor-pointer hover:scale-110 transition"
                   onClick={handleLike}
@@ -788,6 +812,17 @@ useEffect(() => {
                   onClick={() => setShowComments((prev) => !prev)}
                 />
               </div>
+              <svg
+                onClick={handleSave}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+                fill={saved ? "white" : "none"}
+                stroke="white"
+                strokeWidth="2"
+              >
+                <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+              </svg>
             </div>
 
             {/* Like Count */}

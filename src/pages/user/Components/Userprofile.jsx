@@ -22,7 +22,7 @@ function Userprofile({ selectedUsername }) {
   }
 
   return () => {
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = "auto";
   };
 }, [selectedPost]);
 
