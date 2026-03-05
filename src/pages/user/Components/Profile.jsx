@@ -45,7 +45,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     type: null,
   });
 
-    const [like,setLike]=useState(0)
+  const [like, setLike] = useState(0);
 
   const token = localStorage.getItem("userToken");
 
@@ -79,7 +79,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     } catch (error) {
       console.error(error);
     }
-
   };
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */
@@ -92,13 +91,11 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       const isSaved = savedPost.some((p) => p._id === selectedPost._id);
       setSaved(isSaved);
     }
-  }, [selectedPost, savedPost,]);
+  }, [selectedPost, savedPost]);
 
   /* ---------------- FETCH SAVED POSTS ---------------- */
   useEffect(() => {
-    if (activeTab === "saved") {
-      fetchSavedPost();
-    }
+    fetchSavedPost();
   }, [activeTab]);
 
   const isPostOwner =
@@ -207,9 +204,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     }
   };
 
-
-
-  
   const handleSave = async () => {
     const token = localStorage.getItem("userToken"); // ✅ ADD THIS
     if (!token) return alert("Login required");
@@ -326,67 +320,64 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   };
 
   /* ---------------- POST SHARE ---------------- */
-const handleSendPost = async () => {
-  if (!selectedDistricts.length || !selectedPost?._id) {
-    console.log("No districts or no post selected");
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      "http://localhost:3001/user/send-post-to-chats",
-      {
-        chatIds: selectedDistricts,
-        postId: selectedPost._id,   // ✅ FIXED
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    console.log("Share response:", res.data);
-
-    if (res.data.success) {
-      setShowShare(false);
-      setSelectedDistricts([]);
+  const handleSendPost = async () => {
+    if (!selectedDistricts.length || !selectedPost?._id) {
+      console.log("No districts or no post selected");
+      return;
     }
-  } catch (err) {
-    console.error("Share failed:", err.response?.data || err.message);
-  }
-};
-
-useEffect(() => {
-  const fetchLikeStatus = async () => {
-    if (!userdetails) return;
 
     try {
-             const token = localStorage.getItem("userToken");
-             console.log(selectedPost._id);
-             
-
       const res = await axios.post(
-        "http://localhost:3001/user/checkisliked",
-        { postId: selectedPost._id },
+        "http://localhost:3001/user/send-post-to-chats",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+          chatIds: selectedDistricts,
+          postId: selectedPost._id, // ✅ FIXED
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
+      console.log("Share response:", res.data);
+
       if (res.data.success) {
-        setLiked(res.data.isLiked);
-        setLike(res.data.likes);
+        setShowShare(false);
+        setSelectedDistricts([]);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Share failed:", err.response?.data || err.message);
     }
   };
 
-  fetchLikeStatus();
-}, [selectedPost]);
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if (!userdetails) return;
 
+      try {
+        const token = localStorage.getItem("userToken");
+        console.log(selectedPost._id);
 
+        const res = await axios.post(
+          "http://localhost:3001/user/checkisliked",
+          { postId: selectedPost._id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (res.data.success) {
+          setLiked(res.data.isLiked);
+          setLike(res.data.likes);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchLikeStatus();
+  }, [selectedPost]);
 
   const isOwner = userdetails._id === localStorage.getItem("userId");
 
@@ -418,7 +409,7 @@ useEffect(() => {
               />
             </div>
 
-            <h1 className="text-xl font-semibold">{userdetails.username}</h1>
+            <h1 className="text-xl font-semibold ">{userdetails.username}</h1>
             <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
 
             <div className="flex gap-10 mb-5">
@@ -430,8 +421,8 @@ useEffect(() => {
                 className="cursor-pointer"
                 onClick={() => fetchConnections("connected")}
               >
-                <p className="font-semibold">{connected}</p>
-                <p className="text-xs text-gray-400">connected</p>
+                <p className="font-semibold ">{connected}</p>
+                <p className="text-xs text-gray-400  ">connected</p>
               </div>
               <div
                 className="cursor-pointer"
@@ -450,7 +441,7 @@ useEffect(() => {
               className={`py-3 ${
                 activeTab === "posts"
                   ? "border-t-2 border-white"
-                  : "text-gray-400"
+                  : "text-gray-400 "
               }`}
             >
               POSTS
@@ -500,7 +491,7 @@ useEffect(() => {
                     className="w-5 cursor-pointer"
                     onClick={() => {
                       setselectedPost(item);
-                     setShowShare(true)
+                      setShowShare(true);
                     }}
                   />
                   <img
@@ -547,7 +538,7 @@ useEffect(() => {
                     alt="user"
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <span className="font-semibold text-sm">
+                  <span className="font-semibold text-sm ">
                     {selectedPost.postOwner?.username || userdetails.username}
                   </span>
                 </div>
@@ -672,16 +663,16 @@ useEffect(() => {
 
                   {/* SAVE */}
                   <svg
-                onClick={handleSave}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
-                fill={saved ? "white" : "none"}
-                stroke="white"
-                strokeWidth="2"
-              >
-                <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
-              </svg>
+                    onClick={handleSave}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+                    fill={saved ? "white" : "none"}
+                    stroke="white"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+                  </svg>
                 </div>
 
                 {/* ADD COMMENT */}
@@ -763,12 +754,12 @@ useEffect(() => {
               connectionList.map((user) => (
                 <div
                   key={user._id}
-                  className="flex items-center gap-3 py-2 border-b border-gray-800"
+                  className="flex items-center gap-3 py-2 border-b border-gray-800 cursor-pointer"
                 >
                   <img
                     src={user.img || profile}
                     alt={user.username}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover "
                   />
                   <div>
                     <p

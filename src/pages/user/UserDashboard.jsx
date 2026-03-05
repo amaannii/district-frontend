@@ -23,7 +23,7 @@ function UserDashboard() {
         return (
           <Home
           setSelectedUsername={setSelectedUsername}
-          setActivePage={setActivePage}
+          setActive={setActivePage}
             openChat={(district) => {
               setSelectedDistrict(district);
               setActivePage("MESSAGES");
@@ -35,7 +35,8 @@ function UserDashboard() {
         return <Search />;
 
       case "EXPLORE":
-        return <Explore />;
+        return <Explore  setSelectedUsername={setSelectedUsername}
+            setActive={setActivePage} />;
       case "UPROFILE":
         return <Userprofile selectedUsername={selectedUsername} />;
 
