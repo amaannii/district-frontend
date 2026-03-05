@@ -113,13 +113,8 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
   };
 
   // DELETE COMMENT
-
-  const handleSave = async () => {
+const handleSave = async () => {
   if (!token) return alert("Login required");
-
-  // 🔥 instantly toggle UI
-  const newSavedState = !saved;
-  setSaved(newSavedState);
 
   try {
     const res = await axios.post(
@@ -128,18 +123,14 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    if (!res.data.success) {
-      // rollback if something failed
-      setSaved(!newSavedState);
+    if (res.data.success) {
+      setSaved(res.data.isSaved); // ✅ use backend truth
     }
 
   } catch (err) {
     console.error(err);
-    // rollback on error
-    setSaved(!newSavedState);
   }
 };
-
   const handleDeleteComment = async () => {
     if (!commentToDelete) return;
 
@@ -212,11 +203,13 @@ return (
 />
 
 <span
-  onClick={() => {
-    setActivePage("UPROFILE");
-    setSelectedUsername(data.userId?.username);
-
-    
+ onClick={() => {
+    if (data.userId?._id === currentUser?._id) {
+      setActivePage("PROFILE");
+    } else {
+      setSelectedUsername(data.userId?.username);
+      setActivePage("UPROFILE");
+    }
   }}
   className="font-semibold cursor-pointer"
 >
