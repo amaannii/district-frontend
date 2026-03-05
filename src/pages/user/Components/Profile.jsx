@@ -207,7 +207,17 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     }
   };
 
+
+
+  
   const handleSave = async () => {
+    const token = localStorage.getItem("userToken"); // ✅ ADD THIS
+    if (!token) return alert("Login required");
+
+    // 🔥 instantly toggle UI
+    const newSavedState = !saved;
+    setSaved(newSavedState);
+
     try {
       const res = await axios.post(
         "http://localhost:3001/user/save-post",
@@ -215,15 +225,14 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      if (res.data.success) {
-        setSaved(true);
-        setSavedPost((prev) => {
-          if (prev.find((p) => p._id === selectedPost._id)) return prev;
-          return [...prev, selectedPost];
-        });
+      if (!res.data.success) {
+        // rollback if something failed
+        setSaved(!newSavedState);
       }
     } catch (err) {
       console.error(err);
+      // rollback on error
+      setSaved(!newSavedState);
     }
   };
 
@@ -377,6 +386,8 @@ useEffect(() => {
   fetchLikeStatus();
 }, [selectedPost]);
 
+
+
   const isOwner = userdetails._id === localStorage.getItem("userId");
 
   /* ----------------- RETURN UI ----------------- */
@@ -449,8 +460,8 @@ useEffect(() => {
                 onClick={() => setActiveTab("saved")}
                 className={`py-3 ${
                   activeTab === "saved"
-                    ? "border-t-2 border-white"
-                    : "text-gray-400"
+                    ? "border-t-2 border-white "
+                    : "text-gray-400 cursor-pointer"
                 }`}
               >
                 SAVED
@@ -660,11 +671,17 @@ useEffect(() => {
                   </div>
 
                   {/* SAVE */}
-                  <img
-                    src={saved ? bookmarkFilled : bookmark}
-                    className="w-5 cursor-pointer"
-                    onClick={saved ? handleUnsave : handleSave}
-                  />
+                  <svg
+                onClick={handleSave}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+                fill={saved ? "white" : "none"}
+                stroke="white"
+                strokeWidth="2"
+              >
+                <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+              </svg>
                 </div>
 
                 {/* ADD COMMENT */}
