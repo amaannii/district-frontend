@@ -115,6 +115,7 @@ function PostCard({
 
   // DELETE COMMENT
 
+
   const handleSave = async () => {
     if (!token) return alert("Login required");
 
@@ -223,6 +224,7 @@ function PostCard({
         className="w-full max-h-[300px] sm:max-h-[450px] object-cover"
       />
 
+
       {/* CAPTION */}
       <div className="px-4 sm:px-6 py-2 text-gray-300 text-sm sm:text-base">
         <span className="font-semibold mr-2">{data.userId?.username}</span>
@@ -242,6 +244,7 @@ function PostCard({
             />
             <span className="text-xs text-gray-400">{likeCount}</span>
           </div>
+
 
           {/* COMMENT */}
           <img

@@ -31,7 +31,7 @@ const images = [
   { src: plkd, title: "PALAKKAD" },
   { src: tsr, title: "THRISSUR" },
   { src: alpzha, title: "ALAPPUZHA" },
-  { src: kollm, title: "KOVALAM" },
+  { src: kollm, title: "KOLLAM" },
   { src: pathmtta, title: "PATHANAMTHITTA" },
   { src: tvpm, title: "THIRUVANANTHAPURAM" },
 ];
