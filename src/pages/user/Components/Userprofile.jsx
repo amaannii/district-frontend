@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import PostCard from "../Components/PostCard"; 
+import PostCard from "../Components/PostCard";
+import { useNavigate } from "react-router-dom";
 
 function Userprofile({ selectedUsername }) {
   const [userData, setUserData] = useState(null);
@@ -12,75 +13,73 @@ function Userprofile({ selectedUsername }) {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  const navigate = useNavigate();
 
-  
   useEffect(() => {
-  if (selectedPost) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "auto";
-  }
+    if (selectedPost) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
 
-  return () => {
-    document.body.style.overflow = "hidden";
-  };
-}, [selectedPost]);
+    return () => {
+      document.body.style.overflow = "hidden";
+    };
+  }, [selectedPost]);
 
- useEffect(() => {
-  const usernameToFetch = selectedUsername || localStorage.getItem("username");
+  useEffect(() => {
+    const usernameToFetch =
+      selectedUsername || localStorage.getItem("username");
 
-  if (!usernameToFetch) return;
-  
+    if (!usernameToFetch) return;
 
-  const fetchUserData = async () => {
-    setLoading(true);
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("userToken");
+
+        const response = await axios.post(
+          "http://localhost:3001/user/selecteduser",
+          { username: usernameToFetch },
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+
+        const user = response.data.user || response.data;
+        setUserData(user);
+
+        const statusRes = await axios.get(
+          `http://localhost:3001/user/connection-status/${usernameToFetch}`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+
+        if (statusRes.data.status === "connected") setConnecting(true);
+        else if (statusRes.data.status === "requested") setRequested(true);
+
+        setConnectionsCount(user.connections?.length || 0);
+      } catch (err) {
+        console.error(err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [selectedUsername]);
+
+  const fetchFullPost = async (postId) => {
     try {
       const token = localStorage.getItem("userToken");
 
-      const response = await axios.post(
-        "http://localhost:3001/user/selecteduser",
-        { username: usernameToFetch },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.get(`http://localhost:3001/user/post/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      const user = response.data.user || response.data;
-      setUserData(user);
-
-      const statusRes = await axios.get(
-        `http://localhost:3001/user/connection-status/${usernameToFetch}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (statusRes.data.status === "connected") setConnecting(true);
-      else if (statusRes.data.status === "requested") setRequested(true);
-
-      setConnectionsCount(user.connections?.length || 0);
+      setSelectedPost(res.data.post);
     } catch (err) {
       console.error(err);
-      setError(err);
-    } finally {
-      setLoading(false);
     }
   };
-
-  fetchUserData();
-}, [selectedUsername]);
-
-
-  const fetchFullPost = async (postId) => {
-  try {
-    const token = localStorage.getItem("userToken");
-
-    const res = await axios.get(
-      `http://localhost:3001/user/post/${postId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    setSelectedPost(res.data.post);
-  } catch (err) {
-    console.error(err);
-  }
-};
 
   const handleRequest = async () => {
     if (!userData) return;
@@ -89,7 +88,7 @@ function Userprofile({ selectedUsername }) {
       const res = await axios.post(
         "http://localhost:3001/user/request",
         { username: userData.username },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.data.success) setRequested(true);
     } catch (err) {
@@ -104,7 +103,7 @@ function Userprofile({ selectedUsername }) {
       await axios.post(
         "http://localhost:3001/user/remove-connection",
         { username: userData.username },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setConnecting(false);
       setRequested(false);
@@ -119,15 +118,20 @@ function Userprofile({ selectedUsername }) {
   if (!userData) return <div>No user selected</div>;
 
   return (
-    <div className="flex play-regular flex-col items-center p-6 sm:p-10 text-center overflow-auto  scrollbar-hide">
-      {/* Profile Image */}
-      <div >
-
-      <img
-        src={userData.img}
-        alt={userData.name}
-        className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mb-4"
-      />
+    <div className="flex relative play-regular flex-col items-center p-6 sm:p-10 text-center overflow-auto  scrollbar-hide">
+      <button
+        onClick={() => navigate(-0)}
+        className="absolute top-7 left-3 bg-[#1a1a1a] text-white px-3 py-1 rounded-md hover:bg-[#333]"
+      >
+        ← Back
+      </button>
+      {/* Profile Image */} 
+      <div>
+        <img
+          src={userData.img}
+          alt={userData.name}
+          className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mb-4"
+        />
       </div>
 
       {/* Username and Name */}
@@ -142,18 +146,18 @@ function Userprofile({ selectedUsername }) {
 
       {/* Connections and Posts Info */}
       <div className="flex gap-8 mb-4 text-sm text-gray-300">
-  <span>
-    <strong>{userData.post?.length || 0}</strong> posts
-  </span>
+        <span>
+          <strong>{userData.post?.length || 0}</strong> posts
+        </span>
 
-  <span>
-    <strong>{userData.connected?.length || 0}</strong> connected
-  </span>
+        <span>
+          <strong>{userData.connected?.length || 0}</strong> connected
+        </span>
 
-  <span>
-    <strong>{userData.connecting?.length || 0}</strong> connecting
-  </span>
-</div>
+        <span>
+          <strong>{userData.connecting?.length || 0}</strong> connecting
+        </span>
+      </div>
 
       {/* Connect / Requested / Connected Button */}
       <button
@@ -173,15 +177,15 @@ function Userprofile({ selectedUsername }) {
       {/* Posts Grid */}
       {userData.post?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full max-w-5xl mx-auto">
-         {userData.post.map((post, index) => (
-  <img
-    key={index}
-    src={post.image}
-    alt="post"
-    className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
-    onClick={() => fetchFullPost(post._id)}
-  />
-))}
+          {userData.post.map((post, index) => (
+            <img
+              key={index}
+              src={post.image}
+              alt="post"
+              className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
+              onClick={() => fetchFullPost(post._id)}
+            />
+          ))}
         </div>
       ) : (
         <p className="text-gray-500">No posts available</p>
@@ -216,38 +220,32 @@ function Userprofile({ selectedUsername }) {
           </div>
         </div>
       )}
-       
-     {selectedPost && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
 
-    {/* Click outside to close */}
-    <div
-      className="absolute inset-0"
-      onClick={() => setSelectedPost(null)}
-    ></div>
+      {selectedPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          {/* Click outside to close */}
+          <div
+            className="absolute inset-0"
+            onClick={() => setSelectedPost(null)}
+          ></div>
 
-    {/* Modal Content */}
-    <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
+          {/* Modal Content */}
+          <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
+            >
+              ✕
+            </button>
 
-      {/* Close Button */}
-      <button
-        onClick={() => setSelectedPost(null)}
-        className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
-      >
-        ✕
-      </button>
-
-      {/* PostCard */}
-      <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
-        <PostCard
-          data={selectedPost}
-          user={userData}
-        />
-      </div>
-
-    </div>
-  </div>
-)}
+            {/* PostCard */}
+            <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+              <PostCard data={selectedPost} user={userData} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
