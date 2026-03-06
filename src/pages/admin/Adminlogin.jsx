@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit =async (e) => {
     e.preventDefault();
+      setLoading(true);
    
     const res =await axios.post("http://localhost:3001/admin/admin-login", {
       email,
@@ -25,6 +27,8 @@ export default function AdminLogin() {
     } else {
       alert("enter you correct email and password");
     }
+        setLoading(false);
+
     // connect backend here
   };
 
@@ -84,7 +88,11 @@ export default function AdminLogin() {
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
-
+{loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
       </div>
     </div>
   );

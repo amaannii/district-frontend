@@ -9,13 +9,14 @@ function Notifications() {
   const [enabled, setEnabled] = useState(true);
   const [duration, setDuration] = useState("for 2 days");
   const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
   // ✅ Fetch settings from backend
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const token = localStorage.getItem("userToken");
-
+  setLoading(true);
         const res = await axios.post(
           "http://localhost:3001/user/userdetails",
           {},
@@ -30,6 +31,8 @@ function Notifications() {
         setDuration(user.notifications?.duration ?? "for 2 days");
       } catch (error) {
         console.log("Error fetching notification settings ❌", error);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -40,7 +43,7 @@ function Notifications() {
 const saveNotificationSettings = async (newEnabled, newDuration) => {
   try {
     const userToken = localStorage.getItem("userToken");
-
+  setLoading(true);
     // Save enabled + duration
     await axios.post(
       "http://localhost:3001/user/updateNotifications",
@@ -77,7 +80,9 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
     console.log("Notification settings saved ✅");
   } catch (error) {
     console.log("Error saving notification settings ❌", error);
-  }
+  }finally {
+        setLoading(false);
+      }
 };
 
 
@@ -156,6 +161,11 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
               ))}
             </div>
           )}
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>

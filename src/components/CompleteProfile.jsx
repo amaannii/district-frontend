@@ -8,6 +8,7 @@ const CompleteProfile = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("googleEmail");
@@ -32,6 +33,7 @@ const CompleteProfile = () => {
     }
 
     try {
+        setLoading(true);
       setError("");
 
       const res = await axios.post(
@@ -46,7 +48,9 @@ const CompleteProfile = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Server error");
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   return (
@@ -129,6 +133,11 @@ const CompleteProfile = () => {
 
         </form>
       </div>
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 };

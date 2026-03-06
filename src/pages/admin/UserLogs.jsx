@@ -5,15 +5,19 @@ import axios from "axios";
 function UserLogs() {
   const [logs, setLogs] = useState([]);
   const [selectedLog, setSelectedLog] = useState(null);
+    const [loading, setLoading] = useState(false);
 
   // Fetch logged persons details
   useEffect(() => {
     const fetchLoginLogs = async () => {
       try {
+          setLoading(true);
         const res = await axios.get("http://localhost:3001/admin/login-logs");
         setLogs(res.data.logs);
       } catch (error) {
         console.error("Failed to fetch login logs", error);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -124,6 +128,11 @@ function UserLogs() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>

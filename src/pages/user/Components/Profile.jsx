@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import settings from "../../../assets/images/icons8-settings-50.png";
-import profile from "../../../assets/images/profile.png";
+import profile from "../../../assets/images/icons8-profile-50.png";
 import heart from "../../../assets/images/icons8-heart-24.png";
 import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
 import commentIcon from "../../../assets/images/icons8-comment-50.png";
@@ -48,6 +48,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const [like, setLike] = useState(0);
   const fileInputRef = useRef(null);
   const [showImageConfirm, setShowImageConfirm] = useState(false);
+    const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("userToken");
 
@@ -59,6 +60,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
   const fetchUserDetails = async () => {
     try {
+      setLoading(true);
       const response = await axios.post(
         "http://localhost:3001/user/userdetails",
         {},
@@ -81,6 +83,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       localStorage.setItem("userId", user._id);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,6 +118,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
   const fetchSavedPost = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(
         "http://localhost:3001/user/get-saved-posts",
         { headers: { Authorization: `Bearer ${token}` } },
@@ -122,6 +127,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       if (res.data) setSavedPost(res.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,6 +152,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   /* ---------------- DELETE POST ---------------- */
   const handleDeletePost = async (postId) => {
     try {
+      setLoading(true);
       await axios.delete(`http://localhost:3001/user/delete-post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -153,12 +161,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       setselectedPost(null);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   /* ---------------- UPDATE POST ---------------- */
   const handleUpdatePost = async () => {
     try {
+      setLoading(true);
       await axios.put(
         `http://localhost:3001/user/update-post/${selectedPost._id}`,
         { caption: editedCaption },
@@ -179,12 +190,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       setIsEditing(false);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   /* ---------------- CONNECTIONS ---------------- */
   const fetchConnections = async (type) => {
     try {
+      setLoading(true);
       const res = await axios.get(`http://localhost:3001/user/${type}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -196,12 +210,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   /* ---------------- UNSAVE / SAVE ---------------- */
   const handleUnsave = async () => {
     try {
+      setLoading(true);
       await axios.delete(
         `http://localhost:3001/user/unsave/${selectedPost._id}`,
         { headers: { Authorization: `Bearer ${token}` } },
@@ -211,6 +228,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       setSavedPost((prev) => prev.filter((p) => p._id !== selectedPost._id));
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -223,9 +242,10 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     setSaved(newSavedState);
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/save-post",
-        { postId: selectedPost._id,username:userdetails.username },
+        { postId: selectedPost._id, username: userdetails.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
@@ -237,12 +257,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       console.error(err);
       // rollback on error
       setSaved(!newSavedState);
+    } finally {
+      setLoading(false);
     }
   };
 
   /* ---------------- LIKE ---------------- */
   const handleLike = async () => {
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/like-post",
         { postId: selectedPost._id },
@@ -255,6 +278,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -263,6 +288,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     if (!commentText.trim()) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/add-comment",
         { postId: selectedPost._id, text: commentText },
@@ -275,12 +301,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   /* ---------------- DELETE COMMENT ---------------- */
   const handleDeleteComment = async (commentId) => {
     try {
+      setLoading(true);
       const comment = comments.find((c) => c._id === commentId);
       if (!comment) return;
 
@@ -298,6 +327,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -309,7 +340,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", "newuploads");
-
+    setLoading(true);
     const res = await fetch(
       "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
       { method: "POST", body: data },
@@ -324,6 +355,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      setLoading(false);
       fetchUserDetails();
       seteditprofile(false);
     }
@@ -337,6 +369,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     }
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/send-post-to-chats",
         {
@@ -356,6 +389,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       }
     } catch (err) {
       console.error("Share failed:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -364,6 +399,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       if (!userdetails) return;
 
       try {
+        setLoading(true);
         const token = localStorage.getItem("userToken");
         console.log(selectedPost._id);
 
@@ -383,6 +419,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         }
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -409,8 +447,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           {/* PROFILE HEADER */}
           <div className="flex flex-col items-center text-center">
             <div
-             onClick={() => setShowImageConfirm(true)}
-              className="relative w-20 h-20 rounded-full bg-white overflow-hidden mb-3 cursor-pointer group"
+              onClick={() => setShowImageConfirm(true)}
+              className="relative w-20 h-20 rounded-full  overflow-hidden mb-3 cursor-pointer group"
             >
               <img
                 src={
@@ -425,15 +463,14 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 onError={(e) => (e.target.src = profile)}
               />
             </div>
-<h1 className="text-xl font-semibold">{userdetails.username}</h1>
-<p className="text-sm text-gray-400">{userdetails.name}</p>
+            <h1 className="text-xl font-semibold">{userdetails.username}</h1>
+            <p className="text-sm text-gray-400">{userdetails.name}</p>
 
-
-{userdetails.bio && (
-  <p className="text-sm text-gray-300 mt-2 text-center max-w-[350px]">
-    {userdetails.bio}
-  </p>
-)}
+            {userdetails.bio && (
+              <p className="text-sm text-gray-300 mt-2 text-center max-w-[350px]">
+                {userdetails.bio}
+              </p>
+            )}
 
             <input
               type="file"
@@ -442,10 +479,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               onChange={handleImageUpload}
               style={{ display: "none" }}
             />
-
-            <h1 className="text-xl font-semibold ">{userdetails.username}</h1>
-            <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
-
 
             <div className="flex gap-10 mb-5">
               <div>
@@ -467,7 +500,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
-            
           </div>
 
           {/* TABS */}
@@ -766,33 +798,31 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         </div>
       )}
       {showImageConfirm && (
-  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
-      <h2 className="text-lg font-semibold mb-4">
-        Add Profile Photo?
-      </h2>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
+            <h2 className="text-lg font-semibold mb-4">Add Profile Photo?</h2>
 
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={() => {
-            setShowImageConfirm(false);
-            fileInputRef.current?.click();
-          }}
-          className="bg-[#879F00] px-5 py-2 rounded text-sm"
-        >
-          Yes
-        </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => {
+                  setShowImageConfirm(false);
+                  fileInputRef.current?.click();
+                }}
+                className="bg-[#879F00] px-5 py-2 rounded text-sm"
+              >
+                Yes
+              </button>
 
-        <button
-          onClick={() => setShowImageConfirm(false)}
-          className="bg-gray-600 px-5 py-2 rounded text-sm"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              <button
+                onClick={() => setShowImageConfirm(false)}
+                className="bg-gray-600 px-5 py-2 rounded text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showConnections && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -898,6 +928,11 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               Cancel
             </button>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </>

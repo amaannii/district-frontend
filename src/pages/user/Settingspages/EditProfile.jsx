@@ -1,5 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import profile from "../../../assets/images/icons8-user-100.png";
+import Swal from "sweetalert2";
 
 function EditProfile() {
   const [bio, setBio] = useState("");
@@ -8,7 +10,7 @@ function EditProfile() {
   const [userdetails, setuserdetails] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
   const [posts, setposts] = useState([]);
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [deleted, setdeleted] = useState(0);
   const [user, setUser] = useState({});
   const [uploadshow, setuploadshow] = useState(false);
@@ -17,11 +19,12 @@ function EditProfile() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [name, setName] = useState("");
   const [savedName, setSavedName] = useState("");
+  
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        setloading(true);
+        setLoading(true);
         const token = localStorage.getItem("userToken");
 
         const response = await axios.post(
@@ -50,7 +53,7 @@ function EditProfile() {
       } catch (error) {
         console.error("Error fetching user details:", error);
       } finally {
-        setloading(false);
+        setLoading(false);
       }
     };
 
@@ -59,6 +62,7 @@ function EditProfile() {
 
   const handledelete = async () => {
     try {
+        setLoading(true);
       const token = localStorage.getItem("userToken");
 
       const response = await axios.post(
@@ -72,7 +76,15 @@ function EditProfile() {
       );
 
       if (response.data.success) {
-        console.log("Image deleted successfully ✅");
+        Swal.fire({
+  toast: true,
+  position: "top-end",
+  icon: "success",
+  title: "Image Deleted",
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+});
 
         // Update UI immediately
         setUser((prev) => ({
@@ -86,7 +98,10 @@ function EditProfile() {
       console.error("Error deleting image ❌", error);
 
       alert("Failed to delete image. Try again!");
-    }
+    }finally {
+        setLoading(false);
+      }
+    
   };
 
   const handleuploadimg = async (file) => {
@@ -97,7 +112,7 @@ function EditProfile() {
     data.append("upload_preset", "newuploads");
 
     try {
-      setloading(true);
+       setLoading(true);
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
         { method: "POST", body: data },
@@ -118,13 +133,24 @@ function EditProfile() {
         if (res.data.success == true) {
           setuploadshow(false);
           setShowModal(false);
+                Swal.fire({
+  toast: true,
+  position: "top-end",
+  icon: "success",
+  title: "Profile photo updated",
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+});
+
         }
       }
     } catch (error) {
       console.error("Image upload failed", error);
     } finally {
-      setloading(false);
+        setLoading(false);
     }
+ 
   };
 
   const handleFileSelect = (e) => {
@@ -134,6 +160,7 @@ function EditProfile() {
 
   const handleSaveGender = async () => {
     try {
+        setLoading(true);
       const token = localStorage.getItem("userToken");
       const res = await axios.post(
         "http://localhost:3001/user/updateGender",
@@ -145,22 +172,34 @@ function EditProfile() {
         },
       );
 
-      if (res.data.success) {
-        setSavedGender(gender); // ✅ update button state
+    if (res.data.success) {
+  setSavedGender(gender);
 
-      }
+
+  Swal.fire({
+  toast: true,
+  position: "top-end",
+  icon: "success",
+  title: "Profile photo updated",
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+});
+}
 
       console.log(res.data);
     } catch (error) {
       console.log(error);
       alert("Error saving gender ❌");
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const handleSaveBio = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
+  setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/updateBio",
         { bio },
@@ -173,39 +212,60 @@ function EditProfile() {
 
       if (res.data.success) {
         setSavedBio(bio);
-        alert("Bio saved successfully ✅");
+     
+  Swal.fire({
+  toast: true,
+  position: "top-end",
+  icon: "success",
+  title: "Your bio was saved successfully",
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+});
       }
     } catch (error) {
       console.log(error);
       alert("Error saving bio ❌");
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const handleSaveName = async () => {
-  try {
-    const token = localStorage.getItem("userToken");
-
-    const res = await axios.post(
-      "http://localhost:3001/user/updateName",
-      { name },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const token = localStorage.getItem("userToken");
+  setLoading(true);
+      const res = await axios.post(
+        "http://localhost:3001/user/updateName",
+        { name },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
+      );
+
+      if (res.data.success) {
+        setSavedName(name);
+        setShowNameModal(false);
+     
+  Swal.fire({
+  toast: true,
+  position: "top-end",
+  icon: "success",
+  title: "Name Updated",
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+});
       }
-    );
-
-    if (res.data.success) {
-      setSavedName(name);
-      setShowNameModal(false);
-      alert("Name updated successfully ✅");
-    }
-  } catch (error) {
-    console.log(error);
-    alert("Error updating name ❌");
-  }
-};
-
+    } catch (error) {
+      console.log(error);
+      alert("Error updating name ❌");
+    }finally {
+        setLoading(false);
+      }
+  };
 
   return (
     <div className="w-full text-white play-regular relative">
@@ -213,11 +273,11 @@ function EditProfile() {
       <h1 className="text-xl font-bold mb-13">Edit Profile</h1>
 
       {/* Profile Card */}
-      <div className="bg-white text-black rounded-xl p-2 flex items-center justify-between w-[600px] shadow-lg">
+      <div className=" text-black bg-white rounded-xl p-2 flex items-center justify-between w-[600px] shadow-lg">
         {/* Left Info */}
         <div className="flex items-center gap-4">
           <img
-            src={userdetails.img}
+            src={userdetails.img || profile}
             alt="profile"
             className="w-14 h-14 rounded-full object-cover"
           />
@@ -225,17 +285,16 @@ function EditProfile() {
           <div>
             <h2 className="font-semibold text-sm">{userdetails.username}</h2>
             <div className="flex items-center gap-2">
-  <p className="text-gray-500 text-xs">{savedName}</p>
+              <p className="text-gray-500 text-xs">{savedName}</p>
 
-  {/* Pen Button */}
-  <button
-    onClick={() => setShowNameModal(true)}
-    className="text-gray-400 hover:text-black transition"
-  >
-    🖊️
-  </button>
-</div>
-
+              {/* Pen Button */}
+              <button
+                onClick={() => setShowNameModal(true)}
+                className="text-gray-400 hover:text-black transition"
+              >
+                🖊️
+              </button>
+            </div>
           </div>
         </div>
 
@@ -406,46 +465,50 @@ function EditProfile() {
         </div>
       )}
       {/* ================= NAME MODAL ================= */}
-{showNameModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-    <div className="bg-[#111] w-[420px] rounded-2xl p-6 border border-gray-700 shadow-xl">
+      {showNameModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+          <div className="bg-[#111] w-[420px] rounded-2xl p-6 border border-gray-700 shadow-xl">
+            {/* Title */}
+            <h2 className="text-center text-lg font-semibold mb-5 text-white">
+              Update Name
+            </h2>
 
-      {/* Title */}
-      <h2 className="text-center text-lg font-semibold mb-5 text-white">
-        Update Name
-      </h2>
+            {/* Input */}
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-black border border-gray-600 text-white"
+              placeholder="Enter new name"
+            />
 
-      {/* Input */}
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full px-4 py-3 rounded-xl bg-black border border-gray-600 text-white"
-        placeholder="Enter new name"
-      />
+            {/* Buttons */}
+            <div className="flex justify-between mt-6">
+              {/* Cancel */}
+              <button
+                onClick={() => setShowNameModal(false)}
+                className="px-5 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600"
+              >
+                Cancel
+              </button>
 
-      {/* Buttons */}
-      <div className="flex justify-between mt-6">
-        {/* Cancel */}
-        <button
-          onClick={() => setShowNameModal(false)}
-          className="px-5 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600"
-        >
-          Cancel
-        </button>
-
-        {/* Save */}
-        <button
-          onClick={handleSaveName}
-          disabled={name === savedName || name.length === 0}
-          className="px-5 py-2 rounded-xl bg-[#879F00] text-white hover:opacity-90"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              {/* Save */}
+              <button
+                onClick={handleSaveName}
+                disabled={name === savedName || name.length === 0}
+                className="px-5 py-2 rounded-xl bg-[#879F00] text-white hover:opacity-90"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
 
     </div>
   );

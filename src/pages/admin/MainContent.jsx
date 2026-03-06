@@ -1,4 +1,5 @@
-import Chatroom from "./Chatroom";
+
+import ChatRoom from "./ChatRoom";
 import DashboardHome from "./DashboardHome";
 import Reports from "./Reports";
 import UserLogs from "./UserLogs";
@@ -9,7 +10,7 @@ export default function MainContent({ active }) {
     <main className="flex-1 p-8 h-[100vh] overflow-scroll  text-white">
       {active === "/dashboard" && <DashboardHome />}
       {active === "/users" && <UserManagement/>}
-      {active === "/chatroom" && <Chatroom/>}
+      {active === "/chatroom" && <ChatRoom/>}
       {active === "/reports" && <Reports/>}
       {active === "/userlogs" && <UserLogs/>}
     </main>

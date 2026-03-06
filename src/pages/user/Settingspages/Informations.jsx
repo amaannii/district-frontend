@@ -1,5 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+
 
 function Informations() {
   const [showContactModal, setShowContactModal] = useState(false);
@@ -12,6 +14,7 @@ function Informations() {
   const [userdetails, setuserdetails] = useState({});
   const [ShowEditModal, setShowEditModal] = useState(false);
   const [showBirthdayModal, setShowBirthdayModal] = useState(false);
+    const [loading, setLoading] = useState(false);
 
   const [month, setMonth] = useState("December");
   const [day, setDay] = useState("30");
@@ -21,7 +24,7 @@ function Informations() {
     const fetchContacts = async () => {
       try {
         const token = localStorage.getItem("userToken");
-
+        setLoading(true);
         const res = await axios.get("http://localhost:3001/user/getContacts", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,6 +50,8 @@ function Informations() {
         }
       } catch (err) {
         console.log("Error fetching contacts:", err);
+      } finally {
+        setLoading(false);
       }
     };
     if (showAddModal) {
@@ -60,7 +65,7 @@ function Informations() {
   const handleSaveContact = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/addContact",
         { number: newNumber },
@@ -76,13 +81,15 @@ function Informations() {
       setNewNumber("");
     } catch (err) {
       alert(err.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteNumber = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/deleteContact",
         { number: selectedNumber },
@@ -98,13 +105,15 @@ function Informations() {
       setSelectedNumber(null);
     } catch (err) {
       alert("Error deleting number");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateNumber = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/updateContact",
         {
@@ -124,13 +133,15 @@ function Informations() {
       setSelectedNumber(newNumber);
     } catch (err) {
       alert("Error updating number");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSaveBirthday = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/updateBirthday",
         {
@@ -145,8 +156,15 @@ function Informations() {
         },
       );
 
-      alert("Birthday Saved ✅");
-      // ✅ Update UI instantly without refresh
+      Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: "Birthday Saved",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
       setMonth(res.data.birthday.month);
       setDay(res.data.birthday.day);
       setYear(res.data.birthday.year);
@@ -154,6 +172,8 @@ function Informations() {
       setShowBirthdayModal(false);
     } catch (err) {
       alert("Error saving birthday ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -544,6 +564,11 @@ function Informations() {
               Save
             </button>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>

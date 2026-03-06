@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -10,35 +11,38 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:3001/admin/users"
-      );
+      setLoading(true);
+      const res = await axios.get("http://localhost:3001/admin/users");
       setUsers(res.data.users);
     } catch (error) {
       console.error("Failed to fetch users");
+    } finally {
+      setLoading(false);
     }
   };
 
-const toggleBlockUser = async (id) => {
-  try {
-    const token = localStorage.getItem("adminToken");
+  const toggleBlockUser = async (id) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("adminToken");
 
-    await axios.patch(
-      `http://localhost:3001/admin/users/${id}/block`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.patch(
+        `http://localhost:3001/admin/users/${id}/block`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
-    );
+      );
 
-    fetchUsers();
-  } catch (error) {
-    console.error("Failed to block/unblock user");
-  }
-};
-
+      fetchUsers();
+    } catch (error) {
+      console.error("Failed to block/unblock user");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -63,32 +67,27 @@ const toggleBlockUser = async (id) => {
                 src={user.avatar || "https://i.pravatar.cc/150"}
                 className="w-10 h-10 rounded-full"
               /> */}
-              <span className="font-medium">
-                {user.name || "No Name"}
-              </span>
+              <span className="font-medium">{user.name || "No Name"}</span>
             </div>
 
             <span className="text-gray-400">{user.email}</span>
-                <span className="w-full flex justify-end">
-
-            <span
-              className={`text-xs px-3 py-1 rounded-full w-fit ${
-                user.isBlocked
-                  ? "bg-red-500/20 text-red-400"
-                  : "bg-green-500/20 text-green-400"
-              }`}
-            >
-              {user.isBlocked ? "Blocked" : "Active"}
+            <span className="w-full flex justify-end">
+              <span
+                className={`text-xs px-3 py-1 rounded-full w-fit ${
+                  user.isBlocked
+                    ? "bg-red-500/20 text-red-400"
+                    : "bg-green-500/20 text-green-400"
+                }`}
+              >
+                {user.isBlocked ? "Blocked" : "Active"}
+              </span>
             </span>
-                </span>
 
             <div className="text-center">
               <button
                 onClick={() => toggleBlockUser(user._id)}
                 className={`px-4 py-2 text-sm rounded-lg ${
-                  user.isBlocked
-                    ? "bg-green-600"
-                    : "bg-red-600"
+                  user.isBlocked ? "bg-green-600" : "bg-red-600"
                 }`}
               >
                 {user.isBlocked ? "Unblock" : "Block"}
@@ -96,6 +95,11 @@ const toggleBlockUser = async (id) => {
             </div>
           </div>
         ))}
+        {loading && (
+          <div className="fixed inset-0 flex justify-center items-center z-50">
+            <div className="chaotic-orbit"></div>
+          </div>
+        )}
       </div>
     </>
   );
