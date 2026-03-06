@@ -213,7 +213,7 @@ function Search() {
                 {!search && (
                   <button
                     onClick={() => handleDeleteRecent(user._id)}
-                    className="text-gray-400 hover:text-red-500 text-sm"
+                    className="text-gray-400 hover:text-red-500 text-sm cursor-pointer"
                   >
                     ✕
                   </button>
@@ -238,11 +238,33 @@ function Search() {
   className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white object-cover mb-4"
 />
 
-            <h2 className="text-lg sm:text-xl mb-4 break-words">
-              <strong>@{selectedUser.username}</strong>
-              <br />
-              {selectedUser.name}
-            </h2>
+            <h2 className="text-lg sm:text-xl break-words">
+  <strong>@{selectedUser.username}</strong>
+  <br />
+  {selectedUser.name}
+</h2>
+
+{/* BIO */}
+{selectedUser.bio && (
+  <p className="text-gray-400 text-sm mt-2 max-w-md">
+    {selectedUser.bio}
+  </p>
+)}
+
+{/* CONNECTION COUNTS */}
+<div className="flex gap-6 mt-4 text-sm text-gray-300">
+  <span>
+    <strong>{selectedUser.connectedCount || 0}</strong> Connected
+  </span>
+
+  <span>
+    <strong>{selectedUser.connectingCount || 0}</strong> Connecting
+  </span>
+
+  <span>
+    <strong>{selectedUser.post?.length || 0}</strong> Posts
+  </span>
+</div>
 
             <button
               onClick={() => {

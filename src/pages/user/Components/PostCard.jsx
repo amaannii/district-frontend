@@ -209,7 +209,7 @@ return (
       setActivePage("PROFILE");
     } else {
       setSelectedUsername(data.userId?.username);
-      setActivePage("UPROFILE");
+      setActive("UPROFILE");
     }
   }}
   className="font-semibold cursor-pointer"
@@ -304,7 +304,7 @@ stroke="white"
 
           <button
             onClick={() => setCommentToDelete(c._id)}
-            className="text-red-500 text-xs mt-1 sm:mt-0 hover:text-red-400"
+            className="text-red-500 text-xs mt-1 sm:mt-0 hover:text-red-400 cursor-pointer"
           >
             Delete
           </button>
@@ -322,7 +322,7 @@ stroke="white"
       />
       <button
         onClick={handleComment}
-        className="text-blue-500 font-semibold text-sm"
+        className="text-blue-500 font-semibold text-sm cursor-pointer"
       >
         send
       </button>
@@ -346,14 +346,14 @@ stroke="white"
           <div className="flex justify-between gap-3">
             <button
               onClick={() => setCommentToDelete(null)}
-              className="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-500"
+              className="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 cursor-pointer"
             >
               Cancel
             </button>
 
             <button
               onClick={handleDeleteComment}
-              className="flex-1 px-4 py-2 bg-[#879F00] rounded"
+              className="flex-1 px-4 py-2 bg-[#879F00] rounded cursor-pointer"
             >
               Delete
             </button>
@@ -391,7 +391,7 @@ stroke="white"
 
           <button
             onClick={handleSendPost}
-            className="mt-4 w-full py-2 rounded bg-[#879F00]"
+            className="mt-4 w-full py-2 rounded bg-[#879F00] cursor-pointer"
           >
             Send
           </button>
@@ -401,7 +401,7 @@ stroke="white"
               setShowShare(false);
               setSelectedDistricts([]);
             }}
-            className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+            className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500 cursor-pointer"
           >
             Cancel
           </button>

@@ -33,11 +33,11 @@ function SettingsSidebar({ activeSetting, setActiveSetting }) {
             >
               {/* Active Green Line like Your Design */}
               {isActive && (
-                <span className="absolute left-0 top-2 bottom-2 w-[4px] bg-[#879F00] rounded-full"></span>
+                <span className="absolute left-0 top-2 bottom-2 w-[4px] bg-[#879F00] rounded-full "></span>
               )}
 
               {/* Text aligned exactly like HOME */}
-              <span className="ml-3">{item.name}</span>
+              <span className="ml-3 cursor-pointer">{item.name}</span>
             </button>
           );
         })}

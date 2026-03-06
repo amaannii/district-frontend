@@ -152,14 +152,14 @@ const NotificationItem = ({ item }) => (
         <>
           <button
             onClick={() => handleConfirm(item.username)}
-            className="px-3 sm:px-4 py-1 bg-[#879F00] text-white rounded-md text-xs sm:text-sm"
+            className="px-3 sm:px-4 py-1 bg-[#879F00] text-white rounded-md text-xs sm:text-sm cursor-pointer"
           >
             Confirm
           </button>
 
           <button
             onClick={() => handleDelete(item._id)}
-            className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm"
+            className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm cursor-pointer"
           >
             Delete
           </button>
@@ -167,7 +167,7 @@ const NotificationItem = ({ item }) => (
       ) : (
         <button
           onClick={() => handleDelete(item._id)}
-          className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm"
+          className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm cursor-pointer"
         >
           Delete
         </button>
@@ -193,7 +193,7 @@ return (
       </h1>
 
       {notifications.length === 0 ? (
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-400 text-sm ">
           No notifications
         </p>
       ) : (

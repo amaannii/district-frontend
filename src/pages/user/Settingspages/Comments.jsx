@@ -55,7 +55,7 @@ function Comments() {
       {/* Options */}
       <div className="space-y-10">
         {/* Option 1 */}
-        <label className="flex items-start gap-6 cursor-pointer">
+        <label className="flex items-start gap-6 ">
           <input
             type="radio"
             name="comments"
@@ -64,7 +64,7 @@ function Comments() {
               setSelected("followers");
               savePermission("followers");
             }}
-            className="w-5 h-5 accent-white mt-1"
+            className="w-5 h-5 accent-white mt-1 cursor-pointer"
           />
 
           <div>
@@ -76,7 +76,7 @@ function Comments() {
         </label>
 
         {/* Option 2 */}
-        <label className="flex items-start gap-6 cursor-pointer">
+        <label className="flex items-start gap-6 ">
           <input
             type="radio"
             name="comments"
@@ -85,7 +85,7 @@ function Comments() {
               setSelected("followback");
               savePermission("followback");
             }}
-            className="w-5 h-5 accent-white mt-1"
+            className="w-5 h-5 accent-white mt-1 cursor-pointer"
           />
 
           <div>
@@ -97,13 +97,13 @@ function Comments() {
         </label>
 
         {/* Option 3 */}
-        <label className="flex items-start gap-6 cursor-pointer">
+        <label className="flex items-start gap-6 ">
           <input
             type="radio"
             name="comments"
             checked={
               selected === "off" && (
-                <p className="text-red-400 text-sm mt-4">
+                <p className="text-red-400 text-sm mt-4 cursor-pointer">
                   Comments are disabled.
                 </p>
               )
@@ -112,7 +112,7 @@ function Comments() {
               setSelected("off");
               savePermission("off");
             }}
-            className="w-5 h-5 accent-white mt-1"
+            className="w-5 h-5 accent-white mt-1 cursor-pointer"
           />
 
           <div>

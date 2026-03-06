@@ -188,7 +188,7 @@ function Home({setSelectedUsername,setActive,openChat }) {
                  {!myNote && (
                   <button
                     onClick={addMyNote}
-                    className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold"
+                    className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold cursor-pointer "
                   >
                     +
                   </button>
@@ -301,14 +301,14 @@ setSelectedUsername={setSelectedUsername}
       <div className="flex justify-center gap-4">
         <button
           onClick={handleDeleteNote}
-          className="bg-red-600 px-4 py-2 rounded"
+          className="bg-red-600 px-4 py-2 rounded cursor-pointer"
         >
           Delete
         </button>
 
         <button
           onClick={() => setShowDeleteModal(false)}
-          className="bg-neutral-700 px-4 py-2 rounded"
+          className="bg-neutral-700 px-4 py-2 rounded cursor-pointer"
         >
           Cancel
         </button>
