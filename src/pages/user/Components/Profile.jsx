@@ -54,6 +54,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   /* ---------------- FETCH USER ---------------- */
   useEffect(() => {
     fetchUserDetails();
+    fetchSavedPost();
   }, []);
 
   const fetchUserDetails = async () => {
@@ -224,7 +225,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     try {
       const res = await axios.post(
         "http://localhost:3001/user/save-post",
-        { postId: selectedPost._id },
+        { postId: selectedPost._id,username:userdetails.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
