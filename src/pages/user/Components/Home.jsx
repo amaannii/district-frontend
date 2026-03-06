@@ -13,7 +13,7 @@ function Home({setSelectedUsername,setActive,openChat }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showPostOptions, setShowPostOptions] = useState(false);
   const [showAboutAccount, setShowAboutAccount] = useState(false);
-
+ 
   const [posts, setPosts] = useState([]);
   const [image, setImage] = useState();
   const [myNote, setMyNote] = useState("");
@@ -23,6 +23,7 @@ function Home({setSelectedUsername,setActive,openChat }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
 
+  
   
 
   /* ================= INITIAL FETCH ================= */
