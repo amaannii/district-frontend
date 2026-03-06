@@ -4,16 +4,16 @@ import Messages from "./Messages";
 import PostCard from "./PostCard";
 import axios from "axios";
 import Profile from "./Profile";
-import defaultProfile from "../../../assets/images/profile.png";
+import defaultProfile from "../../../assets/images/icons8-profile-50.png";
 
-function Home({setSelectedUsername,setActive,openChat }) {
+function Home({ setSelectedUsername, setActive, openChat }) {
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [sharePost, setSharePost] = useState(null);
   const [shareNote, setShareNote] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const [showPostOptions, setShowPostOptions] = useState(false);
   const [showAboutAccount, setShowAboutAccount] = useState(false);
- 
+
   const [posts, setPosts] = useState([]);
   const [image, setImage] = useState();
   const [myNote, setMyNote] = useState("");
@@ -21,9 +21,6 @@ function Home({setSelectedUsername,setActive,openChat }) {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  
-
-  
   
 
   /* ================= INITIAL FETCH ================= */
@@ -75,11 +72,11 @@ function Home({setSelectedUsername,setActive,openChat }) {
 
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/note",
         { note },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (res.data.success) {
@@ -87,17 +84,18 @@ function Home({setSelectedUsername,setActive,openChat }) {
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteNote = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
-      const res = await axios.delete(
-        "http://localhost:3001/user/note",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      setLoading(true);
+      const res = await axios.delete("http://localhost:3001/user/note", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (res.data.success) {
         setMyNote("");
@@ -105,94 +103,33 @@ function Home({setSelectedUsername,setActive,openChat }) {
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
-
-//   /* ================= PROFILE VIEW ================= */
-//  /* ================= PROFILE VIEW ================= */
-// if (active === "PROFILE" && profileData) {
-//   return (
-//     <div className="flex w-full min-h-screen bg-black text-white">
-//       <div className="flex-1 max-w-3xl mx-auto p-6">
-//         {/* Back button */}
-//         <button
-//           onClick={() => {
-//             setActive("HOME");
-//             setSelectedUserId(null);
-//             setProfileData(null);
-//           }}
-//           className="mb-4 text-blue-400 hover:underline"
-//         >
-//           ← Back
-//         </button>
-
-//         {/* Profile Header */}
-//         <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
-//          <img
-//   src={profileData.img || "/default-avatar.png"}
-//   alt={profileData.username}
-//   className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover"
-// />
-//           <div className="text-center sm:text-left">
-//             <h2 className="text-2xl font-bold">{profileData.username}</h2>
-//             {profileData.bio && (
-//               <p className="text-gray-400 mt-1">{profileData.bio}</p>
-//             )}
-//             <p className="text-gray-400 mt-2">
-//               {profileData.posts?.length || 0} posts
-//             </p>
-//           </div>
-//         </div>
-
-//         {/* Posts Grid */}
-//         {profileData.posts?.length > 0 ? (
-//           <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-1">
-//             {profileData.posts.map((post) => (
-//               <img
-//                 key={post._id}
-//                 src={post.image || "/default-post.png"}
-//                 alt="post"
-//                 className="w-full h-32 sm:h-40 object-cover cursor-pointer hover:opacity-80 transition"
-//               />
-//             ))}
-//           </div>
-//         ) : (
-//           <p className="text-gray-500 text-center mt-6">No posts yet</p>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
 
   /* ================= HOME VIEW ================= */
   return (
     <div className="flex w-full play-regular min-h-screen bg-black text-white">
       <div className="flex-1 max-w-2xl mx-auto">
-
         {/* NOTES */}
         <div className="h-[130px] px-6 border-b border-neutral-800">
           <div className="flex gap-12 overflow-x-auto mt-6 scrollbar-hide">
-
             <div className="flex flex-col items-center w-[85px] shrink-0">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                <img src={image||defaultProfile} className="w-full h-full object-cover bg-white" />
-
-             
+                <img
+                  src={image || defaultProfile}
+                  className="w-full h-full object-cover "
+                />
               </div>
-                 {!myNote && (
-                  <button
-                    onClick={addMyNote}
-                    className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold"
-                  >
-                    +
-                  </button>
-                )}
+              {!myNote && (
+                <button
+                  onClick={addMyNote}
+                  className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold"
+                >
+                  +
+                </button>
+              )}
 
               {myNote && (
                 <div
@@ -215,9 +152,7 @@ function Home({setSelectedUsername,setActive,openChat }) {
                     <img src={n.img} className="w-full h-full object-cover" />
                   </div>
 
-                  <p className="text-xs text-gray-300 mt-1">
-                    {n.username}
-                  </p>
+                  <p className="text-xs text-gray-300 mt-1">{n.username}</p>
 
                   <div className="bg-[#879F00] text-[11px] px-3 py-1 rounded-full mt-1">
                     {n.note}
@@ -235,13 +170,13 @@ function Home({setSelectedUsername,setActive,openChat }) {
             </p>
           ) : (
             posts.map((p) => (
-              <PostCard 
-  key={p._id}
-  data={p}
-  user={user}
-  setActive={setActive}
-setSelectedUsername={setSelectedUsername}
-/>
+              <PostCard
+                key={p._id}
+                data={p}
+                user={user}
+                setActive={setActive}
+                setSelectedUsername={setSelectedUsername}
+              />
             ))
           )}
         </div>
@@ -262,12 +197,8 @@ setSelectedUsername={setSelectedUsername}
                 className="w-8 h-8 rounded-full"
               />
               <div>
-                <p className="font-semibold">
-                  {selectedPost.userId?.username}
-                </p>
-                <p className="text-xs text-gray-400">
-                  Public profile
-                </p>
+                <p className="font-semibold">{selectedPost.userId?.username}</p>
+                <p className="text-xs text-gray-400">Public profile</p>
               </div>
             </div>
 
@@ -286,36 +217,34 @@ setSelectedUsername={setSelectedUsername}
       </div>
 
       {loading && (
-        <div className="w-full h-screen absolute top-0 left-0 flex justify-center items-center">
-          Loading...
+        <div className="fixed inset-0 flex justify-center items-center bg-black/60 z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
       {/* DELETE NOTE MODAL */}
-{showDeleteModal && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-neutral-900 w-[320px] rounded-lg p-6 text-center">
-      <h3 className="text-lg font-semibold mb-4">
-        Delete your note?
-      </h3>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-neutral-900 w-[320px] rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold mb-4">Delete your note?</h3>
 
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={handleDeleteNote}
-          className="bg-red-600 px-4 py-2 rounded"
-        >
-          Delete
-        </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleDeleteNote}
+                className="bg-red-600 px-4 py-2 rounded"
+              >
+                Delete
+              </button>
 
-        <button
-          onClick={() => setShowDeleteModal(false)}
-          className="bg-neutral-700 px-4 py-2 rounded"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-neutral-700 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

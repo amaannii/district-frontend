@@ -39,6 +39,7 @@ const images = [
 function Messages({ selectedDistrict, setSelectedDistrict,  setSelectedUsername,setActive }) {
   const [search, setSearch] = useState("");
   const [userdetails, setuserdetails] = useState({});
+    const [loading, setLoading] = useState(false);
 
 
  const token = localStorage.getItem("userToken");
@@ -49,6 +50,7 @@ function Messages({ selectedDistrict, setSelectedDistrict,  setSelectedUsername,
 
   const fetchUserDetails = async () => {
     try {
+        setLoading(true);
       const response = await axios.post(
         "http://localhost:3001/user/userdetails",
         {},
@@ -63,7 +65,9 @@ function Messages({ selectedDistrict, setSelectedDistrict,  setSelectedUsername,
       localStorage.setItem("userId", user._id);
     } catch (error) {
       console.error(error);
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const filteredImages = images.filter((item) =>
@@ -163,6 +167,11 @@ function Messages({ selectedDistrict, setSelectedDistrict,  setSelectedUsername,
         ) : (
           <p className="text-gray-400 mt-4">Select a district</p>
         )}
+        {loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
       </div>
     </div>
   );

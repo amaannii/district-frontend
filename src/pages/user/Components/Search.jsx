@@ -9,7 +9,8 @@ import send from "../../../assets/images/icons8-sent-50.png";
 import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import PostCard from "../Components/PostCard";
-import defaultProfile from "../../../assets/images/profile.png";
+import profile from "../../../assets/images/icons8-profile-50.png";
+import Swal from "sweetalert2";
 
 function Search() {
   const [users, setUsers] = useState([]);
@@ -36,14 +37,15 @@ function Search() {
 
       const token = localStorage.getItem("userToken");
       try {
-        const res = await axios.get("http://localhost:3001/user/allusers",{
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        const res = await axios.get("http://localhost:3001/user/allusers", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (res.data.success) setUsers(res.data.users);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchUsers();
@@ -88,6 +90,7 @@ function Search() {
     const token = localStorage.getItem("userToken");
 
     try {
+      setLoading(true);
       const res = await axios.get(
         `http://localhost:3001/user/connection-status/${user.username}`,
         { headers: { Authorization: `Bearer ${token}` } },
@@ -100,6 +103,8 @@ function Search() {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
 
     setRecentUsers((prev) => {
@@ -124,7 +129,7 @@ function Search() {
 
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const response = await axios.post(
         "http://localhost:3001/user/request",
         { username: selectedUser.username },
@@ -133,9 +138,20 @@ function Search() {
 
       if (response.data.success) {
         setrequested(true);
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Request Send Successfully",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       }
     } catch (error) {
       console.error(error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -143,6 +159,7 @@ function Search() {
     const token = localStorage.getItem("userToken");
 
     try {
+      setLoading(true);
       await axios.post(
         "http://localhost:3001/user/remove-connection",
         { username: selectedUser.username },
@@ -154,6 +171,8 @@ function Search() {
       setShowRemoveModal(false);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -199,11 +218,11 @@ function Search() {
                   onClick={() => handleSelectUser(user)}
                   className="flex items-center gap-3 cursor-pointer"
                 >
-                <img
-  src={user.img || defaultProfile}
-  alt={user.name}
-  className="w-10 h-10 rounded-full object-cover bg-white"
-/>
+                  <img
+                    src={user.img || profile}
+                    alt={user.name}
+                    className="w-10 h-10 rounded-full object-cover "
+                  />
                   <div>
                     <p className="font-medium">{user.name}</p>
                     <p className="text-xs text-gray-400">@{user.username}</p>
@@ -232,11 +251,11 @@ function Search() {
       <div className="flex-1 overflow-y-auto">
         {selectedUser ? (
           <div className="w-full flex flex-col items-center p-6 sm:p-10 text-center">
-           <img
-  src={selectedUser.img || defaultProfile}
-  alt={selectedUser.name}
-  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white object-cover mb-4"
-/>
+            <img
+              src={selectedUser.img || profile}
+              alt={selectedUser.name}
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full  object-cover mb-4"
+            />
 
             <h2 className="text-lg sm:text-xl mb-4 break-words">
               <strong>@{selectedUser.username}</strong>

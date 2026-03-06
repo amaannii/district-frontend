@@ -17,6 +17,7 @@ const Signup = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ const Signup = () => {
 
   const resendOtp = async () => {
     try {
+        setLoading(true);
       await axios.post("http://localhost:3001/user/send-otp", { email });
       setTimeLeft(60);
       setOtp("");
@@ -45,7 +47,9 @@ const Signup = () => {
       otpRefs.current[0]?.focus();
     } catch (error) {
       console.error(error);
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const validateForm = () => {
@@ -75,12 +79,15 @@ const Signup = () => {
     if (!validateForm()) return;
 
     try {
+        setLoading(true);
       await axios.post("http://localhost:3001/user/send-otp", { email });
       setShowOtpModal(true);
       setTimeLeft(60);
     } catch (error) {
       console.error(error);
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const verifyotp = async () => {
@@ -88,6 +95,7 @@ const Signup = () => {
     if (timeLeft === 0) return alert("OTP expired");
 
     try {
+        setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/verify-otp",
         { email, otp, password, name, username }
@@ -106,7 +114,9 @@ const Signup = () => {
       setShowOtpModal(false);
     } catch (error) {
       alert(error.response?.data?.message || "Invalid OTP");
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const handleOtpChange = (e, index) => {
@@ -299,6 +309,11 @@ const Signup = () => {
             </button>
 
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>
