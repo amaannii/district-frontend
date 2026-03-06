@@ -16,16 +16,18 @@ function Userprofile({ selectedUsername }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (selectedPost) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
 
-    return () => {
-      document.body.style.overflow = "hidden";
-    };
-  }, [selectedPost]);
+  if (selectedPost) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [selectedPost]);
+
 
   useEffect(() => {
     const usernameToFetch =

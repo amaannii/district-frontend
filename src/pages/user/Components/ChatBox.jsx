@@ -267,8 +267,6 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       console.error("Document upload error:", error);
     }
   };
-
-
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!selectedPost?.post?._id) return;
@@ -295,18 +293,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       }
     };
 
-      if (!selectedPost || !currentUser) return;
-
-  const isSaved = currentUser.savedPosts?.some(
-    (item) =>
-      item.postId === selectedPost.post._id &&
-      item.username === selectedPost.postOwner?.username
-  );
-
-  setSaved(isSaved);
-
     fetchLikeStatus();
-  }, [selectedPost?.post?._id,currentUser]);
+  }, [selectedPost?.post?._id]);
 
   /* ================= AUDIO ================= */
 
@@ -329,25 +317,44 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
     audioChunksRef.current = [];
   };
 
-  const sendRecording = () => {
-    mediaRecorderRef.current.stop();
+const sendRecording = async () => {
+  mediaRecorderRef.current.stop();
 
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-      const url = URL.createObjectURL(blob);
+  mediaRecorderRef.current.onstop = async () => {
+    const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+
+    const data = new FormData();
+    data.append("file", blob);
+    data.append("upload_preset", "newuploads");
+
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dlxxxangl/video/upload",
+        {
+          method: "POST",
+          body: data,
+        },
+      );
+
+      const result = await res.json();
+
+      if (!result.secure_url) return;
 
       socket.emit("sendMessage", {
         district,
         message: {
           type: "audio",
-          content: url,
+          content: result.secure_url,
         },
         sender: currentUser.name,
       });
 
       setRecording(false);
-    };
+    } catch (error) {
+      console.error("Audio upload error:", error);
+    }
   };
+};
 
   const deleteMessage = (id) => {
     console.log("Deleting id:", id);
@@ -635,7 +642,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
               {msg.type === "audio" && (
                 <audio controls>
-                  <source src={msg.content} />
+                 <source src={msg.content} type="audio/webm" />
                 </audio>
               )}
 

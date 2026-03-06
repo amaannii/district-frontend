@@ -425,6 +425,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 onError={(e) => (e.target.src = profile)}
               />
             </div>
+<h1 className="text-xl font-semibold">{userdetails.username}</h1>
+<p className="text-sm text-gray-400">{userdetails.name}</p>
+
+
+{userdetails.bio && (
+  <p className="text-sm text-gray-300 mt-2 text-center max-w-[350px]">
+    {userdetails.bio}
+  </p>
+)}
 
             <input
               type="file"
@@ -436,6 +445,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
             <h1 className="text-xl font-semibold ">{userdetails.username}</h1>
             <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
+
 
             <div className="flex gap-10 mb-5">
               <div>
@@ -457,6 +467,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
+            
           </div>
 
           {/* TABS */}
