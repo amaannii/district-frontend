@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import PostCard from "../Components/PostCard";
+import profile from "../../../assets/images/icons8-profile-50.png";
 
 function Explore({ setSelectedUsername, setActive }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+
 
   useEffect(() => {
     fetchExplorePosts();
@@ -26,6 +28,7 @@ function Explore({ setSelectedUsername, setActive }) {
 
   const fetchFullPost = async (postId) => {
     try {
+        setLoading(true);
       const token = localStorage.getItem("userToken");
       const res = await axios.get(`http://localhost:3001/user/post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -33,7 +36,9 @@ function Explore({ setSelectedUsername, setActive }) {
       setSelectedPost(res.data.post);
     } catch (err) {
       console.error(err);
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   return (
@@ -43,7 +48,7 @@ function Explore({ setSelectedUsername, setActive }) {
         {posts.map((post, index) => (
           <div key={index} className="mb-2 break-inside-avoid group">
             <img
-              src={post.image}
+              src={post.image||profile}
               alt="post"
               onClick={() => fetchFullPost(post._id)}
               className="w-full cursor-pointer rounded-lg 
@@ -88,6 +93,11 @@ function Explore({ setSelectedUsername, setActive }) {
               />
             </div>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>

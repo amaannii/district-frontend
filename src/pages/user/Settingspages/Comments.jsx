@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 
 function Comments() {
   const [selected, setSelected] = useState("followers");
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPermission = async () => {
       try {
         const token = localStorage.getItem("userToken");
-        
+          setLoading(true);
 
         const res = await axios.post(
           "http://localhost:3001/user/userdetails",{},
@@ -24,6 +25,8 @@ function Comments() {
         setSelected(permission);
       } catch (err) {
         console.log("Fetch error:", err);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -32,7 +35,7 @@ function Comments() {
 
   const savePermission = async (value) => {
     const token = localStorage.getItem("userToken");
-
+  setLoading(true);
     await axios.post(
       "http://localhost:3001/user/updateCommentPermission",
       { permission: value.toLowerCase() },
@@ -40,6 +43,8 @@ function Comments() {
         headers: { Authorization: `Bearer ${token}` },
       },
     );
+        setLoading(false);
+    
   };
 
   return (
@@ -120,6 +125,11 @@ function Comments() {
           </div>
         </label>
       </div>
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 }

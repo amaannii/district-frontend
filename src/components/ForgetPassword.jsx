@@ -11,6 +11,7 @@ const ForgetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", ""]);
+    const [loading, setLoading] = useState(false);
   const otpRefs = useRef([]);
   const navigate = useNavigate();
 
@@ -22,11 +23,14 @@ const ForgetPassword = () => {
 
   const handleSendotp = async () => {
     try {
+        setLoading(true);
       await axios.post("http://localhost:3001/user/send-otp", { email });
       setShowSuccess(true);
     } catch (error) {
       console.error(error);
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const handleVerifyOtp = async () => {
@@ -37,6 +41,7 @@ const ForgetPassword = () => {
     }
 
     try {
+        setLoading(true);
       await axios.post("http://localhost:3001/user/verify-otp", {
         email,
         otp: otpValue,
@@ -45,7 +50,9 @@ const ForgetPassword = () => {
       setShowChangePassword(true);
     } catch (error) {
       alert(error.response?.data?.message || "Invalid OTP");
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   const handleChangePassword = async () => {
@@ -60,6 +67,7 @@ const ForgetPassword = () => {
     }
 
     try {
+        setLoading(true);
       await axios.post("http://localhost:3001/user/reset-password", {
         email,
         password: newPassword,
@@ -68,7 +76,9 @@ const ForgetPassword = () => {
       setShowChangePassword(false);
     } catch (error) {
       alert(error.response?.data?.message || "Something went wrong");
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   return (
@@ -236,6 +246,11 @@ const ForgetPassword = () => {
     </div>
   </div>
 )}
+{loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 };

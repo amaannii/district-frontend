@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardChart from "./DashboardChart";
-import ChatRoom from "./Chatroom";
+
 
 export default function DashboardHome() {
   const [users, setUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [activeCard, setActiveCard] = useState("dashboard");
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -15,6 +16,7 @@ export default function DashboardHome() {
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true)
       const [usersRes, messagesRes, adminsRes] = await Promise.all([
         axios.get("http://localhost:3001/admin/users"),
         axios.get("http://localhost:3001/admin/messages"),
@@ -26,7 +28,9 @@ export default function DashboardHome() {
       setAdmins(adminsRes.data.admins || []);
     } catch (error) {
       console.error(error);
-    }
+    }finally {
+        setLoading(false);
+      }
   };
 
   return (
@@ -114,6 +118,11 @@ function UsersTable({ users }) {
           ))}
         </tbody>
       </table>
+         {Loading && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/60 z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 }
@@ -144,6 +153,11 @@ function MessagesTable({ messages }) {
           ))}
         </tbody>
       </table>
+         {Loading && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/60 z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 }
@@ -170,6 +184,11 @@ function AdminsTable({ admins }) {
           ))}
         </tbody>
       </table>
+         {Loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
     </div>
   );
 }

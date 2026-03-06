@@ -34,40 +34,35 @@ function MiniChatBox({ openChat }) {
   return (
     <div
       className="
-        w-full 
-        md:w-[320px] 
-        lg:w-[350px]
-        h-screen 
-        bg-[#0f0f0f] 
-        border-neutral-800 
-        md:border-l
-        overflow-y-auto 
-        scrollbar-hide
-        px-4 
-        py-6
-      "
+      w-full
+      md:w-[320px]
+      lg:w-[350px]
+      h-screen
+      bg-[#0f0f0f]
+      border-neutral-800
+      md:border-l
+      flex flex-col
+    "
     >
       {/* Header */}
-      <div className="sticky top-0 bg-[#0f0f0f] z-10 pb-4">
-        <h2 className="text-lg font-semibold text-white">
-          Messages
-        </h2>
+      <div className="h-[60px] flex items-center px-4 border-b border-neutral-800">
+        <h2 className="text-lg font-semibold text-white">Messages</h2>
       </div>
 
-      {/* Message List */}
-      <div className="space-y-3">
+      {/* Scrollable District List */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide px-3 py-4 space-y-3">
         {miniMessages.map((item, i) => (
           <div
             key={i}
             onClick={() => openChat(item)}
             className="
-              flex items-center gap-4 
-              cursor-pointer 
-              hover:bg-neutral-900 
-              p-3 
-              rounded-xl 
-              transition duration-200
-            "
+            flex items-center gap-4
+            cursor-pointer
+            hover:bg-neutral-900
+            p-3
+            rounded-xl
+            transition
+          "
           >
             <img
               src={item.src}
@@ -79,9 +74,7 @@ function MiniChatBox({ openChat }) {
               <p className="text-sm font-semibold text-white">
                 {item.title}
               </p>
-              <p className="text-xs text-gray-400">
-                Tap to open chat
-              </p>
+              <p className="text-xs text-gray-400">Tap to open chat</p>
             </div>
           </div>
         ))}

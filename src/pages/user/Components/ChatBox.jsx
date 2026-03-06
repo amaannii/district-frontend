@@ -44,12 +44,14 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const [commentText, setCommentText] = useState("");
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
+    const [loading, setLoading] = useState(false);
 
   /* ================= SOCKET ================= */
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("userToken");
 
         const res = await axios.post(
@@ -64,7 +66,10 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         setcurrentUser(user);
       } catch (error) {
         console.log("Error fetching notification settings ❌", error);
+      } finally {
+        setLoading(false);
       }
+
       const handleDelete = (messageId) => {
         setMessages((prev) =>
           prev.filter((m) => m._id === undefined || m._id !== messageId),
@@ -199,7 +204,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
     try {
       console.log("Uploading to Cloudinary...");
-
+      setLoading(true);
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
         {
@@ -228,6 +233,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       });
     } catch (error) {
       console.error("Upload error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -242,6 +249,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
     data.append("upload_preset", "newuploads");
 
     try {
+      setLoading(true);
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/raw/upload",
         {
@@ -265,6 +273,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       });
     } catch (error) {
       console.error("Document upload error:", error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -273,7 +283,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
       try {
         const token = localStorage.getItem("userToken");
-
+        setLoading(true);
         const res = await axios.post(
           "http://localhost:3001/user/checkisliked",
           { postId: selectedPost.post._id },
@@ -290,6 +300,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         }
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -317,44 +329,47 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
     audioChunksRef.current = [];
   };
 
-const sendRecording = async () => {
-  mediaRecorderRef.current.stop();
+  const sendRecording = async () => {
+    mediaRecorderRef.current.stop();
 
-  mediaRecorderRef.current.onstop = async () => {
-    const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+    mediaRecorderRef.current.onstop = async () => {
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
 
-    const data = new FormData();
-    data.append("file", blob);
-    data.append("upload_preset", "newuploads");
+      const data = new FormData();
+      data.append("file", blob);
+      data.append("upload_preset", "newuploads");
 
-    try {
-      const res = await fetch(
-        "https://api.cloudinary.com/v1_1/dlxxxangl/video/upload",
-        {
-          method: "POST",
-          body: data,
-        },
-      );
+      try {
+        setLoading(true);
+        const res = await fetch(
+          "https://api.cloudinary.com/v1_1/dlxxxangl/video/upload",
+          {
+            method: "POST",
+            body: data,
+          },
+        );
 
-      const result = await res.json();
+        const result = await res.json();
 
-      if (!result.secure_url) return;
+        if (!result.secure_url) return;
 
-      socket.emit("sendMessage", {
-        district,
-        message: {
-          type: "audio",
-          content: result.secure_url,
-        },
-        sender: currentUser.name,
-      });
+        socket.emit("sendMessage", {
+          district,
+          message: {
+            type: "audio",
+            content: result.secure_url,
+          },
+          sender: currentUser.name,
+        });
 
-      setRecording(false);
-    } catch (error) {
-      console.error("Audio upload error:", error);
-    }
+        setRecording(false);
+      } catch (error) {
+        console.error("Audio upload error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
   };
-};
 
   const deleteMessage = (id) => {
     console.log("Deleting id:", id);
@@ -384,6 +399,8 @@ const sendRecording = async () => {
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error("Download failed ❌", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -402,6 +419,8 @@ const sendRecording = async () => {
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error("Download failed ❌", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -410,6 +429,7 @@ const sendRecording = async () => {
     if (!token) return alert("Login required");
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/like-post",
         { postId: selectedPost.post._id },
@@ -419,6 +439,8 @@ const sendRecording = async () => {
       setLike(res.data.likes);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -429,6 +451,7 @@ const sendRecording = async () => {
     if (!commentText.trim()) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/add-comment",
         { postId: selectedPost.post._id, text: commentText },
@@ -453,6 +476,8 @@ const sendRecording = async () => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -465,6 +490,7 @@ const sendRecording = async () => {
     setSaved(newSavedState);
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/save-post",
         {
@@ -482,6 +508,8 @@ const sendRecording = async () => {
       console.error(err);
       // rollback on error
       setSaved(!newSavedState);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -642,7 +670,7 @@ const sendRecording = async () => {
 
               {msg.type === "audio" && (
                 <audio controls>
-                 <source src={msg.content} type="audio/webm" />
+                  <source src={msg.content} type="audio/webm" />
                 </audio>
               )}
 
@@ -886,6 +914,11 @@ const sendRecording = async () => {
             )}
           </div>
           {/* Add Comment */}
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>

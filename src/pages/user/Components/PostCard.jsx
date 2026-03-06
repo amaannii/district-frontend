@@ -7,8 +7,17 @@ import send from "../../../assets/images/icons8-sent-50.png";
 // import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 // import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import socket from "../../../Socket";
+import profile from "../../../assets/images/icons8-profile-50.png";
+import Swal from "sweetalert2";
 
-function PostCard({setSelectedUsername,setActivePage, data, user, setActive, setSelectedUserId }) {
+function PostCard({
+  setSelectedUsername,
+  setActivePage,
+  data,
+  user,
+  setActive,
+  setSelectedUserId,
+}) {
   const token = localStorage.getItem("userToken");
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
@@ -23,29 +32,8 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
   // Delete modal state
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [selectedDistricts, setSelectedDistricts] = useState([]);
-
-
-
-
-
-
-
-// const fetchProfile = async () => {
-//   try {
-//     const token = localStorage.getItem("userToken");
-
-//     const res = await axios.get(
-//       `http://localhost:3001/user/profile/${selectedUserId}`,
-//       {
-//         headers: { Authorization: `Bearer ${token}` },
-//       }
-//     );
-
-//     setProfileData(res.data);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };
+  const [loading, setLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     if (!data) return;
@@ -68,6 +56,7 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
   const handleLike = async () => {
     if (!token) return alert("Login required");
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/like-post",
         { postId: data._id },
@@ -84,6 +73,8 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,48 +84,55 @@ function PostCard({setSelectedUsername,setActivePage, data, user, setActive, set
     if (!commentText.trim()) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/add-comment",
         { postId: data._id, text: commentText },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-    if (res.data.success) {
-  setComments((prev) => [...prev, res.data.comment]);
-  setCommentText("");
+      if (res.data.success) {
+        setComments((prev) => [...prev, res.data.comment]);
+        setCommentText("");
 
-  socket.emit("newComment", {
-    postId: data._id,
-    comment: res.data.comment,
-  });
-}
+        socket.emit("newComment", {
+          postId: data._id,
+          comment: res.data.comment,
+        });
+      }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   // DELETE COMMENT
-const handleSave = async () => {
-  if (!token) return alert("Login required");
+  const handleSave = async () => {
+    if (!token) return alert("Login required");
 
-  try {
-    const res = await axios.post(
-      "http://localhost:3001/user/save-post",
-      { postId: data._id, username: data.userId.username },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        "http://localhost:3001/user/save-post",
+        { postId: data._id, username: data.userId.username },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
 
-    if (res.data.success) {
-      setSaved(res.data.isSaved); // ✅ use backend truth
+      if (res.data.success) {
+        setSaved(res.data.isSaved); // ✅ use backend truth
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-  } catch (err) {
-    console.error(err);
-  }
-};
   const handleDeleteComment = async () => {
     if (!commentToDelete) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/delete-comment",
         {
@@ -144,63 +142,91 @@ const handleSave = async () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-   if (res.data.success==true) {
-  setComments((prev) => prev.filter((c) => c._id !== commentToDelete));
+      if (res.data.success == true) {
+        setComments((prev) => prev.filter((c) => c._id !== commentToDelete));
 
-  socket.emit("deleteComment", {
-    postId: data._id,
-    commentId: commentToDelete,
-  });
+        socket.emit("deleteComment", {
+          postId: data._id,
+          commentId: commentToDelete,
+        });
 
-  setCommentToDelete(null);
-}
+        setCommentToDelete(null);
+      }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
-
 
   const handleSendPost = async () => {
     if (!selectedDistricts.length) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/send-post-to-chats",
         { chatIds: selectedDistricts, postId: data._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-    if (res.data.success) {
-      setShowShare(false);
-  socket.emit("sharePost", {
-    postId: data._id,
-    districts: selectedDistricts,
-    sender: currentUser.username,
-  });
+      if (res.data.success) {
+        setShowShare(false);
+        socket.emit("sharePost", {
+          postId: data._id,
+          districts: selectedDistricts,
+          sender: currentUser.username,
+        });
 
-  
-  setSelectedDistricts([]);
-}
+        setSelectedDistricts([]);
+      }
     } catch (err) {
       console.error("Share failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  return (
+    <div className="border-b border-neutral-800 mb-6 w-full max-w-2xl mx-auto">
+      {/* USER INFO */}
+      <div className="px-4 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
+        <img
+          onClick={() => {
+            setSelectedUserId(data.userId._id);
+          }}
+          src={data.userId?.img || profile}
+          className="w-8 h-8 rounded-full object-cover cursor-pointer"
+        />
 
+        <span
+          onClick={() => {
+            if (data.userId?._id === currentUser?._id) {
+              setActivePage("PROFILE");
+            } else {
+              setSelectedUsername(data.userId?.username);
+              setActive("UPROFILE");
+            }
+          }}
+          className="font-semibold cursor-pointer"
+        >
+          {data.userId?.username}
+        </span>
+      </div>
 
-return (
-  <div className="border-b border-neutral-800 mb-6 w-full max-w-2xl mx-auto">
+      {/* IMAGE */}
+      <img
+        src={data.image}
+        alt="post"
+        className="w-full max-h-[300px] sm:max-h-[450px] object-cover"
+      />
 
-    {/* USER INFO */}
-    <div className="px-4 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
-<img
-  onClick={() => {
-    setSelectedUserId(data.userId._id);
+      {/* CAPTION */}
+      <div className="px-4 sm:px-6 py-2 text-gray-300 text-sm sm:text-base">
+        <span className="font-semibold mr-2">{data.userId?.username}</span>
+        {data.caption}
+      </div>
 
-  }}
-  src={data.userId?.img || "/default-avatar.png"}
-  className="w-8 h-8 rounded-full object-cover cursor-pointer"
-/>
 
 <span
  onClick={() => {
@@ -218,175 +244,127 @@ return (
 </span>
     </div>
 
-    {/* IMAGE */}
-    <img
-      src={data.image}
-      alt="post"
-      className="w-full max-h-[300px] sm:max-h-[450px] object-cover"
-    /> 
+      {/* ACTIONS */}
+      <div className="flex justify-between px-4 sm:px-6 py-3">
+        <div className="flex gap-5 items-center">
+          {/* LIKE */}
+          <div className="flex items-center gap-1">
+            <img
+              src={liked ? heartRed : heart}
+              className="w-5 cursor-pointer"
+              onClick={handleLike}
+              alt="like"
+            />
+            <span className="text-xs text-gray-400">{likeCount}</span>
+          </div>
 
-    {/* CAPTION */}
-    <div className="px-4 sm:px-6 py-2 text-gray-300 text-sm sm:text-base">
-      <span className="font-semibold mr-2">
-        {data.userId?.username}
-      </span>
-      {data.caption}
-    </div>
 
-    {/* ACTIONS */}
-    <div className="flex justify-between px-4 sm:px-6 py-3">
-      <div className="flex gap-5 items-center">
-        
-        {/* LIKE */}
-        <div className="flex items-center gap-1">
+          {/* COMMENT */}
           <img
-            src={liked ? heartRed : heart}
+            src={commentIcon}
             className="w-5 cursor-pointer"
-            onClick={handleLike}
-            alt="like"
+            onClick={() => setShowComments(!showComments)}
+            alt="comment"
           />
-          <span className="text-xs text-gray-400">
-            {likeCount}
-          </span>
+
+          {/* SHARE */}
+          <img
+            src={send}
+            className="w-5 cursor-pointer"
+            onClick={() => setShowShare(true)}
+            alt="share"
+          />
         </div>
 
-        {/* COMMENT */}
-        <img
-          src={commentIcon}
-          className="w-5 cursor-pointer"
-          onClick={() => setShowComments(!showComments)}
-          alt="comment"
-        />
-
-        {/* SHARE */}
-        <img
-          src={send}
-          className="w-5 cursor-pointer"
-          onClick={() => setShowShare(true)}
-          alt="share"
-        />
-      </div>
-
-      {/* SAVE */}
-     <svg
-  onClick={handleSave}
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
- fill={saved ? "white" : "none"}
-stroke="white"
-  strokeWidth="2"
->
-  <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
-</svg>
-    </div>
-
-    {/* COMMENTS */}
-   {showComments && (
-  <div className="px-4 sm:px-6 pb-4">
-    
-    {/* Scrollable Comments */}
-    <div className="max-h-48 overflow-y-auto pr-2 mb-3  scrollbar-hide">
-      {comments.map((c) => (
-        <div
-          key={c._id}
-          className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-sm text-gray-300 mb-3"
+        {/* SAVE */}
+        <svg
+          onClick={handleSave}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+          fill={saved ? "white" : "none"}
+          stroke="white"
+          strokeWidth="2"
         >
-          <div>
-            <span className="font-semibold mr-2">
-              {c.username}
-            </span>
-            {c.text}
-            <div className="text-xs text-gray-500">
-              {new Date(c.createdAt).toLocaleString()}
-            </div>
-          </div>
-
-          <button
-            onClick={() => setCommentToDelete(c._id)}
-            className="text-red-500 text-xs mt-1 sm:mt-0 hover:text-red-400 cursor-pointer"
-          >
-            Delete
-          </button>
-        </div>
-      ))}
-    </div>
-
-    {/* Add Comment */}
-    <div className="flex flex-col sm:flex-row gap-2">
-      <input
-        value={commentText}
-        onChange={(e) => setCommentText(e.target.value)}
-        className="flex-1 bg-neutral-800 p-2 rounded text-sm"
-        placeholder="Add a comment..."
-      />
-      <button
-        onClick={handleComment}
-        className="text-blue-500 font-semibold text-sm cursor-pointer"
-      >
-        send
-      </button>
-    </div>
-
-  </div>
-)}
-
-    {/* DELETE MODAL */}
-    {commentToDelete && (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-        <div className="bg-neutral-900 p-6 rounded-lg w-full max-w-sm text-center shadow-lg">
-          <h3 className="text-lg font-semibold mb-4 text-white">
-            Delete Comment?
-          </h3>
-
-          <p className="text-gray-400 text-sm mb-6">
-            Are you sure you want to delete this comment?
-          </p>
-
-          <div className="flex justify-between gap-3">
-            <button
-              onClick={() => setCommentToDelete(null)}
-              className="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 cursor-pointer"
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={handleDeleteComment}
-              className="flex-1 px-4 py-2 bg-[#879F00] rounded cursor-pointer"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+          <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+        </svg>
       </div>
-    )}
 
-    {/* SHARE MODAL */}
-    {showShare && (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-        <div className="bg-neutral-900 p-5 overflow-scroll scrollbar-hide rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
-          <h2 className="text-lg font-semibold mb-4 text-white">
-            Share Post
-          </h2>
+      {/* COMMENTS */}
+      {showComments && (
+        <div className="px-4 sm:px-6 pb-4">
+          {/* Scrollable Comments */}
+          <div className="max-h-48 overflow-y-auto pr-2 mb-3  scrollbar-hide">
+            {comments.map((c) => (
+              <div
+                key={c._id}
+                className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-sm text-gray-300 mb-3"
+              >
+                <div>
+                  <span className="font-semibold mr-2">{c.username}</span>
+                  {c.text}
+                  <div className="text-xs text-gray-500">
+                    {new Date(c.createdAt).toLocaleString()}
+                  </div>
+                </div>
 
-          {[
-            "KASARGOD","KANNUR","ERNAKULAM","KOZHIKODE",
-            "IDUKKI","KOTTAYAM","WAYANAD","MALAPPURAM",
-            "PALAKKAD","THRISSUR","ALAPPUZHA","KOVALAM",
-            "PATHANAMTHITTA","THIRUVANANTHAPURAM",
-          ].map((district) => (
-            <div
-              key={district}
-              onClick={() => toggleDistrict(district)}
-              className={`p-3 cursor-pointer rounded text-sm
-                ${selectedDistricts.includes(district)
-                  ? "bg-[#879F00]"
-                  : "hover:bg-neutral-800"}
-              `}
+                <button
+                  onClick={() => setCommentToDelete(c._id)}
+                  className="text-red-500 text-xs mt-1 sm:mt-0 hover:text-red-400"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+
+
+          {/* Add Comment */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              className="flex-1 bg-neutral-800 p-2 rounded text-sm"
+              placeholder="Add a comment..."
+            />
+            <button
+              onClick={handleComment}
+              className="text-blue-500 font-semibold text-sm"
             >
-              {district}
+              send
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE MODAL */}
+      {commentToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-neutral-900 p-6 rounded-lg w-full max-w-sm text-center shadow-lg">
+            <h3 className="text-lg font-semibold mb-4 text-white">
+              Delete Comment?
+            </h3>
+
+            <p className="text-gray-400 text-sm mb-6">
+              Are you sure you want to delete this comment?
+            </p>
+
+            <div className="flex justify-between gap-3">
+              <button
+                onClick={() => setCommentToDelete(null)}
+                className="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDeleteComment}
+                className="flex-1 px-4 py-2 bg-[#879F00] rounded"
+              >
+                Delete
+              </button>
             </div>
+
           ))}
 
           <button
@@ -405,15 +383,95 @@ stroke="white"
           >
             Cancel
           </button>
+
         </div>
-      </div>
-    )}
+      )}
 
+      {/* SHARE MODAL */}
+      {showShare && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+          <div className="bg-neutral-900 rounded-lg w-full max-w-md max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="p-4 border-b border-neutral-700">
+              <h2 className="text-lg font-semibold text-white">Share Post</h2>
+            </div>
 
+            {/* Scrollable District List */}
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-1">
+              {[
+                "KASARGOD",
+                "KANNUR",
+                "ERNAKULAM",
+                "KOZHIKODE",
+                "IDUKKI",
+                "KOTTAYAM",
+                "WAYANAD",
+                "MALAPPURAM",
+                "PALAKKAD",
+                "THRISSUR",
+                "ALAPPUZHA",
+                "KOVALAM",
+                "PATHANAMTHITTA",
+                "THIRUVANANTHAPURAM",
+              ].map((district) => (
+                <div
+                  key={district}
+                  onClick={() => toggleDistrict(district)}
+                  className={`p-3 cursor-pointer rounded text-sm
+              ${
+                selectedDistricts.includes(district)
+                  ? "bg-[#879F00]"
+                  : "hover:bg-neutral-800"
+              }
+            `}
+                >
+                  {district}
+                </div>
+              ))}
+            </div>
 
+            {/* Fixed Buttons */}
+            <div className="p-4 border-t border-neutral-700">
+              <button
+                onClick={() => {
+                  handleSendPost(); // ✅ call function
+                  setShowShare(false);
+                  setShowAlert(true);
 
-  </div>
-);
+                  setTimeout(() => {
+                    setShowAlert(false);
+                  }, 2000);
+                }}
+                className="w-full py-2 rounded bg-[#879F00]"
+              >
+                Send
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowShare(false);
+                  setSelectedDistricts([]);
+                }}
+                className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="chaotic-orbit"></div>
+        </div>
+      )}
+      {showAlert && (
+        <div className=" right-5 top-5 fixed bg-[#879F00] text-white px-6 py-3 rounded-lg shadow-lg animate-fadeIn">
+          Post sent successfully
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default PostCard;

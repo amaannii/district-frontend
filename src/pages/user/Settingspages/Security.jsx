@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useRef } from "react";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 function Security() {
   const [openModal, setOpenModal] = useState(false);
@@ -22,6 +23,7 @@ function Security() {
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!showSuccess) return;
@@ -42,7 +44,7 @@ function Security() {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("userToken");
-
+        setLoading(true);
         const res = await axios.post(
           "http://localhost:3001/user/userdetails",
           {},
@@ -58,6 +60,8 @@ function Security() {
         console.log(userdetails.img);
       } catch (error) {
         console.log("Error fetching user details ❌", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -74,7 +78,7 @@ function Security() {
 
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       await axios.post(
         "http://localhost:3001/user/verify-otp",
         {
@@ -93,13 +97,15 @@ function Security() {
       handleChangePassword(); // 🔥 CALL PASSWORD UPDATE HERE
     } catch (error) {
       setMessage(error.response?.data?.message || "Invalid OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChangePassword = async () => {
     try {
       const token = localStorage.getItem("userToken");
-
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:3001/user/changePassword",
         {
@@ -115,6 +121,15 @@ function Security() {
       );
 
       if (res.data.success) {
+          Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Password Changed Successfully",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
         setShowSuccessPopup(true);
         setIsOtpVerified(false);
         setOpenPasswordModal(false);
@@ -128,6 +143,8 @@ function Security() {
       }
     } catch (error) {
       setMessage(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,7 +154,7 @@ function Security() {
     try {
       setIsOtpSent(true); // 🔥 Disable immediately (before API call)
       setMessage("");
-
+      setLoading(true);
       if (!userdetails?.email) {
         setMessage("User email not found");
         setIsOtpSent(false);
@@ -153,6 +170,8 @@ function Security() {
     } catch (error) {
       setIsOtpSent(false); // 🔥 Re-enable only if error
       setMessage(error.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -563,6 +582,11 @@ function Security() {
               </span>
             </p>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
+          <div className="chaotic-orbit"></div>
         </div>
       )}
     </div>
