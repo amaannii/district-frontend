@@ -267,8 +267,6 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       console.error("Document upload error:", error);
     }
   };
-
-
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!selectedPost?.post?._id) return;
@@ -295,18 +293,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       }
     };
 
-      if (!selectedPost || !currentUser) return;
-
-  const isSaved = currentUser.savedPosts?.some(
-    (item) =>
-      item.postId === selectedPost.post._id &&
-      item.username === selectedPost.postOwner?.username
-  );
-
-  setSaved(isSaved);
-
     fetchLikeStatus();
-  }, [selectedPost?.post?._id,currentUser]);
+  }, [selectedPost?.post?._id]);
 
   /* ================= AUDIO ================= */
 
