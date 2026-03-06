@@ -25,8 +25,8 @@ function More({ setActive }) {
         {/* Saved Posts */}
         <button
           onClick={() => {
-            setActive("PROFILE");
-            localStorage.setItem("openSaved", "true");
+           setActive("PROFILE");
+  localStorage.setItem("openSaved", "true");
           }}
           className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
         >
