@@ -285,18 +285,7 @@ function EditProfile() {
           <div>
             <h2 className="font-semibold text-sm">{userdetails.username}</h2>
             <div className="flex items-center gap-2">
-
-  <p className="text-gray-500 text-xs">{savedName}</p>
-
-  {/* Pen Button */}
-  <button
-    onClick={() => setShowNameModal(true)}
-    className="text-gray-400 hover:text-black transition cursor-pointer"
-  >
-    🖊️
-  </button>
-</div>
-
+              <p className="text-gray-500 text-xs">{savedName}</p>
 
               {/* Pen Button */}
               <button
@@ -312,7 +301,7 @@ function EditProfile() {
         {/* Change Photo Button */}
         <button
           onClick={() => setShowModal(true)}
-          className="bg-black text-white px-5 py-2 rounded-lg text-sm hover:bg-gray-800 transition cursor-pointer"
+          className="bg-black text-white px-5 py-2 rounded-lg text-sm hover:bg-gray-800 transition"
         >
           Change Photo
         </button>
@@ -352,7 +341,7 @@ function EditProfile() {
           <button
             onClick={handleSaveBio}
             disabled={bio === savedBio || bio.length === 0}
-            className={`mt-4 px-5 py-1 rounded-xl text-white cursor-pointer
+            className={`mt-4 px-5 py-1 rounded-xl text-white
       ${bio === savedBio ? "bg-[#879F00]" : "bg-[#879F00]"}`}
           >
             {savedBio === ""
@@ -372,7 +361,7 @@ function EditProfile() {
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 cursor-pointer"
+            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700"
           >
             <option value="">Select Gender</option>
             <option value="Female">Female</option>
@@ -384,7 +373,7 @@ function EditProfile() {
           <button
             onClick={handleSaveGender}
             disabled={gender === savedGender}
-            className={`mt-4 px-6 py-2 rounded-xl text-white cursor-pointer
+            className={`mt-4 px-6 py-2 rounded-xl text-white
     ${gender === savedGender ? "bg-[#879F00]" : "bg-[#879F00]"}`}
           >
             {savedGender === ""
@@ -408,7 +397,7 @@ function EditProfile() {
             {/* Upload */}
             <button
               onClick={() => setuploadshow(true)}
-              className="w-full py-4 text-[#879F00] font-semibold border-b border-gray-700 hover:bg-white/5 transition cursor-pointer"
+              className="w-full py-4 text-[#879F00] font-semibold border-b border-gray-700 hover:bg-white/5 transition"
             >
               Upload Photo
             </button>
@@ -416,7 +405,7 @@ function EditProfile() {
             {/* Remove */}
             <button
               onClick={handledelete}
-              className="w-full py-4 text-red-500 font-semibold border-b border-gray-700 hover:bg-white/5 transition cursor-pointer"
+              className="w-full py-4 text-red-500 font-semibold border-b border-gray-700 hover:bg-white/5 transition"
             >
               Remove Current Photo
             </button>
@@ -424,7 +413,7 @@ function EditProfile() {
             {/* Cancel */}
             <button
               onClick={() => setShowModal(false)}
-              className="w-full py-4 text-white font-medium hover:bg-white/5 transition cursor-pointer"
+              className="w-full py-4 text-white font-medium hover:bg-white/5 transition"
             >
               Cancel
             </button>
@@ -459,7 +448,7 @@ function EditProfile() {
               {/* Close Button */}
               <button
                 onClick={() => setuploadshow(false)}
-                className=" text-sm text-black hover:text-black cursor-pointer"
+                className=" text-sm text-black hover:text-black"
               >
                 Cancel
               </button>
@@ -484,7 +473,6 @@ function EditProfile() {
               Update Name
             </h2>
 
-
             {/* Input */}
             <input
               type="text"
@@ -499,7 +487,7 @@ function EditProfile() {
               {/* Cancel */}
               <button
                 onClick={() => setShowNameModal(false)}
-                className="px-5 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600 cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600"
               >
                 Cancel
               </button>
@@ -508,7 +496,7 @@ function EditProfile() {
               <button
                 onClick={handleSaveName}
                 disabled={name === savedName || name.length === 0}
-                className="px-5 py-2 rounded-xl bg-[#879F00] text-white hover:opacity-90 cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-[#879F00] text-white hover:opacity-90"
               >
                 Save
               </button>
@@ -521,7 +509,6 @@ function EditProfile() {
           <div className="chaotic-orbit"></div>
         </div>
       )}
-
 
     </div>
   );

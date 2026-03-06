@@ -227,23 +227,6 @@ function PostCard({
         {data.caption}
       </div>
 
-
-<span
- onClick={() => {
-    if  (data.userId?._id === currentUser?._id)
-       {
-      setActivePage("PROFILE");
-    } else {
-      setSelectedUsername(data.userId?.username);
-      setActive("UPROFILE");
-    }
-  }}
-  className="font-semibold cursor-pointer"
->
-  {data.userId?.username}
-</span>
-    </div>
-
       {/* ACTIONS */}
       <div className="flex justify-between px-4 sm:px-6 py-3">
         <div className="flex gap-5 items-center">
@@ -257,7 +240,6 @@ function PostCard({
             />
             <span className="text-xs text-gray-400">{likeCount}</span>
           </div>
-
 
           {/* COMMENT */}
           <img
@@ -318,7 +300,6 @@ function PostCard({
             ))}
           </div>
 
-
           {/* Add Comment */}
           <div className="flex flex-col sm:flex-row gap-2">
             <input
@@ -364,26 +345,7 @@ function PostCard({
                 Delete
               </button>
             </div>
-
-          ))}
-
-          <button
-            onClick={handleSendPost}
-            className="mt-4 w-full py-2 rounded bg-[#879F00] cursor-pointer"
-          >
-            Send
-          </button>
-
-          <button
-            onClick={() => {
-              setShowShare(false);
-              setSelectedDistricts([]);
-            }}
-            className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500 cursor-pointer"
-          >
-            Cancel
-          </button>
-
+          </div>
         </div>
       )}
 
@@ -461,7 +423,7 @@ function PostCard({
         </div>
       )}
       {loading && (
-        <div className="fixed inset-0 flex justify-center items-center z-50">
+        <div className="fixed inset-0 flex justify-center items-center  z-50">
           <div className="chaotic-orbit"></div>
         </div>
       )}
