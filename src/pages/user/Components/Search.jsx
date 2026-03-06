@@ -32,8 +32,12 @@ function Search() {
 
     const fetchUsers = async () => {
       setLoading(true);
+
+      const token = localStorage.getItem("userToken");
       try {
-        const res = await axios.get("http://localhost:3001/user/allusers");
+        const res = await axios.get("http://localhost:3001/user/allusers",{
+        headers: { Authorization: `Bearer ${token}` },
+      });
         if (res.data.success) setUsers(res.data.users);
       } catch (error) {
         console.error(error);
@@ -45,26 +49,23 @@ function Search() {
   }, []);
 
   const fetchFullPost = async (postId) => {
-  if (!postId) return;
+    if (!postId) return;
 
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("userToken");
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("userToken");
 
-    const res = await axios.get(
-      `http://localhost:3001/user/post/${postId}`,
-      {
+      const res = await axios.get(`http://localhost:3001/user/post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+      });
 
-    setSelectedPost(res.data.post);
-  } catch (error) {
-    console.error("Failed to fetch full post:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      setSelectedPost(res.data.post);
+    } catch (error) {
+      console.error("Failed to fetch full post:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem("recentUsers", JSON.stringify(recentUsers));
@@ -76,37 +77,37 @@ function Search() {
       (user.username || "").toLowerCase().includes(search.toLowerCase()),
   );
 
-const handleSelectUser = async (user) => {
-  setSelectedUser(user);
+  const handleSelectUser = async (user) => {
+    setSelectedUser(user);
 
-  // reset first
-  setconnecting(false);
-  setrequested(false);
+    // reset first
+    setconnecting(false);
+    setrequested(false);
 
-  const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("userToken");
 
-  try {
-    const res = await axios.get(
-      `http://localhost:3001/user/connection-status/${user.username}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const res = await axios.get(
+        `http://localhost:3001/user/connection-status/${user.username}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
 
-    if (res.data.status === "connected") {
-      setconnecting(true);
-    } else if (res.data.status === "requested") {
-      setrequested(true);
+      if (res.data.status === "connected") {
+        setconnecting(true);
+      } else if (res.data.status === "requested") {
+        setrequested(true);
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
 
-  setRecentUsers((prev) => {
-    const filtered = prev.filter((u) => u._id !== user._id);
-    return [user, ...filtered].slice(0, 6);
-  });
+    setRecentUsers((prev) => {
+      const filtered = prev.filter((u) => u._id !== user._id);
+      return [user, ...filtered].slice(0, 6);
+    });
 
-  setSearch("");
-};
+    setSearch("");
+  };
 
   const handleDeleteRecent = (id) => {
     setRecentUsers((prev) => prev.filter((user) => user._id !== id));
@@ -117,45 +118,43 @@ const handleSelectUser = async (user) => {
     localStorage.removeItem("recentUsers");
   };
 
-const handleRequest = async () => {
-  if (!selectedUser) return;
+  const handleRequest = async () => {
+    if (!selectedUser) return;
 
-  try {
+    try {
+      const token = localStorage.getItem("userToken");
+
+      const response = await axios.post(
+        "http://localhost:3001/user/request",
+        { username: selectedUser.username },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (response.data.success) {
+        setrequested(true);
+      }
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+    }
+  };
+
+  const handleRemoveRequest = async () => {
     const token = localStorage.getItem("userToken");
 
+    try {
+      await axios.post(
+        "http://localhost:3001/user/remove-connection",
+        { username: selectedUser.username },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
 
-    const response = await axios.post(
-      "http://localhost:3001/user/request",
-      { username: selectedUser.username },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-
-    if (response.data.success) {
-      setrequested(true);
+      setconnecting(false);
+      setrequested(false);
+      setShowRemoveModal(false);
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error.response?.data || error.message);
-  }
-};
-
-const handleRemoveRequest = async () => {
-  const token = localStorage.getItem("userToken");
-
-  try {
-    await axios.post(
-      "http://localhost:3001/user/remove-connection",
-      { username: selectedUser.username },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    setconnecting(false);
-    setrequested(false);
-    setShowRemoveModal(false);
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
   const listToShow = search ? searchResults : recentUsers;
 
@@ -331,38 +330,35 @@ const handleRemoveRequest = async () => {
         </div>
       )}
       {selectedPost && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          {/* Click outside to close */}
+          <div
+            className="absolute inset-0"
+            onClick={() => setSelectedPost(null)}
+          ></div>
 
-    {/* Click outside to close */}
-    <div
-      className="absolute inset-0"
-      onClick={() => setSelectedPost(null)}
-    ></div>
+          <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
+            >
+              ✕
+            </button>
 
-    <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
-
-      {/* Close Button */}
-      <button
-        onClick={() => setSelectedPost(null)}
-        className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
-      >
-        ✕
-      </button>
-
-      <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
-        <PostCard
-          data={selectedPost}
-          user={null}
-          setSelectedUsername={() => {}}
-          setActivePage={() => {}}
-          setActive={() => {}}
-          setSelectedUserId={() => {}}
-        />
-      </div>
-
-    </div>
-  </div>
-)}
+            <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+              <PostCard
+                data={selectedPost}
+                user={null}
+                setSelectedUsername={() => {}}
+                setActivePage={() => {}}
+                setActive={() => {}}
+                setSelectedUserId={() => {}}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

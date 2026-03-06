@@ -147,7 +147,7 @@ function EditProfile() {
 
       if (res.data.success) {
         setSavedGender(gender); // ✅ update button state
-        alert("Gender saved successfully ✅");
+
       }
 
       console.log(res.data);

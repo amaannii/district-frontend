@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import settings from "../../../assets/images/icons8-settings-50.png";
 import profile from "../../../assets/images/profile.png";
 import heart from "../../../assets/images/icons8-heart-24.png";
@@ -45,7 +45,9 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     type: null,
   });
 
-    const [like,setLike]=useState(0)
+  const [like, setLike] = useState(0);
+  const fileInputRef = useRef(null);
+  const [showImageConfirm, setShowImageConfirm] = useState(false);
 
   const token = localStorage.getItem("userToken");
 
@@ -79,7 +81,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     } catch (error) {
       console.error(error);
     }
-
   };
 
   /* ---------------- SYNC SELECTED POST STATES ---------------- */
@@ -92,13 +93,18 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       const isSaved = savedPost.some((p) => p._id === selectedPost._id);
       setSaved(isSaved);
     }
-  }, [selectedPost, savedPost,]);
+
+    const openSaved = localStorage.getItem("openSaved");
+
+    if (openSaved === "true") {
+      setActiveTab("saved");
+      localStorage.removeItem("openSaved");
+    }
+  }, [selectedPost, savedPost]);
 
   /* ---------------- FETCH SAVED POSTS ---------------- */
   useEffect(() => {
-    if (activeTab === "saved") {
-      fetchSavedPost();
-    }
+    fetchSavedPost();
   }, [activeTab]);
 
   const isPostOwner =
@@ -207,9 +213,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     }
   };
 
-
-
-  
   const handleSave = async () => {
     const token = localStorage.getItem("userToken"); // ✅ ADD THIS
     if (!token) return alert("Login required");
@@ -326,67 +329,64 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   };
 
   /* ---------------- POST SHARE ---------------- */
-const handleSendPost = async () => {
-  if (!selectedDistricts.length || !selectedPost?._id) {
-    console.log("No districts or no post selected");
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      "http://localhost:3001/user/send-post-to-chats",
-      {
-        chatIds: selectedDistricts,
-        postId: selectedPost._id,   // ✅ FIXED
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    console.log("Share response:", res.data);
-
-    if (res.data.success) {
-      setShowShare(false);
-      setSelectedDistricts([]);
+  const handleSendPost = async () => {
+    if (!selectedDistricts.length || !selectedPost?._id) {
+      console.log("No districts or no post selected");
+      return;
     }
-  } catch (err) {
-    console.error("Share failed:", err.response?.data || err.message);
-  }
-};
-
-useEffect(() => {
-  const fetchLikeStatus = async () => {
-    if (!userdetails) return;
 
     try {
-             const token = localStorage.getItem("userToken");
-             console.log(selectedPost._id);
-             
-
       const res = await axios.post(
-        "http://localhost:3001/user/checkisliked",
-        { postId: selectedPost._id },
+        "http://localhost:3001/user/send-post-to-chats",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+          chatIds: selectedDistricts,
+          postId: selectedPost._id, // ✅ FIXED
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
+      console.log("Share response:", res.data);
+
       if (res.data.success) {
-        setLiked(res.data.isLiked);
-        setLike(res.data.likes);
+        setShowShare(false);
+        setSelectedDistricts([]);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Share failed:", err.response?.data || err.message);
     }
   };
 
-  fetchLikeStatus();
-}, [selectedPost]);
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if (!userdetails) return;
 
+      try {
+        const token = localStorage.getItem("userToken");
+        console.log(selectedPost._id);
 
+        const res = await axios.post(
+          "http://localhost:3001/user/checkisliked",
+          { postId: selectedPost._id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (res.data.success) {
+          setLiked(res.data.isLiked);
+          setLike(res.data.likes);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchLikeStatus();
+  }, [selectedPost]);
 
   const isOwner = userdetails._id === localStorage.getItem("userId");
 
@@ -408,23 +408,44 @@ useEffect(() => {
           {/* PROFILE HEADER */}
           <div className="flex flex-col items-center text-center">
             <div
-              onClick={() => seteditprofile(true)}
-              className="w-20 h-20 rounded-full bg-white overflow-hidden mb-3 cursor-pointer"
+             onClick={() => setShowImageConfirm(true)}
+              className="relative w-20 h-20 rounded-full bg-white overflow-hidden mb-3 cursor-pointer group"
             >
               <img
-                src={userdetails.img || profile}
-                alt=""
+                src={
+                  userdetails?.img &&
+                  userdetails.img !== "null" &&
+                  userdetails.img.trim() !== ""
+                    ? userdetails.img
+                    : profile
+                }
+                alt="profile"
                 className="w-full h-full object-cover"
+                onError={(e) => (e.target.src = profile)}
               />
             </div>
 <h1 className="text-xl font-semibold">{userdetails.username}</h1>
 <p className="text-sm text-gray-400">{userdetails.name}</p>
+
 
 {userdetails.bio && (
   <p className="text-sm text-gray-300 mt-2 text-center max-w-[350px]">
     {userdetails.bio}
   </p>
 )}
+
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              style={{ display: "none" }}
+            />
+
+            <h1 className="text-xl font-semibold ">{userdetails.username}</h1>
+            <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
+
+
             <div className="flex gap-10 mb-5">
               <div>
                 <p className="font-semibold">{posts.length}</p>
@@ -434,8 +455,8 @@ useEffect(() => {
                 className="cursor-pointer"
                 onClick={() => fetchConnections("connected")}
               >
-                <p className="font-semibold">{connected}</p>
-                <p className="text-xs text-gray-400">connected</p>
+                <p className="font-semibold ">{connected}</p>
+                <p className="text-xs text-gray-400  ">connected</p>
               </div>
               <div
                 className="cursor-pointer"
@@ -460,18 +481,17 @@ useEffect(() => {
             >
               POSTS
             </button>
-            {isOwner && (
-              <button
-                onClick={() => setActiveTab("saved")}
-                className={`py-3 ${
-                  activeTab === "saved"
-                    ? "border-t-2 border-white "
-                    : "text-gray-400 cursor-pointer"
-                }`}
-              >
-                SAVED
-              </button>
-            )}
+
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`py-3 ${
+                activeTab === "saved"
+                  ? "border-t-2 border-white"
+                  : "text-gray-400"
+              }`}
+            >
+              SAVED
+            </button>
           </div>
 
           {/* GRID */}
@@ -505,7 +525,7 @@ useEffect(() => {
                     className="w-5 cursor-pointer"
                     onClick={() => {
                       setselectedPost(item);
-                     setShowShare(true)
+                      setShowShare(true);
                     }}
                   />
                   <img
@@ -552,7 +572,7 @@ useEffect(() => {
                     alt="user"
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <span className="font-semibold text-sm">
+                  <span className="font-semibold text-sm ">
                     {selectedPost.postOwner?.username || userdetails.username}
                   </span>
                 </div>
@@ -677,16 +697,16 @@ useEffect(() => {
 
                   {/* SAVE */}
                   <svg
-                onClick={handleSave}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
-                fill={saved ? "white" : "none"}
-                stroke="white"
-                strokeWidth="2"
-              >
-                <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
-              </svg>
+                    onClick={handleSave}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+                    fill={saved ? "white" : "none"}
+                    stroke="white"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+                  </svg>
                 </div>
 
                 {/* ADD COMMENT */}
@@ -744,6 +764,34 @@ useEffect(() => {
           </div>
         </div>
       )}
+      {showImageConfirm && (
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
+      <h2 className="text-lg font-semibold mb-4">
+        Add Profile Photo?
+      </h2>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => {
+            setShowImageConfirm(false);
+            fileInputRef.current?.click();
+          }}
+          className="bg-[#879F00] px-5 py-2 rounded text-sm"
+        >
+          Yes
+        </button>
+
+        <button
+          onClick={() => setShowImageConfirm(false)}
+          className="bg-gray-600 px-5 py-2 rounded text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {showConnections && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -768,12 +816,12 @@ useEffect(() => {
               connectionList.map((user) => (
                 <div
                   key={user._id}
-                  className="flex items-center gap-3 py-2 border-b border-gray-800"
+                  className="flex items-center gap-3 py-2 border-b border-gray-800 cursor-pointer"
                 >
                   <img
                     src={user.img || profile}
                     alt={user.username}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover "
                   />
                   <div>
                     <p
