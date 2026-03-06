@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import settings from "../../../assets/images/icons8-settings-50.png";
 import profile from "../../../assets/images/profile.png";
 import heart from "../../../assets/images/icons8-heart-24.png";
@@ -46,6 +46,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   });
 
   const [like, setLike] = useState(0);
+  const fileInputRef = useRef(null);
+  const [showImageConfirm, setShowImageConfirm] = useState(false);
 
   const token = localStorage.getItem("userToken");
 
@@ -90,6 +92,13 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
       const isSaved = savedPost.some((p) => p._id === selectedPost._id);
       setSaved(isSaved);
+    }
+
+    const openSaved = localStorage.getItem("openSaved");
+
+    if (openSaved === "true") {
+      setActiveTab("saved");
+      localStorage.removeItem("openSaved");
     }
   }, [selectedPost, savedPost]);
 
@@ -399,15 +408,30 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           {/* PROFILE HEADER */}
           <div className="flex flex-col items-center text-center">
             <div
-              onClick={() => seteditprofile(true)}
-              className="w-20 h-20 rounded-full bg-white overflow-hidden mb-3 cursor-pointer"
+             onClick={() => setShowImageConfirm(true)}
+              className="relative w-20 h-20 rounded-full bg-white overflow-hidden mb-3 cursor-pointer group"
             >
               <img
-                src={userdetails.img || profile}
-                alt=""
+                src={
+                  userdetails?.img &&
+                  userdetails.img !== "null" &&
+                  userdetails.img.trim() !== ""
+                    ? userdetails.img
+                    : profile
+                }
+                alt="profile"
                 className="w-full h-full object-cover"
+                onError={(e) => (e.target.src = profile)}
               />
             </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              style={{ display: "none" }}
+            />
 
             <h1 className="text-xl font-semibold ">{userdetails.username}</h1>
             <p className="text-sm text-gray-400 mb-4">{userdetails.name}</p>
@@ -441,23 +465,22 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               className={`py-3 ${
                 activeTab === "posts"
                   ? "border-t-2 border-white"
-                  : "text-gray-400 "
+                  : "text-gray-400"
               }`}
             >
               POSTS
             </button>
-            {isOwner && (
-              <button
-                onClick={() => setActiveTab("saved")}
-                className={`py-3 ${
-                  activeTab === "saved"
-                    ? "border-t-2 border-white "
-                    : "text-gray-400 cursor-pointer"
-                }`}
-              >
-                SAVED
-              </button>
-            )}
+
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`py-3 ${
+                activeTab === "saved"
+                  ? "border-t-2 border-white"
+                  : "text-gray-400"
+              }`}
+            >
+              SAVED
+            </button>
           </div>
 
           {/* GRID */}
@@ -730,6 +753,34 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           </div>
         </div>
       )}
+      {showImageConfirm && (
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
+      <h2 className="text-lg font-semibold mb-4">
+        Add Profile Photo?
+      </h2>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => {
+            setShowImageConfirm(false);
+            fileInputRef.current?.click();
+          }}
+          className="bg-[#879F00] px-5 py-2 rounded text-sm"
+        >
+          Yes
+        </button>
+
+        <button
+          onClick={() => setShowImageConfirm(false)}
+          className="bg-gray-600 px-5 py-2 rounded text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {showConnections && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">

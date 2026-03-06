@@ -4,6 +4,7 @@ import Messages from "./Messages";
 import PostCard from "./PostCard";
 import axios from "axios";
 import Profile from "./Profile";
+import profile from "../../../assets/images/profile.png";
 
 function Home({setSelectedUsername,setActive,openChat }) {
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -209,7 +210,7 @@ function Home({setSelectedUsername,setActive,openChat }) {
                   className="flex flex-col items-center w-[80px] shrink-0"
                 >
                   <div className="w-16 h-16 rounded-full overflow-hidden">
-                    <img src={n.img} className="w-full h-full object-cover" />
+                    <img src={n.img||profile} className="w-full h-full object-cover" />
                   </div>
 
                   <p className="text-xs text-gray-300 mt-1">
