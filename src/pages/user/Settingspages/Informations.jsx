@@ -225,7 +225,7 @@ function Informations() {
             {/* Close Button */}
             <button
               onClick={() => setShowContactModal(false)}
-              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
+              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white cursor-pointer"
             >
               x
             </button>
@@ -272,7 +272,7 @@ function Informations() {
 
                   setShowAddModal(true);
                 }}
-                className="w-full text-left px-6 py-5 text-[#879F00] hover:bg-[#111]"
+                className="w-full text-left px-6 py-5 text-[#879F00] hover:bg-[#111] cursor-pointer"
               >
                 Add new contact
               </button>
@@ -295,7 +295,7 @@ function Informations() {
             {/* Close Button */}
             <button
               onClick={() => setShowAddModal(false)}
-              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
+              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white cursor-pointer"
             >
               x
             </button>
@@ -325,7 +325,7 @@ function Informations() {
             <button
               onClick={handleSaveContact}
               disabled={contacts ? true : false}
-              className={`w-full py-2 rounded-xl font-semibold text-lg transition
+              className={`w-full py-2 rounded-xl font-semibold text-lg transition cursor-pointer
                 {contacts && (
   <p>Number already added</p>
 )}
@@ -348,7 +348,7 @@ function Informations() {
             {/* Close */}
             <button
               onClick={() => setShowNumberModal(false)}
-              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
+              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white cursor-pointer"
             >
               ✕
             </button>
@@ -390,7 +390,7 @@ function Informations() {
                   setShowEditModal(true); // ✅ Open edit modal
                   setNewNumber(selectedNumber); // ✅ Fill input with selected number
                 }}
-                className="w-full text-left px-6 py-4 text-[#879F00] hover:bg-[#111] text-sm"
+                className="w-full text-left px-6 py-4 text-[#879F00] hover:bg-[#111] text-sm cursor-pointer"
               >
                 Edit number
               </button>
@@ -398,7 +398,7 @@ function Informations() {
               {/* Delete */}
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="w-full text-left px-6 py-4 text-red-500 hover:bg-[#111] text-sm border-t border-gray-700"
+                className="w-full text-left px-6 py-4 text-red-500 hover:bg-[#111] text-sm border-t border-gray-700 cursor-pointer"
               >
                 Delete number
               </button>
@@ -425,7 +425,7 @@ function Informations() {
               {/* Cancel */}
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="w-full py-2 rounded-xl border border-gray-600 text-gray-300 hover:bg-[#111]"
+                className="w-full py-2 rounded-xl border border-gray-600 text-gray-300 hover:bg-[#111] cursor-pointer"
               >
                 Cancel
               </button>
@@ -436,7 +436,7 @@ function Informations() {
                   handleDeleteNumber();
                   setShowDeleteConfirm(false);
                 }}
-                className="w-full py-2 rounded-xl bg-red-600 hover:bg-red-700 font-semibold"
+                className="w-full py-2 rounded-xl bg-red-600 hover:bg-red-700 font-semibold cursor-pointer"
               >
                 Delete
               </button>
@@ -453,7 +453,7 @@ function Informations() {
             {/* Close */}
             <button
               onClick={() => setShowEditModal(false)}
-              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
+              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white cursor-pointer"
             >
               ✕
             </button>
@@ -474,7 +474,7 @@ function Informations() {
             {/* Save Button */}
             <button
               onClick={handleUpdateNumber}
-              className="w-full bg-[#879F00] py-2 rounded-xl font-semibold text-lg"
+              className="w-full bg-[#879F00] py-2 rounded-xl font-semibold text-lg cursor-pointer"
             >
               Save Changes
             </button>
@@ -491,7 +491,7 @@ function Informations() {
             {/* Close */}
             <button
               onClick={() => setShowBirthdayModal(false)}
-              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white"
+              className="absolute top-6 right-6 text-gray-400 text-2xl hover:text-white cursor-pointer"
             >
               x
             </button>
@@ -511,7 +511,7 @@ function Informations() {
               <select
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
-                className="w-full bg-black border border-gray-600 rounded-xl px-3 py-3 text-white focus:outline-none"
+                className="w-full bg-black border border-gray-600 rounded-xl px-3 py-3 text-white focus:outline-none cursor-pointer"
               >
                 <option>January</option>
                 <option>February</option>
@@ -531,7 +531,7 @@ function Informations() {
               <select
                 value={day}
                 onChange={(e) => setDay(e.target.value)}
-                className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none"
+                className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none cursor-pointer"
               >
                 {Array.from({ length: 31 }, (_, i) => (
                   <option key={i + 1}>{i + 1}</option>
@@ -542,7 +542,7 @@ function Informations() {
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none"
+                className="w-full bg-black border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none cursor-pointer"
               >
                 {Array.from({ length: 50 }, (_, i) => (
                   <option key={i}>{2025 - i}</option>
@@ -559,7 +559,7 @@ function Informations() {
             {/* Save Button */}
             <button
               onClick={handleSaveBirthday}
-              className="w-full bg-[#879F00] hover:bg-[#6f8500] py-3 rounded-xl font-semibold text-lg"
+              className="w-full bg-[#879F00] hover:bg-[#6f8500] py-3 rounded-xl font-semibold text-lg cursor-pointer"
             >
               Save
             </button>

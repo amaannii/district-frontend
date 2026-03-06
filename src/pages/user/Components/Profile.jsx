@@ -480,6 +480,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               style={{ display: "none" }}
             />
 
+
             <div className="flex gap-10 mb-5">
               <div>
                 <p className="font-semibold">{posts.length}</p>
@@ -503,13 +504,13 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           </div>
 
           {/* TABS */}
-          <div className="flex justify-center gap-10 border-t border-gray-700 mt-6">
+          <div className="flex justify-center gap-10 border-t border-gray-700 mt-6 ">
             <button
               onClick={() => setActiveTab("posts")}
               className={`py-3 ${
                 activeTab === "posts"
                   ? "border-t-2 border-white"
-                  : "text-gray-400"
+                  : "text-gray-400 cursor-pointer"
               }`}
             >
               POSTS
@@ -520,7 +521,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               className={`py-3 ${
                 activeTab === "saved"
                   ? "border-t-2 border-white"
-                  : "text-gray-400"
+                  : "text-gray-400 cursor-pointer"
               }`}
             >
               SAVED
@@ -618,6 +619,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                           setIsEditing(true);
                           setEditedCaption(selectedPost.caption);
                         }}
+                         className=" cursor-pointer"
                       >
                         Edit
                       </button>
@@ -626,14 +628,15 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                         onClick={() =>
                           setConfirmModal({ show: true, type: "delete" })
                         }
-                        className="text-red-500"
+                        className="text-red-500 cursor-pointer"
                       >
                         Delete
                       </button>
                     </>
                   )}
 
-                  <button onClick={() => setselectedPost(null)}>✕</button>
+                  <button onClick={() => setselectedPost(null)}
+                     className="cursor-pointer">✕</button>
                 </div>
               </div>
 
@@ -650,13 +653,13 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                     <div className="flex gap-4 text-xs">
                       <button
                         onClick={handleUpdatePost}
-                        className="text-[#879F00]"
+                        className="text-[#879F00] cursor-pointer"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setIsEditing(false)}
-                        className="text-red-500"
+                        className="text-red-500 cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -690,7 +693,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                     {(c.username === userdetails.username || isPostOwner) && (
                       <button
                         onClick={() => handleDeleteComment(c._id)}
-                        className="text-red-500 text-xs ml-3"
+                        className="text-red-500 text-xs ml-3 cursor-pointer"
                       >
                         Delete
                       </button>
@@ -753,7 +756,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                   />
                   <button
                     onClick={handleComment}
-                    className="text-sm text-[#879F00]"
+                    className="text-sm text-[#879F00] cursor-pointer"
                   >
                     Post
                   </button>
@@ -782,14 +785,14 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                   }
                   setConfirmModal({ show: false, type: null });
                 }}
-                className="bg-red-600 px-5 py-2 rounded text-sm"
+                className="bg-red-600 px-5 py-2 rounded text-sm cursor-pointer"
               >
                 Confirm
               </button>
 
               <button
                 onClick={() => setConfirmModal({ show: false, type: null })}
-                className="bg-gray-600 px-5 py-2 rounded text-sm"
+                className="bg-gray-600 px-5 py-2 rounded text-sm cursor-pointer"
               >
                 Cancel
               </button>
@@ -798,31 +801,35 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         </div>
       )}
       {showImageConfirm && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
-            <h2 className="text-lg font-semibold mb-4">Add Profile Photo?</h2>
 
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => {
-                  setShowImageConfirm(false);
-                  fileInputRef.current?.click();
-                }}
-                className="bg-[#879F00] px-5 py-2 rounded text-sm"
-              >
-                Yes
-              </button>
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
+      <h2 className="text-lg font-semibold mb-4">
+        Add Profile Photo?
+      </h2>
 
-              <button
-                onClick={() => setShowImageConfirm(false)}
-                className="bg-gray-600 px-5 py-2 rounded text-sm"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => {
+            setShowImageConfirm(false);
+            fileInputRef.current?.click();
+          }}
+          className="bg-[#879F00] px-5 py-2 rounded text-sm cursor-pointer"
+        >
+          Yes
+        </button>
+
+        <button
+          onClick={() => setShowImageConfirm(false)}
+          className="bg-gray-600 px-5 py-2 rounded text-sm cursor-pointer"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {showConnections && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -833,7 +840,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               </h2>
               <button
                 onClick={() => setShowConnections(false)}
-                className="text-gray-400"
+                className="text-gray-400 cursor-not-allowed"
               >
                 ✕
               </button>
@@ -913,7 +920,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
             <button
               onClick={handleSendPost}
-              className="mt-4 w-full py-2 rounded bg-[#879F00]"
+              className="mt-4 w-full py-2 rounded bg-[#879F00] cursor-pointer"
             >
               Send
             </button>
@@ -923,7 +930,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 setShowShare(false);
                 setSelectedDistricts([]);
               }}
-              className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+              className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500 cursor-pointer"
             >
               Cancel
             </button>

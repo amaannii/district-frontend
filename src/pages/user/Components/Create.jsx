@@ -94,7 +94,7 @@ function Create() {
             {/* Close */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute right-4 top-3 text-gray-200 hover:text-white text-xl"
+              className="absolute right-4 top-3 text-gray-200 hover:text-white text-xl cursor-pointer"
             >
               ×
             </button>
@@ -135,7 +135,7 @@ function Create() {
                       document.getElementById("fileUpload").click()
                     }
                     className="bg-[#879F00] px-4 py-2 rounded 
-                               hover:opacity-90 text-sm sm:text-base"
+                               hover:opacity-90 text-sm sm:text-base cursor-pointer"
                   >
                     Select from computer
                   </button>
@@ -167,7 +167,7 @@ function Create() {
                   <button
                     className="w-full bg-[#879F00] py-2 sm:py-3 
                                rounded font-semibold hover:opacity-90 
-                               text-sm sm:text-base"
+                               text-sm sm:text-base cursor-pointer"
                     onClick={handleSubmit}
                   >
                     Upload Post

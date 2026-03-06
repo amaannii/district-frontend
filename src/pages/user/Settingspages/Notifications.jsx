@@ -111,7 +111,7 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
           }`}
         >
           <span
-            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition ${
+            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition cursor-pointer ${
               enabled ? "translate-x-6" : "translate-x-0"
             }`}
           />

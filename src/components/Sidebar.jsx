@@ -33,7 +33,7 @@ function Sidebar({ active, setActive }) {
           </button>
         </div>
 
-        <div className="flex flex-col gap-2 px-3">
+        <div className="flex flex-col gap-2 px-3 crusor-pointer">
           <SidebarItem icon={home} text="HOME" {...{ collapsed, active, setActive }} />
           <SidebarItem icon={search} text="SEARCH" {...{ collapsed, active, setActive }} />
           <SidebarItem icon={explore} text="EXPLORE" {...{ collapsed, active, setActive }} />
@@ -90,7 +90,7 @@ function SidebarItem({ icon, text, collapsed, active, setActive }) {
   return (
     <button
       onClick={() => setActive(text)}
-      className={`relative flex items-center px-4 py-3 rounded-lg transition
+      className={`relative flex items-center px-4 py-3 rounded-lg transition cursor-pointer
       ${collapsed ? "justify-center" : "gap-4"}
       ${
         isActive

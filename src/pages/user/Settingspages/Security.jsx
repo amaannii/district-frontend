@@ -253,7 +253,7 @@ function Security() {
             {/* Close Button */}
             <button
               onClick={() => setOpenPasswordModal(false)}
-              className="absolute top-4 right-5 text-gray-400 text-xl hover:text-white"
+              className="absolute top-4 right-5 text-gray-400 text-xl hover:text-white cursor-pointer"
             >
               ✕
             </button>
@@ -302,7 +302,7 @@ function Security() {
                     // Eye
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
+                      className="w-5 h-5 cursor-pointer"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -344,7 +344,7 @@ function Security() {
                   {showNew ? (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
+                      className="w-5 h-5 cursor-pointer"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -364,7 +364,7 @@ function Security() {
                   ) : (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
+                      className="w-5 h-5 cursor-pointer"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -406,7 +406,7 @@ function Security() {
                   {showConfirm ? (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
+                      className="w-5 h-5 cursor-pointer"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -426,7 +426,7 @@ function Security() {
                   ) : (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
+                      className="w-5 h-5 cursor-pointer"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -475,7 +475,7 @@ function Security() {
                   sendOtpToEmail();
                 }}
                 disabled={isOtpSent}
-                className={`w-full text-black font-semibold py-3 rounded-xl transition ${
+                className={`w-full text-black font-semibold py-3 rounded-xl transition cursor-pointer ${
                   isOtpSent
                     ? "bg-gray-500 cursor-not-allowed"
                     : "bg-[#879F00] hover:opacity-90"
@@ -509,7 +509,7 @@ function Security() {
             {/* OK Button */}
             <button
               onClick={() => setShowSuccessPopup(false)}
-              className="mt-4 w-full bg-[#879F00] text-black font-semibold py-2 rounded-xl hover:bg-[#a6c400] transition"
+              className="mt-4 w-full bg-[#879F00] text-black font-semibold py-2 rounded-xl hover:bg-[#a6c400] transition cursor-pointer"
             >
               OK
             </button>
@@ -561,7 +561,7 @@ function Security() {
 
             <button
               onClick={handleVerifyOtp}
-              className="w-full bg-[#879F00] py-3 rounded-lg mb-4"
+              className="w-full bg-[#879F00] py-3 rounded-lg mb-4 cursor-pointer"
             >
               Verify OTP
             </button>

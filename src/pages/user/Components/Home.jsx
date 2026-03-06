@@ -122,14 +122,16 @@ function Home({ setSelectedUsername, setActive, openChat }) {
                   className="w-full h-full object-cover "
                 />
               </div>
-              {!myNote && (
-                <button
-                  onClick={addMyNote}
-                  className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold"
-                >
-                  +
-                </button>
-              )}
+
+                 {!myNote && (
+                  <button
+                    onClick={addMyNote}
+                    className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold cursor-pointer "
+                  >
+                    +
+                  </button>
+                )}
+
 
               {myNote && (
                 <div
@@ -222,29 +224,33 @@ function Home({ setSelectedUsername, setActive, openChat }) {
         </div>
       )}
       {/* DELETE NOTE MODAL */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-neutral-900 w-[320px] rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold mb-4">Delete your note?</h3>
 
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleDeleteNote}
-                className="bg-red-600 px-4 py-2 rounded"
-              >
-                Delete
-              </button>
+{showDeleteModal && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-neutral-900 w-[320px] rounded-lg p-6 text-center">
+      <h3 className="text-lg font-semibold mb-4">
+        Delete your note?
+      </h3>
 
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="bg-neutral-700 px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={handleDeleteNote}
+          className="bg-red-600 px-4 py-2 rounded cursor-pointer"
+        >
+          Delete
+        </button>
+
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          className="bg-neutral-700 px-4 py-2 rounded cursor-pointer"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

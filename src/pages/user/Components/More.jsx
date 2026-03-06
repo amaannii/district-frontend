@@ -17,7 +17,7 @@ function More({ setActive }) {
         {/* Settings */}
         <button
           onClick={() => setActive("SETTINGS")}
-          className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
+          className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition cursor-pointer"
         >
           Settings
         </button>
@@ -28,7 +28,7 @@ function More({ setActive }) {
            setActive("PROFILE");
   localStorage.setItem("openSaved", "true");
           }}
-          className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition"
+          className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition cursor-pointer"
         >
           Saved Posts
         </button>
@@ -36,7 +36,7 @@ function More({ setActive }) {
         {/* Logout */}
         <button
           onClick={() => setShowConfirm(true)}
-          className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition text-red-400"
+          className="w-full text-left px-3 py-2 rounded hover:bg-[#879F00] transition text-red-400 cursor-pointer"
         >
           Log out
         </button>
@@ -54,7 +54,7 @@ function More({ setActive }) {
               {/* Cancel */}
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition"
+                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -62,7 +62,7 @@ function More({ setActive }) {
               {/* Confirm Logout */}
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 rounded bg-[#879F00] text-white hover:bg-[#879F00] transition"
+                className="px-4 py-2 rounded bg-[#879F00] text-white hover:bg-[#879F00] transition cursor-pointer"
               >
                 Log out
               </button>

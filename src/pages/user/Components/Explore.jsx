@@ -42,9 +42,9 @@ function Explore({ setSelectedUsername, setActive }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-black text-white px-2 sm:px-4 md:px-6 py-3">
+    <div className="min-h-screen w-full bg-black text-white px-2 sm:px-4 md:px-6 py-3 overflow-y-auto scrollbar-hide ">
       {/* ===== Masonry Grid ===== */}
-      <div className="columns-2 sm:columns-3 lg:columns-4 gap-2">
+      <div className="columns-2 sm:columns-3 lg:columns-4 gap-2 ">
         {posts.map((post, index) => (
           <div key={index} className="mb-2 break-inside-avoid group">
             <img
@@ -68,7 +68,7 @@ function Explore({ setSelectedUsername, setActive }) {
 
       {/* ===== Post Modal with PostCard ===== */}
       {selectedPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 ">
           {/* Click outside to close */}
           <div
             className="absolute inset-0"
@@ -79,7 +79,7 @@ function Explore({ setSelectedUsername, setActive }) {
             {/* Close Button */}
             <button
               onClick={() => setSelectedPost(null)}
-              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg"
+              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg cursor-pointer"
             >
               ✕
             </button>
