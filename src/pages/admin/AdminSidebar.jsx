@@ -12,7 +12,7 @@ export default function AdminSidebar({ active, setActive, onLogout }) {
   ];
  
   return (
-    <aside className="w-64 h-[100vh] bg-black border-r border-gray-800 text-white flex flex-col">
+    <aside className="w-64 h-[100vh] play-regular bg-black border-r border-gray-800 text-white flex flex-col">
       {/* Logo */}
       <div className="h-20 flex items-center justify-center border-b border-gray-800">
         <h1 className="text-xl font-semibold tracking-wide">Admin</h1>

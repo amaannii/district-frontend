@@ -46,7 +46,7 @@ export default function DashboardChart({ users, messages, admins }) {
   const total = users.length + messages.length + admins.length;
 
   return (
-    <div className="bg-black border border-gray-800 rounded-2xl p-6 mb-8 flex flex-col items-center">
+    <div className="bg-black play-regular border border-gray-800 rounded-2xl p-6 mb-8 flex flex-col items-center">
       <h3 className="text-xl font-semibold mb-6">
         Dashboard Overview
       </h3>
