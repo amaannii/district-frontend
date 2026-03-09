@@ -7,7 +7,7 @@ export default function AdminSidebar({ active, setActive, onLogout }) {
     { id: "/users", name: "User Management", icon: <Users size={20} /> },
     { id: "/userlogs", name: "UserLogs", icon: <User size={20} /> },
     { id: "/chatroom", name: "Chat Rooms", icon: <AreaChart size={20} /> },
-    { id: "/reports", name: "Reports", icon: <FileText size={20} /> },
+    // { id: "/reports", name: "Reports", icon: <FileText size={20} /> },
     
   ];
  

@@ -516,13 +516,13 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   /* ================= UI ================= */
 
   return (
-    <div className="flex flex-col  h-[80vh] bg-[#0f0f0f] rounded-xl p-4 text-white">
+   <div className="flex flex-col h-[85vh] sm:h-[80vh] w-full bg-[#0f0f0f] rounded-none sm:rounded-xl p-2 sm:p-4 text-white">
       <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
         <button onClick={onBack}>←</button>
         <h2>{district}</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 flex flex-col">
+      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 flex flex-col px-1 sm:px-2">
         {messages.map((msg, i) => {
           const isMe = msg.sender === currentUser?.name;
 
@@ -600,7 +600,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
                   <img
                     src={msg.post.image}
-                    className="rounded-lg max-w-xs"
+                   className="rounded-lg max-w-[70vw] sm:max-w-xs"
                     alt="shared post"
                   />
 
@@ -628,7 +628,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
                         openImageMenuId === msg._id ? null : msg._id,
                       )
                     }
-                    className="max-w-xs rounded-lg cursor-pointer"
+                   className="max-w-[70vw] sm:max-w-xs md:max-w-sm rounded-lg cursor-pointer"
                     alt="chat"
                   />
 
@@ -709,7 +709,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="relative flex items-center gap-3 border-t border-gray-700 pt-3">
+     <div className="relative flex items-center gap-2 sm:gap-3 border-t border-gray-700 pt-2 sm:pt-3">
         {!recording ? (
           <>
             <button onClick={() => setShowEmojis(!showEmojis)}>😊</button>
@@ -729,7 +729,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={`Message ${district}`}
-              className="flex-1 px-4 py-2 rounded-full bg-gray-800"
+              className="flex-1 px-3 sm:px-4 py-2 rounded-full bg-gray-800 text-sm sm:text-base"
             />
 
             {message ? (
@@ -751,7 +751,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       {showEmojis && (
         <div
           ref={emojiRef}
-          className="absolute bottom-14 mb-10 bg-gray-800 p-3 rounded-lg max-w-xs shadow-lg z-50"
+         className="absolute bottom-14 left-2 sm:left-auto mb-10 bg-gray-800 p-3 rounded-lg w-[90%] sm:max-w-xs shadow-lg z-50"
         >
           <div className="flex flex-wrap gap-2">
             {EMOJIS.map((emoji, index) => (
@@ -796,7 +796,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#0f0f0f] text-white overflow-scroll scrollbar-hide rounded-xl w-[95%] max-w-lg"
+           className="bg-[#0f0f0f] text-white overflow-y-auto scrollbar-hide rounded-xl w-[95%] sm:w-[90%] md:w-[500px] max-h-[90vh]"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -823,7 +823,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
             {/* Image */}
             <img
               src={selectedPost.post.image}
-              className="w-full max-h-[400px] object-cover"
+              className="w-full max-h-[90vh] object-cover"
               alt="post"
             />
 

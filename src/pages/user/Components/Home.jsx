@@ -110,12 +110,12 @@ function Home({ setSelectedUsername, setActive, openChat }) {
 
   /* ================= HOME VIEW ================= */
   return (
-    <div className="flex w-full play-regular min-h-screen bg-black text-white">
-      <div className="flex-1 max-w-2xl mx-auto">
+   <div className="flex flex-col lg:flex-row w-full play-regular min-h-screen bg-black text-white">
+      <div className="flex-1 w-full max-w-xl sm:max-w-2xl mx-auto">
         {/* NOTES */}
-        <div className="h-[130px] px-6 border-b border-neutral-800">
-          <div className="flex gap-12 overflow-x-auto mt-6 scrollbar-hide">
-            <div className="flex flex-col items-center w-[85px] shrink-0">
+        <div className="min-h-[120px] px-3 sm:px-6 border-b border-neutral-800">
+         <div className="flex gap-6 sm:gap-10 overflow-x-auto mt-4 pb-2 scrollbar-hide">
+            <div className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 <img
                   src={image || defaultProfile}
@@ -187,7 +187,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
       {/* ABOUT ACCOUNT FIXED */}
       {showAboutAccount && selectedPost && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-neutral-900 w-[360px] rounded-lg p-4">
+          <div className="bg-neutral-900 w-[90%] max-w-sm rounded-lg p-4">
             <div className="flex justify-between mb-4">
               <h3 className="text-sm font-semibold">About this account</h3>
               <button onClick={() => setShowAboutAccount(false)}>✕</button>
@@ -214,7 +214,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
         </div>
       )}
 
-      <div className="w-[320px] hidden lg:block">
+    <div className="w-[300px] xl:w-[320px] hidden lg:block">
         <MiniChatBox openChat={openChat} />
       </div>
 
@@ -227,7 +227,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
 
 {showDeleteModal && (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-neutral-900 w-[320px] rounded-lg p-6 text-center">
+   <div className="bg-neutral-900 w-[90%] max-w-xs rounded-lg p-6 text-center">
       <h3 className="text-lg font-semibold mb-4">
         Delete your note?
       </h3>

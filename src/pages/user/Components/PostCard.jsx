@@ -188,9 +188,9 @@ function PostCard({
   };
 
   return (
-    <div className="border-b border-neutral-800 mb-6 w-full max-w-2xl mx-auto">
+    <div className="border-b border-neutral-800 mb-6 w-full max-w-xl sm:max-w-2xl mx-auto">
       {/* USER INFO */}
-      <div className="px-4 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
+     <div className="px-3 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
         <img
           onClick={() => {
             setSelectedUserId(data.userId._id);
@@ -222,7 +222,7 @@ function PostCard({
       />
 
       {/* CAPTION */}
-      <div className="px-4 sm:px-6 py-2 text-gray-300 text-sm sm:text-base">
+     <div className="px-3 sm:px-6 py-2 text-gray-300 text-sm leading-relaxed">
         <span className="font-semibold mr-2">{data.userId?.username}</span>
         {data.caption}
       </div>

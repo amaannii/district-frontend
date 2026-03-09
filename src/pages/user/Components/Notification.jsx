@@ -125,41 +125,41 @@ const NotificationItem = ({ item }) => (
 
     {/* Profile Section */}
     <div
-      className="flex items-center gap-4 cursor-pointer"
+     className="flex items-center gap-3 sm:gap-4 cursor-pointer flex-1"
       onClick={() => navigate(`/profile/${item._id}`)}
     >
       <img
         src={item.img}
         alt="profile"
-        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+       className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full object-cover"
       />
 
       <div>
-        <p className="text-sm">
+      <p className="text-xs sm:text-sm">
           <span className="font-semibold">{item.username}</span>{" "}
           sent you a connection request
         </p>
 
-        <p className="text-gray-400 text-xs">
+        <p className="text-gray-400 text-[11px] sm:text-xs">
           {new Date(item.Date).toLocaleString()}
         </p>
       </div>
     </div>
 
     {/* Actions */}
-    <div className="flex gap-2 sm:gap-3">
+    <div className="flex gap-2 sm:gap-3 flex-wrap">
       {!item.confirmed ? (
         <>
           <button
             onClick={() => handleConfirm(item.username)}
-            className="px-3 sm:px-4 py-1 bg-[#879F00] text-white rounded-md text-xs sm:text-sm cursor-pointer"
+            className="px-3 sm:px-4 py-1.5 bg-[#879F00] text-white rounded-md text-xs sm:text-sm cursor-pointer hover:opacity-90"
           >
             Confirm
           </button>
 
           <button
             onClick={() => handleDelete(item._id)}
-            className="px-3 sm:px-4 py-1 bg-white text-black rounded-md text-xs sm:text-sm cursor-pointer"
+           className="px-3 sm:px-4 py-1.5 bg-white text-black rounded-md text-xs sm:text-sm cursor-pointer hover:bg-gray-200"
           >
             Delete
           </button>
@@ -177,23 +177,23 @@ const NotificationItem = ({ item }) => (
 );
 
 return (
-  <div className="min-h-screen bg-black text-white flex justify-center">
+ <div className="min-h-screen bg-black text-white flex justify-center overflow-x-hidden">
 
     {/* Container */}
     <div className="
-        w-full 
-        max-w-2xl 
-        px-4 sm:px-6 md:px-8 
-        pt-10 md:pt-10 
-        pb-24 md:pb-10
-      ">
+  w-full
+  max-w-md sm:max-w-xl lg:max-w-2xl
+  px-4 sm:px-6 md:px-8
+  pt-8 sm:pt-10
+  pb-24 md:pb-10
+">
 
-      <h1 className="text-xl sm:text-2xl font-semibold mb-6">
+     <h1 className="text-lg sm:text-xl md:text-2xl font-semibold mb-6">
         Notifications
       </h1>
 
       {notifications.length === 0 ? (
-        <p className="text-gray-400 text-sm ">
+        <p className="text-gray-400 text-xs sm:text-sm">
           No notifications
         </p>
       ) : (
