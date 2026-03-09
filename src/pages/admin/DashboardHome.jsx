@@ -35,10 +35,10 @@ export default function DashboardHome() {
 
   return (
     <div>
-      <h2  onClick={()=>setActiveCard("dashboard")} className="text-2xl cursor-pointer font-semibold mb-6">Dashboard Overview</h2>
+      <h2  onClick={()=>setActiveCard("dashboard")} className="text-2xl play-regular cursor-pointer font-semibold mb-6">Dashboard Overview</h2>
 
       {/* STAT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 play-regular md:grid-cols-3 gap-6 mb-8">
         <StatCard
           title="Total Users"
           value={users.length}
@@ -80,7 +80,7 @@ function StatCard({ title, value, onClick, active }) {
   return (
     <div
       onClick={onClick}
-      className={`bg-black border rounded-2xl p-6 cursor-pointer transition
+      className={`bg-black border play-regular rounded-2xl p-6 cursor-pointer transition
         ${active ? "border-blue-500" : "border-gray-800"}
         hover:bg-gray-900`}
     >
@@ -95,7 +95,7 @@ function StatCard({ title, value, onClick, active }) {
 ======================= */
 function UsersTable({ users }) {
   return (
-    <div className="bg-black border border-gray-800 rounded-2xl p-6 mt-6">
+    <div className="bg-black border play-regular border-gray-800 rounded-2xl p-6 mt-6">
       <h3 className="text-xl font-semibold mb-4">Users</h3>
 
       <table className="w-full text-sm">
@@ -132,7 +132,7 @@ function UsersTable({ users }) {
 ======================= */
 function MessagesTable({ messages }) {
   return (
-    <div className="bg-black border border-gray-800 rounded-2xl p-6 mt-6">
+    <div className="bg-black border play-regular border-gray-800 rounded-2xl p-6 mt-6">
       <h3 className="text-xl font-semibold mb-4">Messages</h3>
 
       <table className="w-full text-sm">
@@ -167,7 +167,7 @@ function MessagesTable({ messages }) {
 ======================= */
 function AdminsTable({ admins }) {
   return (
-    <div className="bg-black border border-gray-800 rounded-2xl p-6 mt-6">
+    <div className="bg-black border play-regular border-gray-800 rounded-2xl p-6 mt-6">
       <h3 className="text-xl font-semibold mb-4">Admins</h3>
 
       <table className="w-full text-sm">
