@@ -179,10 +179,9 @@ function Search() {
   const listToShow = search ? searchResults : recentUsers;
 
   return (
-    <div className="flex flex-col lg:flex-row bg-black text-white w-full min-h-screen">
+    <div className="flex flex-col lg:flex-row bg-black text-white w-full min-h-screen overflow-hidden">
       {/* LEFT SECTION */}
-      <div className="w-full lg:w-[320px] lg:min-h-screen border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-col">
-        <div className="p-4">
+<div className="w-full lg:w-[320px] lg:min-h-screen border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-col max-h-[40vh] lg:max-h-none">        <div className="p-4">
           <h1 className="text-2xl font-semibold mb-4">Search</h1>
 
           <input
@@ -207,8 +206,8 @@ function Search() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
-          {listToShow.length > 0 ? (
+<div className="flex-1 overflow-y-auto px-4 pb-6 max-h-[30vh] lg:max-h-none">
+            {listToShow.length > 0 ? (
             listToShow.map((user) => (
               <div
                 key={user._id}
@@ -248,16 +247,16 @@ function Search() {
       </div>
 
       {/* RIGHT PROFILE SECTION */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="hidden lg:block flex-1 overflow-y-auto">
         {selectedUser ? (
-          <div className="w-full flex flex-col items-center p-6 sm:p-10 text-center">
+          <div className="w-full flex flex-col items-center p-4 sm:p-8 lg:p-10 text-center">
             <img
               src={selectedUser.img || profile}
               alt={selectedUser.name}
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full  object-cover mb-4"
+              className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full object-cover mb-4"
             />
 
-            <h2 className="text-lg sm:text-xl break-words">
+            <h2 className="text-base sm:text-lg lg:text-xl break-words leading-tight">
   <strong>@{selectedUser.username}</strong>
   <br />
   {selectedUser.name}
@@ -271,7 +270,7 @@ function Search() {
 )}
 
 {/* CONNECTION COUNTS */}
-<div className="flex gap-6 mt-4 text-sm text-gray-300">
+<div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4 text-xs sm:text-sm text-gray-300">
   <span>
     <strong>{selectedUser.connectedCount || 0}</strong> Connected
   </span>
@@ -295,7 +294,7 @@ function Search() {
                   handleRequest(); // ✅ send request
                 }
               }}
-              className={`h-[35px] w-[140px] sm:w-[160px] text-white rounded-md mb-6
+             className={`h-[36px] w-[130px] sm:w-[150px] lg:w-[160px] text-sm sm:text-base text-white rounded-md mb-6
     ${connecting ? "bg-[#4a5218]" : requested ? "bg-gray-600" : "bg-[#879F00]"}
   `}
             >
@@ -307,13 +306,13 @@ function Search() {
             {activeTab === "posts" && (
               <>
                 {selectedUser.post && selectedUser.post.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full max-w-5xl">
+                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 w-full max-w-5xl">
                     {selectedUser.post.map((post, index) => (
                       <img
                         key={index}
                         src={post.image}
                         alt="post"
-                        className="w-full h-[220px] sm:h-[250px] object-cover cursor-pointer"
+                       className="w-full h-[160px] sm:h-[200px] md:h-[230px] object-cover cursor-pointer"
                         onClick={() => fetchFullPost(post._id)}
                       />
                     ))}
@@ -336,7 +335,7 @@ function Search() {
       {/* REMOVE REQUEST MODAL */}
       {showRemoveModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50 p-4">
-          <div className="bg-black border border-gray-700 rounded-xl p-6 w-full max-w-sm text-center">
+         <div className="bg-black border border-gray-700 rounded-xl p-5 sm:p-6 w-full max-w-[320px] text-center">
             <h3 className="text-lg font-semibold mb-4">
               {connecting ? "Remove Connection?" : "Remove Request?"}
             </h3>
@@ -379,7 +378,7 @@ function Search() {
             onClick={() => setSelectedPost(null)}
           ></div>
 
-          <div className="relative w-full max-w-3xl mx-4 bg-black rounded-xl overflow-hidden shadow-2xl">
+         <div className="relative w-full max-w-lg md:max-w-2xl lg:max-w-3xl mx-3 sm:mx-6 bg-black rounded-xl overflow-hidden shadow-2xl">
             {/* Close Button */}
             <button
               onClick={() => setSelectedPost(null)}
@@ -388,7 +387,7 @@ function Search() {
               ✕
             </button>
 
-            <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+           <div className="max-h-[85vh] overflow-y-auto scrollbar-hide px-2 sm:px-0">
               <PostCard
                 data={selectedPost}
                 user={null}
@@ -401,6 +400,90 @@ function Search() {
           </div>
         </div>
       )}
+
+
+
+      {/* MOBILE USER PROFILE POPUP */}
+{selectedUser && (
+  <div className="lg:hidden fixed inset-0 z-50 bg-black overflow-y-auto flex items-center justify-center">
+    <div className="p-6 flex flex-col items-center text-center">
+
+      {/* CLOSE BUTTON */}
+      <button
+        onClick={() => setSelectedUser(null)}
+        className="absolute top-4 right-4 text-white text-xl"
+      >
+        ✕
+      </button>
+
+      {/* PROFILE IMAGE */}
+      <img
+        src={selectedUser.img || profile}
+        alt={selectedUser.name}
+        className="w-24 h-24 rounded-full object-cover mb-4 mt-24"
+      />
+
+      <h2 className="text-lg">
+        <strong>@{selectedUser.username}</strong>
+        <br />
+        {selectedUser.name}
+      </h2>
+
+      {/* BIO */}
+      {selectedUser.bio && (
+        <p className="text-gray-400 text-sm mt-2 max-w-md">
+          {selectedUser.bio}
+        </p>
+      )}
+
+      {/* CONNECTION COUNTS */}
+      <div className="flex gap-6 mt-4 text-sm text-gray-300">
+        <span>
+          <strong>{selectedUser.connectedCount || 0}</strong> Connected
+        </span>
+
+        <span>
+          <strong>{selectedUser.connectingCount || 0}</strong> Connecting
+        </span>
+
+        <span>
+          <strong>{selectedUser.post?.length || 0}</strong> Posts
+        </span>
+      </div>
+
+      {/* CONNECT BUTTON */}
+      <button
+        onClick={() => {
+          if (connecting || requested) {
+            setShowRemoveModal(true);
+          } else {
+            handleRequest();
+          }
+        }}
+        className={`h-[36px] w-[150px] text-white rounded-md mt-4 mb-6
+        ${connecting ? "bg-[#4a5218]" : requested ? "bg-gray-600" : "bg-[#879F00]"}`}
+      >
+        {connecting ? "Connected" : requested ? "Requested" : "Connect"}
+      </button>
+
+      {/* POSTS GRID */}
+      {selectedUser.post && selectedUser.post.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2 w-full mt-4">
+          {selectedUser.post.map((post, index) => (
+            <img
+              key={index}
+              src={post.image}
+              className="w-full h-[160px] object-cover"
+              onClick={() => fetchFullPost(post._id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-500">No posts available</p>
+      )}
+    </div>
+  </div>
+)}
     </div>
   );
 }

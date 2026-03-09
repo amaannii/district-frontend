@@ -432,8 +432,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   /* ----------------- RETURN UI ----------------- */
   return (
     <>
-      <div className="flex h-screen w-full bg-black text-white">
-        <div className="flex-1 overflow-y-auto px-10 py-8">
+      <div className="flex min-h-screen w-full bg-black text-white">
+  <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-10 py-6">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
             <img
@@ -529,7 +529,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           </div>
 
           {/* GRID */}
-          <div className="grid grid-cols-3 gap-5 max-w-[90%] mx-auto mt-4">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 gap-1 sm:gap-3 md:gap-5 max-w-[95%] mx-auto mt-4">
             {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
               <div key={index} className="relative">
                 <img
@@ -586,25 +586,25 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       {/* POST MODAL */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[950px] h-[620px] flex rounded-lg overflow-hidden">
+         <div className="bg-[#0f0f0f] w-full max-w-5xl h-[90vh] flex flex-col md:flex-row rounded-lg overflow-hidden">
             {/* LEFT IMAGE */}
-            <div className="w-1/2 bg-black">
+          <div className="w-full md:w-1/2 bg-black">
               <img
                 src={selectedPost.image}
                 alt="post"
-                className="w-full h-full object-cover"
+               className="w-full aspect-square object-cover"
               />
             </div>
 
             {/* RIGHT SIDE */}
-            <div className="w-1/2 flex flex-col text-white">
+           <div className="w-full md:w-1/2 flex flex-col text-white">
               {/* HEADER */}
               <div className="flex justify-between items-center p-4 border-b border-neutral-800">
                 <div className="flex items-center gap-3">
                   <img
                     src={userdetails.img}
                     alt="user"
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full"
                   />
                   <span className="font-semibold text-sm ">
                     {selectedPost.postOwner?.username || userdetails.username}

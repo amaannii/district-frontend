@@ -74,27 +74,29 @@ function Create() {
   };
 
   return (
-    <div className="relative w-full h-screen text-white">
+   <div className="relative w-full min-h-screen text-white overflow-x-hidden">
       <Home />
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-6">
           
           {/* Modal */}
-          <div className="bg-[#0f0f0f] w-full max-w-md sm:max-w-lg md:max-w-xl 
-                          rounded-2xl shadow-2xl relative 
-                          max-h-[90vh] overflow-y-auto">
+         <div className="bg-[#0f0f0f] w-full 
+                max-w-[95%] sm:max-w-md md:max-w-lg lg:max-w-xl
+                rounded-xl sm:rounded-2xl shadow-2xl relative
+                max-h-[90vh] overflow-y-auto">
 
             {/* Header */}
-            <div className="border-b border-gray-700 text-center py-3 font-semibold 
-                            bg-[#879F00] rounded-t-2xl text-sm sm:text-base">
+            <div className="border-b border-gray-700 text-center py-3 font-semibold
+           bg-[#879F00] rounded-t-xl sm:rounded-t-2xl
+           text-sm sm:text-base">
               Create new post
             </div>
 
             {/* Close */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute right-4 top-3 text-gray-200 hover:text-white text-xl cursor-pointer"
+              className="absolute right-3 sm:right-4 top-3 text-gray-200 hover:text-white text-lg sm:text-xl cursor-pointer"
             >
               ×
             </button>

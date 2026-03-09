@@ -42,18 +42,18 @@ function Explore({ setSelectedUsername, setActive }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-black text-white px-2 sm:px-4 md:px-6 py-3 overflow-y-auto scrollbar-hide ">
+   <div className="min-h-screen w-full bg-black text-white px-1 sm:px-3 md:px-6 py-3 overflow-y-auto scrollbar-hide overflow-x-hidden">
       {/* ===== Masonry Grid ===== */}
-      <div className="columns-2 sm:columns-3 lg:columns-4 gap-2 ">
+      <div className="columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-2 sm:gap-3">
         {posts.map((post, index) => (
-          <div key={index} className="mb-2 break-inside-avoid group">
+          <div key={index} className="mb-2 sm:mb-3 break-inside-avoid group">
             <img
               src={post.image||profile}
               alt="post"
               onClick={() => fetchFullPost(post._id)}
-              className="w-full cursor-pointer rounded-lg 
-                         transition duration-300 
-                         group-hover:opacity-80"
+              className="w-full cursor-pointer rounded-md sm:rounded-lg
+           transition duration-300
+           group-hover:opacity-80 object-cover"
             />
           </div>
         ))}
@@ -75,17 +75,17 @@ function Explore({ setSelectedUsername, setActive }) {
             onClick={() => setSelectedPost(null)}
           ></div>
 
-          <div className="relative w-full max-w-3xl mx-auto bg-black rounded-xl overflow-hidden shadow-2xl">
+          <div className="relative w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto bg-black rounded-xl overflow-hidden shadow-2xl">
             {/* Close Button */}
             <button
               onClick={() => setSelectedPost(null)}
-              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-lg cursor-pointer"
+              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm sm:text-lg cursor-pointer"
             >
               ✕
             </button>
 
             {/* PostCard */}
-            <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+           <div className="max-h-[85vh] overflow-y-auto scrollbar-hide px-2 sm:px-0">
               <PostCard
                 data={selectedPost}
                 setSelectedUsername={setSelectedUsername}
