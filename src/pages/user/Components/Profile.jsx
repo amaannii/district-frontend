@@ -529,13 +529,13 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           </div>
 
           {/* GRID */}
-          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 gap-1 sm:gap-3 md:gap-5 max-w-[95%] mx-auto mt-4">
+          <div className="grid grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 max-w-5xl mx-auto mt-4">
             {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
               <div key={index} className="relative">
                 <img
                   src={item.image}
                   alt=""
-                  className="w-full h-[400px] object-cover cursor-pointer"
+                  className="w-full h-[310px] object-cover cursor-pointer"
                   onClick={() => setselectedPost(item)}
                 />
 
@@ -586,7 +586,19 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       {/* POST MODAL */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-         <div className="bg-[#0f0f0f] w-full max-w-5xl h-[90vh] flex flex-col md:flex-row rounded-lg overflow-hidden">
+        <div className="
+bg-[#0f0f0f]
+w-full
+h-full
+md:h-[90vh]
+md:max-w-5xl
+flex
+flex-col
+md:flex-row
+rounded-none
+md:rounded-lg
+overflow-hidden
+">
             {/* LEFT IMAGE */}
           <div className="w-full md:w-1/2 bg-black">
               <img
@@ -597,7 +609,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
             </div>
 
             {/* RIGHT SIDE */}
-           <div className="w-full md:w-1/2 flex flex-col text-white">
+          <div className="w-full md:w-1/2 flex flex-col text-white h-full">
               {/* HEADER */}
               <div className="flex justify-between items-center p-4 border-b border-neutral-800">
                 <div className="flex items-center gap-3">
@@ -705,7 +717,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               {/* ACTION SECTION */}
               <div className="border-t border-neutral-800 px-4 py-3">
                 <div className="flex justify-between items-center">
-                  <div className="flex gap-5 items-center">
+                  <div className="flex gap-5 items-center text-xl">
                     {/* LIKE */}
                     <div className="flex items-center gap-1">
                       <img
