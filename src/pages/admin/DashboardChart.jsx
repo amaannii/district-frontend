@@ -46,16 +46,16 @@ export default function DashboardChart({ users, messages, admins }) {
   const total = users.length + messages.length + admins.length;
 
   return (
-    <div className="bg-black play-regular border border-gray-800 rounded-2xl p-6 mb-8 flex flex-col items-center">
-      <h3 className="text-xl font-semibold mb-6">
+  <div className="bg-black play-regular border border-gray-800 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col items-center w-full">
+      <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-center">
         Dashboard Overview
       </h3>
 
-      <div className="w-72">
+      <div className="w-full max-w-[220px] sm:max-w-[260px] md:max-w-[300px] h-[220px] sm:h-[260px] md:h-[300px]">
         <Doughnut data={data} options={options} />
       </div>
 
-      <p className="text-gray-400 mt-4 text-sm">
+      <p className="text-gray-400 mt-3 sm:mt-4 text-xs sm:text-sm text-center">
         Total Records:{" "}
         <span className="text-white font-semibold">
           {total}
