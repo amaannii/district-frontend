@@ -169,7 +169,7 @@ export default function ChatRoom() {
                     {district}
                   </h2>
 
-                  <p className="text-xs text-gray-500">View chat messages</p>
+                  <p className="text-sm text-gray-500">View chat messages</p>
                 </div>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function ChatRoom() {
                 setEnterChat(true);
                 fetchMessages();
               }}
-              className="w-full bg-[#000000] text-white py-2 rounded-xl"
+              className="w-full bg-[#879F00] text-white py-2 rounded-xl"
             >
               Open Chat
             </button>
