@@ -176,7 +176,7 @@ function Security() {
   };
 
   return (
-    <div className="play-regular text-white">
+   <div className="play-regular text-white w-full max-w-lg mx-auto px-4">
       {/* Page Title */}
       <h1 className="text-xl font-bold mb-10">Password and security</h1>
 
@@ -190,8 +190,7 @@ function Security() {
         {/* Change Password Option */}
         <div
           onClick={() => setOpenModal(true)}
-          className="w-[520px] border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between  transition cursor-pointer"
-        >
+         className="w-full max-w-md border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between transition cursor-pointer">
           <span className="text-gray-300 text-sm">Change password</span>
 
           {/* Arrow */}
@@ -202,7 +201,7 @@ function Security() {
       {/* ================= MODAL 1 (Choose Account) ================= */}
       {openModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="bg-black border border-gray-700 rounded-2xl w-[650px] p-10 relative">
+         <div className="bg-black border border-gray-700 rounded-2xl w-full max-w-lg p-6 sm:p-8 md:p-10 relative mx-4">
             {/* Close Button */}
             <button
               onClick={() => setOpenModal(false)}
@@ -248,8 +247,8 @@ function Security() {
 
       {/* ================= MODAL 2 (Password Form) ================= */}
       {openPasswordModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="bg-black border border-gray-700 rounded-2xl w-[650px] p-10 relative">
+       <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50 overflow-y-auto px-4">
+         <div className="bg-black border border-gray-700 rounded-2xl w-full max-w-lg p-6 sm:p-8 md:p-10 relative mx-4">
             {/* Close Button */}
             <button
               onClick={() => setOpenPasswordModal(false)}
@@ -554,7 +553,7 @@ function Security() {
                       otpRefs.current[index - 1]?.focus();
                     }
                   }}
-                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg rounded-lg bg-white text-black"
+                  className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 text-center text-lg rounded-lg bg-white text-black"
                 />
               ))}
             </div>

@@ -29,6 +29,7 @@ function Settings() {
 
   return (
     <div className="flex w-full h-full bg-black text-white play-regular">
+<div className="flex w-full">
 
       {/* Settings Sidebar */}
       <SettingsSidebar
@@ -41,6 +42,7 @@ function Settings() {
         {renderPage()}
          
       </div>
+</div>
     </div>
   );
 }

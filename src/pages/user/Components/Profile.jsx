@@ -530,17 +530,17 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
           {/* GRID */}
           <div className="grid grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 max-w-5xl mx-auto mt-4">
-            {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
-              <div key={index} className="relative">
-                <img
-                  src={item.image}
-                  alt=""
-                  className="w-full h-[310px] object-cover cursor-pointer"
-                  onClick={() => setselectedPost(item)}
-                />
+  {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
+    <div key={index} className="relative aspect-square overflow-hidden">
+      <img
+        src={item.image}
+        alt=""
+        className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
+        onClick={() => setselectedPost(item)}
+      />
 
                 {/* HEART / COMMENT / SHARE / SAVE ICONS overlay */}
-                <div className="absolute bottom-2 left-2 flex gap-2">
+                <div className="absolute bottom-2 left-2 flex ">
                   <img
                     src={item.isLiked ? heartRed : heart}
                     className="w-5 cursor-pointer"
