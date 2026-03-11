@@ -268,22 +268,24 @@ function EditProfile() {
   };
 
   return (
-    <div className="w-full text-white play-regular relative">
+    <div className="w-full max-w-xl text-white play-regular mx-auto px-4 sm:px-6">
       {/* Title */}
-      <h1 className="text-xl font-bold mb-13">Edit Profile</h1>
+      <h1 className="text-lg sm:text-xl font-bold mb-8 sm:mb-10">
+  Edit Profile
+</h1>
 
       {/* Profile Card */}
-      <div className=" text-black bg-white rounded-xl p-2 flex items-center justify-between w-[600px] shadow-lg">
+     <div className="text-black bg-white rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full shadow-lg">
         {/* Left Info */}
         <div className="flex items-center gap-4">
           <img
             src={userdetails.img || profile}
             alt="profile"
-            className="w-14 h-14 rounded-full object-cover"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
           />
 
           <div>
-            <h2 className="font-semibold text-sm">{userdetails.username}</h2>
+           <h2 className="font-semibold text-sm sm:text-base">{userdetails.username}</h2>
             <div className="flex items-center gap-2">
               <p className="text-gray-500 text-xs">{savedName}</p>
 
@@ -301,14 +303,14 @@ function EditProfile() {
         {/* Change Photo Button */}
         <button
           onClick={() => setShowModal(true)}
-          className="bg-black text-white px-5 py-2 rounded-lg text-sm hover:bg-gray-800 transition"
+         className="bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full sm:w-auto hover:bg-gray-800 transition"
         >
           Change Photo
         </button>
       </div>
 
       {/* Form Section */}
-      <div className="mt-5 w-[600px] flex flex-col gap-6">
+      <div className="mt-6 sm:mt-8 w-full flex flex-col gap-6">
         {/* Bio */}
         {/* Bio */}
         <div>
@@ -316,17 +318,17 @@ function EditProfile() {
             Bio
           </label>
 
-          <input
-            type="text"
-            value={bio}
-            onChange={(e) => {
-              if (e.target.value.length <= 250) {
-                setBio(e.target.value);
-              }
-            }}
-            placeholder="Bio (max 250 characters)"
-            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700"
-          />
+         <input
+  type="text"
+  value={bio}
+  onChange={(e) => {
+    if (e.target.value.length <= 250) {
+      setBio(e.target.value);
+    }
+  }}
+  placeholder="Bio (max 250 characters)"
+  className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+/>
 
           {/* Character Counter */}
           <p
@@ -341,7 +343,7 @@ function EditProfile() {
           <button
             onClick={handleSaveBio}
             disabled={bio === savedBio || bio.length === 0}
-            className={`mt-4 px-5 py-1 rounded-xl text-white
+            className={`mt-4 w-full sm:w-auto px-5 py-2 rounded-xl text-white bg-[#879F00] hover:opacity-90 transition
       ${bio === savedBio ? "bg-[#879F00]" : "bg-[#879F00]"}`}
           >
             {savedBio === ""
@@ -359,10 +361,10 @@ function EditProfile() {
           </label>
 
           <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="w-full px-5 py-3 rounded-xl text-sm bg-black border border-gray-700"
-          >
+  value={gender}
+  onChange={(e) => setGender(e.target.value)}
+  className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+>
             <option value="">Select Gender</option>
             <option value="Female">Female</option>
             <option value="Male">Male</option>
@@ -373,7 +375,7 @@ function EditProfile() {
           <button
             onClick={handleSaveGender}
             disabled={gender === savedGender}
-            className={`mt-4 px-6 py-2 rounded-xl text-white
+            className={`mt-4 w-full sm:w-auto px-6 py-2 rounded-xl text-white bg-[#879F00] hover:opacity-90 transition
     ${gender === savedGender ? "bg-[#879F00]" : "bg-[#879F00]"}`}
           >
             {savedGender === ""
@@ -388,7 +390,7 @@ function EditProfile() {
       {/* ================= MODAL ================= */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="bg-[#111] w-[480px] rounded-2xl overflow-hidden border border-gray-700 shadow-xl">
+          <div className="bg-[#111] w-[92%] sm:w-[90%] max-w-md rounded-2xl overflow-hidden border border-gray-700 shadow-xl">
             {/* Title */}
             <h2 className="text-center text-lg font-semibold py-5 border-b border-gray-700">
               Change Profile Photo
@@ -423,7 +425,7 @@ function EditProfile() {
       {uploadshow && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
           {/* Modal Box */}
-          <div className="bg-white justify-between flex flex-col  items-center p-6 rounded-xl w-[350px] shadow-lg text-center">
+          <div className="bg-white justify-between flex flex-col  items-center p-6 rounded-xl w-[90%] max-w-sm shadow-lg text-center">
             <h2 className="text-xl font-semibold text-black mb-4">
               Upload Image
             </h2>
@@ -467,7 +469,7 @@ function EditProfile() {
       {/* ================= NAME MODAL ================= */}
       {showNameModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="bg-[#111] w-[420px] rounded-2xl p-6 border border-gray-700 shadow-xl">
+          <div className="bg-[#111] w-[90%] max-w-sm rounded-2xl p-6 border border-gray-700 shadow-xl">
             {/* Title */}
             <h2 className="text-center text-lg font-semibold mb-5 text-white">
               Update Name

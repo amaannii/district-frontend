@@ -88,14 +88,14 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
 
 
   return (
-    <div className="w-full text-white play-regular">
-      <h1 className="text-xl font-bold mb-10">Notifications</h1>
+    <div className="w-full max-w-xl text-white play-regular mx-auto">
 
-      {/* Toggle */}
-      {/* Toggle */}
-      <div className="bg-white text-black rounded-xl p-5 flex items-center justify-between w-[500px] shadow-lg">
+      <h1 className="text-xl font-bold mb-8">Notifications</h1>
+
+      {/* Toggle Card */}
+      <div className="bg-white text-black rounded-xl p-5 flex items-center justify-between w-full shadow-lg">
         <p className="text-sm font-medium">
-          Notifications {enabled ? "On " : "Off "}
+          Notifications {enabled ? "On" : "Off"}
         </p>
 
         <button
@@ -103,7 +103,6 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
             const newValue = !enabled;
             setEnabled(newValue);
             setOpen(false);
-
             saveNotificationSettings(newValue, duration);
           }}
           className={`w-12 h-6 flex items-center rounded-full px-1 transition ${
@@ -111,7 +110,7 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
           }`}
         >
           <span
-            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition cursor-pointer ${
+            className={`w-4 h-4 bg-white rounded-full shadow-md transform transition ${
               enabled ? "translate-x-6" : "translate-x-0"
             }`}
           />
@@ -120,7 +119,8 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
 
       {/* Duration Dropdown */}
       {enabled && (
-        <div className="mt-5 w-[350px]">
+        <div className="mt-6 w-full max-w-sm">
+
           <button
             onClick={() => setOpen(!open)}
             className="w-full flex justify-between items-center px-5 py-3 border border-gray-700 rounded-xl text-sm bg-black"
@@ -137,7 +137,6 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
                   onClick={() => {
                     setDuration(item);
                     setOpen(false);
-
                     saveNotificationSettings(enabled, item);
                   }}
                   className={`w-full flex justify-between items-center px-5 py-3 text-sm transition ${
@@ -161,10 +160,13 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
               ))}
             </div>
           )}
+
         </div>
       )}
+
+      {/* Loader */}
       {loading && (
-        <div className="fixed inset-0 flex justify-center items-center  z-50">
+        <div className="fixed inset-0 flex justify-center items-center z-50">
           <div className="chaotic-orbit"></div>
         </div>
       )}
