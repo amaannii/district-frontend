@@ -1,4 +1,5 @@
 function SettingsSidebar({ activeSetting, setActiveSetting }) {
+
   const menuItems = [
     { name: "Edit Profile", key: "EditProfile" },
     { name: "Notifications", key: "Notifications" },
@@ -8,7 +9,7 @@ function SettingsSidebar({ activeSetting, setActiveSetting }) {
   ];
 
   return (
-   <aside className="min-h-screen bg-black play-regular text-white border-r border-gray-800 flex flex-col py-6 md:py-9 w-[220px] md:w-[260px]">
+    <aside className="h-screen bg-black text-white border-r border-gray-800 flex flex-col py-6 md:py-9 w-full md:w-[260px]">
 
       {/* Title */}
       <div className="mb-6 md:mb-10 px-6">
@@ -17,8 +18,9 @@ function SettingsSidebar({ activeSetting, setActiveSetting }) {
         </h2>
       </div>
 
-      {/* Menu Items */}
-      <div className="flex flex-col gap-2 py-4 md:py-7 px-2">
+      {/* Menu */}
+      <div className="flex flex-col gap-2 px-2">
+
         {menuItems.map((item) => {
           const isActive = activeSetting === item.key;
 
@@ -26,9 +28,8 @@ function SettingsSidebar({ activeSetting, setActiveSetting }) {
             <button
               key={item.key}
               onClick={() => setActiveSetting(item.key)}
-              className={`relative flex items-center py-3 rounded-lg text-sm tracking-wide transition
-                ${isActive ? "text-white" : "text-gray-300 hover:text-white"}
-                ${isActive ? "bg-white/10" : "hover:bg-white/5"}
+              className={`relative flex items-center py-3 rounded-lg text-sm transition
+                ${isActive ? "text-white bg-white/10" : "text-gray-300 hover:text-white hover:bg-white/5"}
               `}
             >
               {isActive && (
@@ -39,7 +40,9 @@ function SettingsSidebar({ activeSetting, setActiveSetting }) {
             </button>
           );
         })}
+
       </div>
+
     </aside>
   );
 }

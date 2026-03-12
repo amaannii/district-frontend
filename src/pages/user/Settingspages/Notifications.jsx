@@ -5,7 +5,7 @@ import axios from "axios";
 
 
 
-function Notifications() {
+function Notifications({goBack}) {
   const [enabled, setEnabled] = useState(true);
   const [duration, setDuration] = useState("for 2 days");
   const [open, setOpen] = useState(false);
@@ -88,15 +88,22 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
 
 
   return (
-    <div className="w-full max-w-xl text-white play-regular mx-auto">
+   <div className="w-full max-w-2xl xl:max-w-3xl mx-auto text-white play-regular px-4 sm:px-6">
+       {/* Back Button (Mobile Only) */}
+  <button
+    onClick={goBack}
+    className="md:hidden mb-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20"
+  >
+    ← Back
+  </button>
 
-      <h1 className="text-xl font-bold mb-8">Notifications</h1>
+     <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-8">Notifications</h1>
 
       {/* Toggle Card */}
-      <div className="bg-white text-black rounded-xl p-5 flex items-center justify-between w-full shadow-lg">
-        <p className="text-sm font-medium">
-          Notifications {enabled ? "On" : "Off"}
-        </p>
+    <div className="w-full bg-white text-black rounded-xl p-5 flex items-center justify-between gap-4 shadow-lg">
+        <p className="text-sm font-medium min-w-0 truncate">
+  Notifications {enabled ? "On" : "Off"}
+</p>
 
         <button
           onClick={() => {
@@ -105,7 +112,7 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
             setOpen(false);
             saveNotificationSettings(newValue, duration);
           }}
-          className={`w-12 h-6 flex items-center rounded-full px-1 transition ${
+         className={`flex-shrink-0 w-12 h-6 flex items-center rounded-full px-1 transition ${
             enabled ? "bg-[#879F00]" : "bg-gray-300"
           }`}
         >
@@ -119,11 +126,11 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
 
       {/* Duration Dropdown */}
       {enabled && (
-        <div className="mt-6 w-full max-w-sm">
+       <div className="mt-6 w-full sm:max-w-sm">
 
           <button
             onClick={() => setOpen(!open)}
-            className="w-full flex justify-between items-center px-5 py-3 border border-gray-700 rounded-xl text-sm bg-black"
+           className="w-full flex justify-between items-center px-5 py-3 border border-gray-700 rounded-xl text-sm bg-black min-w-0"
           >
             {duration}
             <span>{open ? "▲" : "▼"}</span>
