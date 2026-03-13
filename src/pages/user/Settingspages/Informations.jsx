@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
 
-function Informations() {
+function Informations({goBack}) {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [contacts, setContacts] = useState([]); // Stored numbers
@@ -179,7 +179,14 @@ function Informations() {
   };
 
   return (
-    <div className="play-regular text-white">
+   <div className="play-regular text-white w-full max-w-xl mx-auto px-4">
+       {/* Back Button (Mobile Only) */}
+  <button
+    onClick={goBack}
+    className="md:hidden mb-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20"
+  >
+    ← Back
+  </button>
       {/* Page Title */}
       <h1 className="text-xl font-bold mb-10">
         Your information and permissions
@@ -188,19 +195,21 @@ function Informations() {
       {/* Contact Info Row */}
       <div
         onClick={() => setShowContactModal(true)}
-        className="w-[520px] border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between cursor-pointer mb-1"
+        className="w-full max-w-md border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between gap-4 cursor-pointer mb-1"
       >
-        <span className="text-gray-300 text-sm">Contact info</span>
-        <span className="text-gray-400 text-xl">{">"}</span>
+       <span className="text-gray-300 text-sm min-w-0 truncate">
+  Contact info
+</span>
+       <span className="text-gray-400 text-xl flex-shrink-0">{">"}</span>
       </div>
 
       {/* Birthday Row */}
       {/* Birthday Row */}
       <div
         onClick={() => setShowBirthdayModal(true)}
-        className="w-[520px] border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between cursor-pointer"
+        className="w-full max-w-md border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between gap-4 cursor-pointer"
       >
-        <div>
+       <div className="min-w-0">
           <p className="text-gray-300 text-sm">Birthday</p>
 
           {/* ✅ Show saved birthday */}
@@ -218,11 +227,7 @@ function Informations() {
       {showContactModal && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           {/* Modal Box */}
-          <div
-            className="w-[650px] bg-black text-white 
-                  border-2 border-gray-700 
-                  rounded-2xl p-10 relative"
-          >
+          <div className="w-full max-w-xl bg-black text-white border border-gray-700 rounded-2xl p-6 sm:p-8 relative mx-4">
             {/* Close Button */}
             <button
               onClick={() => setShowContactModal(false)}
@@ -288,11 +293,7 @@ function Informations() {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           {/* Modal Box */}
-          <div
-            className="w-[450px] bg-black text-white
-                 border-2 border-gray-800
-                 rounded-2xl p-8 relative"
-          >
+        <div className="w-full max-w-md bg-black text-white border border-gray-800 rounded-2xl p-6 sm:p-8 relative mx-4">
             {/* Close Button */}
             <button
               onClick={() => setShowAddModal(false)}
@@ -345,7 +346,7 @@ function Informations() {
 
       {showNumberModal && selectedNumber && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="w-[750px] bg-black border border-gray-700 rounded-2xl p-10 relative">
+         <div className="w-full max-w-xl bg-black border border-gray-700 rounded-2xl p-6 sm:p-8 relative mx-4">
             {/* Close */}
             <button
               onClick={() => setShowNumberModal(false)}
@@ -366,7 +367,7 @@ function Informations() {
             </p>
 
             {/* Account Box */}
-            <div className="bg-gray-200 rounded-xl px-5 py-4 flex items-center gap-4 mb-8">
+           <div className="bg-gray-200 rounded-xl px-5 py-4 flex items-center gap-4 mb-8 min-w-0">
               {/* Profile Pic */}
               <img
                 src={userdetails.img}
@@ -376,7 +377,7 @@ function Informations() {
 
               {/* Username */}
               <div>
-                <p className="text-black font-semibold text-sm">
+             <p className="text-black font-semibold text-sm truncate">
                   {userdetails.username}
                 </p>
                 <p className="text-gray-600 text-xs">pending confirmation</p>
@@ -488,7 +489,7 @@ function Informations() {
       {/* ========================= */}
       {showBirthdayModal && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-[80]">
-          <div className="w-[750px] bg-black border border-gray-700 rounded-2xl p-10 relative">
+         <div className="w-full max-w-xl bg-black border border-gray-700 rounded-2xl p-6 sm:p-8 relative mx-4">
             {/* Close */}
             <button
               onClick={() => setShowBirthdayModal(false)}

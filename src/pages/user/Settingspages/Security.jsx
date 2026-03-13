@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
-function Security() {
+function Security({goBack}) {
   const [openModal, setOpenModal] = useState(false);
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [userdetails, setUserdetails] = useState({});
@@ -178,6 +178,13 @@ function Security() {
 
   return (
    <div className="play-regular text-white w-full max-w-lg mx-auto px-4">
+     {/* Back Button (Mobile Only) */}
+  <button
+    onClick={goBack}
+    className="md:hidden mb-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20"
+  >
+    ← Back
+  </button>
       {/* Page Title */}
       <h1 className="text-xl font-bold mb-10">Password and security</h1>
 
@@ -190,12 +197,16 @@ function Security() {
 
         {/* Change Password Option */}
         <div
-          onClick={() => setOpenModal(true)}
-         className="w-full max-w-md border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between transition cursor-pointer">
-          <span className="text-gray-300 text-sm">Change password</span>
+      
+  onClick={() => setOpenModal(true)}
+  className="w-full max-w-md border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between gap-4 transition cursor-pointer"
+>
+        <span className="text-gray-300 text-sm min-w-0 truncate">
+  Change password
+</span>
 
           {/* Arrow */}
-          <span className="text-gray-400 text-xl">{">"}</span>
+          <span className="text-gray-400 text-xl flex-shrink-0">{">"}</span>
         </div>
       </div>
 
@@ -219,28 +230,28 @@ function Security() {
             </p>
 
             {/* Account Option */}
-            <div
-              onClick={() => {
-                setOpenModal(false); // close first modal
-                setOpenPasswordModal(true); // open second modal
-              }}
-              className="flex items-center justify-between bg-white rounded-xl px-5 py-2 cursor-pointer hover:bg-gray-200 transition"
-            >
+           <div
+  onClick={() => {
+    setOpenModal(false);
+    setOpenPasswordModal(true);
+  }}
+  className="flex items-center justify-between gap-4 bg-white rounded-xl px-5 py-2 cursor-pointer hover:bg-gray-200 transition"
+>
               {/* Left Side */}
-              <div className="flex items-center gap-4">
+           <div className="flex items-center gap-4 min-w-0">
                 <img
                   src={userimage}
                   alt="profile"
                   className="w-12 h-12 rounded-full object-cover"
                 />
 
-                <p className="text-black font-semibold">
-                  {userdetails.username}
-                </p>
+               <p className="text-black font-semibold truncate">
+  {userdetails.username}
+</p>
               </div>
 
               {/* Arrow */}
-              <span className="text-black text-2xl">{">"}</span>
+            <span className="text-black text-2xl flex-shrink-0">{">"}</span>
             </div>
           </div>
         </div>

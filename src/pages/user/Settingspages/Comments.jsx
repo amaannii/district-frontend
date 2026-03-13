@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import API from "../../../API/Api";
 
-function Comments() {
+function Comments({goBack}) {
   const [selected, setSelected] = useState("followers");
     const [loading, setLoading] = useState(false);
 
@@ -49,17 +49,24 @@ function Comments() {
   };
 
   return (
-    <div className="w-full text-white play-regular">
+  <div className="w-full max-w-xl mx-auto px-4 text-white play-regular">
+       {/* Back Button (Mobile Only) */}
+  <button
+    onClick={goBack}
+    className="md:hidden mb-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20"
+  >
+    ← Back
+  </button>
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-bold">Comments</h1>
-      </div>
+    <div className="mb-8">
+  <h1 className="text-xl font-bold">Comments</h1>
+</div>
 
       {/* Subtitle */}
       <p className="text-gray-400 text-sm mb-10">Allow comments from</p>
 
       {/* Options */}
-      <div className="space-y-10">
+   <div className="space-y-8 max-w-md">
         {/* Option 1 */}
         <label className="flex items-start gap-6 ">
           <input
@@ -74,10 +81,10 @@ function Comments() {
           />
 
           <div>
-            <p className="text-sm font-medium">Your connections</p>
-            <p className="text-xs text-gray-500">
-              Only people you are connected with can comment.
-            </p>
+        <p className="text-sm font-medium">Connections you follow back</p>
+<p className="text-xs text-gray-500">
+  People who follow you and you follow them back.
+</p>
           </div>
         </label>
 

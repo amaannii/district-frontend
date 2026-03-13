@@ -4,7 +4,7 @@ import profile from "../../../assets/images/icons8-user-100.png";
 import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
-function EditProfile() {
+function EditProfile({goBack}) {
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -264,14 +264,24 @@ function EditProfile() {
   };
 
   return (
-    <div className="w-full max-w-xl text-white play-regular mx-auto px-4 sm:px-6">
+   <div className="w-full max-w-2xl xl:max-w-3xl mx-auto text-white play-regular px-4 sm:px-6">
+       {/* Back Button (Mobile Only) */}
+  <button
+    onClick={goBack}
+    className="md:hidden mb-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20"
+  >
+    ← Back
+  </button>
+
       {/* Title */}
       <h1 className="text-lg sm:text-xl font-bold mb-8 sm:mb-10">
         Edit Profile
       </h1>
 
       {/* Profile Card */}
-      <div className="text-black bg-white rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full shadow-lg">
+
+   <div className="w-full bg-white text-black rounded-xl p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 shadow-lg">
+
         {/* Left Info */}
         <div className="flex items-center gap-4">
           <img
@@ -280,35 +290,39 @@ function EditProfile() {
             className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
           />
 
-          <div>
-            <h2 className="font-semibold text-sm sm:text-base">
-              {userdetails.username}
-            </h2>
-            <div className="flex items-center gap-2">
-              <p className="text-gray-500 text-xs">{savedName}</p>
 
-              {/* Pen Button */}
-              <button
-                onClick={() => setShowNameModal(true)}
-                className="text-gray-400 hover:text-black transition"
-              >
-                🖊️
-              </button>
-            </div>
-          </div>
+         <div className="min-w-0">
+  <h2 className="font-semibold text-sm sm:text-base truncate">
+    {userdetails.username}
+  </h2>
+
+  <div className="flex items-center gap-2 min-w-0">
+    <p className="text-gray-500 text-xs truncate">
+      {savedName}
+    </p>
+
+    <button
+      onClick={() => setShowNameModal(true)}
+      className="text-gray-400 hover:text-black transition flex-shrink-0"
+    >
+      🖊️
+    </button>
+  </div>
+</div>
         </div>
 
         {/* Change Photo Button */}
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full sm:w-auto hover:bg-gray-800 transition"
-        >
-          Change Photo
-        </button>
+       <button
+  onClick={() => setShowModal(true)}
+  className="flex-shrink-0 bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full lg:w-auto hover:bg-gray-800 transition"
+>
+  Change Photo
+</button>
+
       </div>
 
       {/* Form Section */}
-      <div className="mt-6 sm:mt-8 w-full flex flex-col gap-6">
+     <div className="mt-8 w-full max-w-xl flex flex-col gap-6">
         {/* Bio */}
         {/* Bio */}
         <div>
