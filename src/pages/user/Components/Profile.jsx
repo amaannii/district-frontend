@@ -603,14 +603,14 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 bg-[#0f0f0f]
 w-full
 h-full
-md:h-[90vh]
+md:h-[95vh]
 md:max-w-5xl
 flex
 flex-col
 md:flex-row
 rounded-none
 md:rounded-lg
-overflow-hidden
+ overflow-hidden
 "
           >
             {/* LEFT IMAGE */}
@@ -618,12 +618,12 @@ overflow-hidden
               <img
                 src={selectedPost.image}
                 alt="post"
-                className="w-full aspect-square object-cover"
+                className="max-h-[70vh] md:max-h-full w-auto object-contain"
               />
             </div>
 
             {/* RIGHT SIDE */}
-            <div className="w-full md:w-1/2 flex flex-col text-white h-full">
+        <div className="w-full md:w-1/2 flex flex-col text-white h-full md:h-[95vh]">
               {/* HEADER */}
               <div className="flex justify-between items-center p-4 border-b border-neutral-800">
                 <div className="flex items-center gap-3">
@@ -710,7 +710,7 @@ overflow-hidden
               </div>
 
               {/* COMMENTS */}
-              <div className="flex-1 overflow-y-auto px-4 py-3">
+            <div className="flex-1 overflow-y-auto px-4 py-3">
                 {comments.map((c) => (
                   <div
                     key={c._id}
