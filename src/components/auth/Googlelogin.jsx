@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import CompleteProfile from "../CompleteProfile.jsx";
+import API from "../../API/Api.js";
 
 function Googlelogin() {
   const navigate = useNavigate();
@@ -14,8 +15,8 @@ function Googlelogin() {
       const result = await signInWithPopup(auth, googleprovider);
       const user = result.user;
 
-      const res = await axios.post(
-        "http://localhost:3001/user/google-login",
+      const res = await API.post(
+        "/user/google-login",
         {
           name: user.displayName,
           email: user.email,
