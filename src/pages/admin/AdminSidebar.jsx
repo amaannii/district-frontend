@@ -1,8 +1,10 @@
 import { Users, LayoutDashboard, LogOut, AreaChart, User } from "lucide-react";
 import axios from "axios";
 import API from "../../API/Api";
+import { useState } from "react";
 
 export default function AdminSidebar({ active, setActive, onLogout }) {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const menuItems = [
     {
       id: "/dashboard",
@@ -41,6 +43,11 @@ export default function AdminSidebar({ active, setActive, onLogout }) {
     }
   };
 
+  const confirmLogout = () => {
+  setShowLogoutModal(false);
+  handleLogout();
+};
+
   return (
     <>
       {/* DESKTOP / TABLET SIDEBAR */}
@@ -72,7 +79,7 @@ export default function AdminSidebar({ active, setActive, onLogout }) {
         {/* Logout */}
         <div className="p-2 lg:p-4 border-t border-gray-800">
           <button
-            onClick={handleLogout}
+           onClick={() => setShowLogoutModal(true)}
             className="w-full flex items-center gap-3 px-3 lg:px-4 py-3 rounded-xl hover:bg-[#2a2a2a] text-sm"
           >
             <LogOut size={20} />
@@ -103,6 +110,33 @@ export default function AdminSidebar({ active, setActive, onLogout }) {
           <span className="text-[10px] mt-1">Logout</span>
         </button>
       </div>
+
+      {showLogoutModal && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-[#111] text-white rounded-xl p-6 w-80 shadow-lg">
+      <h2 className="text-lg font-semibold mb-4">Confirm Logout</h2>
+      <p className="text-sm text-gray-400 mb-6">
+        Are you sure you want to logout?
+      </p>
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setShowLogoutModal(false)}
+          className="px-4 py-2 text-sm rounded-lg bg-gray-700 hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={confirmLogout}
+          className="px-4 py-2 text-sm rounded-lg bg-red-600 hover:bg-red-700"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </>
   );
 }
