@@ -21,7 +21,6 @@ import Admindashboard from "../src/pages/admin/Admindashboard";
 import DashboardHome from "../src/pages/admin/DashboardHome";
 import UserDashboard from "../src/pages/user/UserDashboard";
 import Settings from "../src/pages/user/Components/Settings";
-import SavedPosts from "../src/pages/user/Components/savedposts";
 
 function Layoutroutes() {
   return (
@@ -44,7 +43,6 @@ function Layoutroutes() {
           <Route path="/adminlogin" element={<AdminLogin />} />
 <Route path="/settings" element={<Settings />} />
 <Route path="/login" element={<Login />} />
- <Route path="/saved-posts" element={<SavedPosts />} />
 
           <Route
             path="/admindashboard"
