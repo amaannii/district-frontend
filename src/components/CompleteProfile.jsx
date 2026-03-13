@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../API/Api";
 
 const CompleteProfile = () => {
   const [email, setEmail] = useState("");
@@ -36,8 +37,8 @@ const CompleteProfile = () => {
         setLoading(true);
       setError("");
 
-      const res = await axios.post(
-        "http://localhost:3001/user/complete-profile",
+      const res = await API.post(
+        "/user/complete-profile",
         { email, username, password }
       );
 
@@ -53,93 +54,102 @@ const CompleteProfile = () => {
       }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-      
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-10 py-8">
 
-        <div className="text-center mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-            Complete Your Profile
-          </h1>
-          <p className="text-sm text-gray-500 mt-2">
-            Create a username and password to continue
-          </p>
-        </div>
+    <div className="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl p-6 sm:p-8 md:p-10">
 
-        {/* EMAIL */}
-        <div className="mb-4">
-          <label className="text-sm text-gray-600">Email</label>
+      {/* HEADER */}
+      <div className="text-center mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+          Complete Your Profile
+        </h1>
+
+        <p className="text-xs sm:text-sm text-gray-500 mt-2">
+          Create a username and password to continue
+        </p>
+      </div>
+
+      {/* EMAIL */}
+      <div className="mb-5">
+        <label className="text-sm text-gray-600">Email</label>
+
+        <input
+          type="email"
+          value={email}
+          disabled
+          className="w-full mt-1 px-4 py-3 rounded-lg border bg-gray-100 text-gray-500 text-sm sm:text-base"
+        />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* USERNAME */}
+        <div>
+          <label className="text-sm text-gray-600">Username</label>
+
           <input
-            type="email"
-            value={email}
-            disabled
-            className="w-full mt-1 px-4 py-3 rounded-lg border bg-gray-100 text-gray-500 text-sm sm:text-base"
+            type="text"
+            placeholder="choose_username123"
+            className="w-full mt-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-black text-sm sm:text-base"
+            value={username}
+            onChange={(e) =>
+              setUsername(
+                e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9_]/g, "")
+              )
+            }
           />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* PASSWORD */}
+        <div>
+          <label className="text-sm text-gray-600">Password</label>
 
-          {/* USERNAME */}
-          <div>
-            <label className="text-sm text-gray-600">Username</label>
-            <input
-              type="text"
-              placeholder="choose_username123"
-              className="w-full mt-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-black text-sm sm:text-base"
-              value={username}
-              onChange={(e) =>
-                setUsername(
-                  e.target.value
-                    .toLowerCase()
-                    .replace(/[^a-z0-9_]/g, "")
-                )
-              }
-            />
-          </div>
-
-          {/* PASSWORD */}
-          <div>
-            <label className="text-sm text-gray-600">Password</label>
-            <input
-              type="password"
-              className="w-full mt-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-black text-sm sm:text-base"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          {/* CONFIRM */}
-          <div>
-            <label className="text-sm text-gray-600">Confirm Password</label>
-            <input
-              type="password"
-              className="w-full mt-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-black text-sm sm:text-base"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-
-          {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition duration-200"
-          >
-            Continue
-          </button>
-
-        </form>
-      </div>
-      {loading && (
-        <div className="fixed inset-0 flex justify-center items-center  z-50">
-          <div className="chaotic-orbit"></div>
+          <input
+            type="password"
+            className="w-full mt-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-black text-sm sm:text-base"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
-      )}
+
+        {/* CONFIRM PASSWORD */}
+        <div>
+          <label className="text-sm text-gray-600">Confirm Password</label>
+
+          <input
+            type="password"
+            className="w-full mt-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-black text-sm sm:text-base"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+
+        {error && (
+          <p className="text-red-500 text-sm text-center">{error}</p>
+        )}
+
+        <button
+          type="submit"
+          className="w-full bg-black text-white py-3 sm:py-3.5 rounded-lg font-semibold hover:bg-gray-900 transition duration-200"
+        >
+          Continue
+        </button>
+
+      </form>
+
     </div>
-  );
+
+    {loading && (
+      <div className="fixed inset-0 flex justify-center items-center z-50">
+        <div className="chaotic-orbit"></div>
+      </div>
+    )}
+
+  </div>
+);
 };
 
 export default CompleteProfile;

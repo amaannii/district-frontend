@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRef } from "react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import API from "../../../API/Api";
 
 function Security({goBack}) {
   const [openModal, setOpenModal] = useState(false);
@@ -45,8 +46,8 @@ function Security({goBack}) {
       try {
         const token = localStorage.getItem("userToken");
         setLoading(true);
-        const res = await axios.post(
-          "http://localhost:3001/user/userdetails",
+        const res = await API.post(
+          "/user/userdetails",
           {},
           {
             headers: {
@@ -79,8 +80,8 @@ function Security({goBack}) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      await axios.post(
-        "http://localhost:3001/user/verify-otp",
+      await API.post(
+        "/user/verify-otp",
         {
           email: userdetails.email,
           otp: otpValue,
@@ -106,8 +107,8 @@ function Security({goBack}) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/changePassword",
+      const res = await API.post(
+        "/user/changePassword",
         {
           currentPassword,
           newPassword,
@@ -161,7 +162,7 @@ function Security({goBack}) {
         return;
       }
 
-      await axios.post("http://localhost:3001/user/send-otp", {
+      await API.post("/user/send-otp", {
         email: userdetails.email,
       });
 

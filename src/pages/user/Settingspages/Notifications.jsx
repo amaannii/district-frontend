@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API from "../../../API/Api";
 
 
 
@@ -17,8 +18,8 @@ function Notifications({goBack}) {
       try {
         const token = localStorage.getItem("userToken");
   setLoading(true);
-        const res = await axios.post(
-          "http://localhost:3001/user/userdetails",
+        const res = await API.post(
+          "/user/userdetails",
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -45,8 +46,8 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
     const userToken = localStorage.getItem("userToken");
   setLoading(true);
     // Save enabled + duration
-    await axios.post(
-      "http://localhost:3001/user/updateNotifications",
+    await API.post(
+      "/user/updateNotifications",
       {
         enabled: newEnabled,
         duration: newDuration,
@@ -61,8 +62,8 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
       const fcmToken = await generateFCMToken();
 
       // Save token
-      await axios.post(
-        "http://localhost:3001/user/saveFCMToken",
+      await API.post(
+        "/user/saveFCMToken",
         { token: fcmToken },
         {
           headers: { Authorization: `Bearer ${userToken}` },
@@ -70,7 +71,7 @@ const saveNotificationSettings = async (newEnabled, newDuration) => {
       );
 
       // ✅ Send test popup immediately
-      await axios.post("http://localhost:3001/user/testNotification", {
+      await API.post("/user/testNotification", {
         token: fcmToken,
       });
 

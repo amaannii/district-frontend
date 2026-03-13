@@ -1,14 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import API from "../../../API/Api";
 
 function More({ setActive }) {
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleLogout = () => {
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+    console.log(token);
+    
+    await API.post(
+      "/user/logout",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     localStorage.removeItem("userToken");
     navigate("/login");
-  };
+  } catch (error) {
+    console.error("Logout failed", error);
+  }
+};
 
   return (
     <>

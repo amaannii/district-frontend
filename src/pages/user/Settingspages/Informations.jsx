@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import API from "../../../API/Api";
 
 
 function Informations({goBack}) {
@@ -25,14 +26,14 @@ function Informations({goBack}) {
       try {
         const token = localStorage.getItem("userToken");
         setLoading(true);
-        const res = await axios.get("http://localhost:3001/user/getContacts", {
+        const res = await API.get("/user/getContacts", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        const response = await axios.post(
-          "http://localhost:3001/user/userdetails",
+        const response = await API.post(
+          "/user/userdetails",
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -66,8 +67,8 @@ function Informations({goBack}) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/addContact",
+      const res = await API.post(
+        "/user/addContact",
         { number: newNumber },
         {
           headers: {
@@ -90,8 +91,8 @@ function Informations({goBack}) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/deleteContact",
+      const res = await API.post(
+        "/user/deleteContact",
         { number: selectedNumber },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -114,8 +115,8 @@ function Informations({goBack}) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/updateContact",
+      const res = await API.post(
+        "/user/updateContact",
         {
           newNumber: newNumber,
         },
@@ -142,8 +143,8 @@ function Informations({goBack}) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/updateBirthday",
+      const res = await API.post(
+        "/user/updateBirthday",
         {
           month,
           day,

@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import API from "../../../API/Api";
 
 function Comments({goBack}) {
   const [selected, setSelected] = useState("followers");
@@ -11,8 +12,8 @@ function Comments({goBack}) {
         const token = localStorage.getItem("userToken");
           setLoading(true);
 
-        const res = await axios.post(
-          "http://localhost:3001/user/userdetails",{},
+        const res = await API.post(
+          "/user/userdetails",{},
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -36,8 +37,8 @@ function Comments({goBack}) {
   const savePermission = async (value) => {
     const token = localStorage.getItem("userToken");
   setLoading(true);
-    await axios.post(
-      "http://localhost:3001/user/updateCommentPermission",
+    await API.post(
+      "/user/updateCommentPermission",
       { permission: value.toLowerCase() },
       {
         headers: { Authorization: `Bearer ${token}` },

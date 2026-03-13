@@ -18,6 +18,7 @@ import location from "../../../assets/images/icons8-location-24.png";
 import ChatBox from "./ChatBox";
 import { useEffect } from "react";
 import axios from "axios";
+import API from "../../../API/Api";
 
 const images = [
   { src: ksg, title: "KASARGOD" },
@@ -51,8 +52,8 @@ function Messages({ selectedDistrict, setSelectedDistrict,  setSelectedUsername,
   const fetchUserDetails = async () => {
     try {
         setLoading(true);
-      const response = await axios.post(
-        "http://localhost:3001/user/userdetails",
+      const response = await API.post(
+        "/user/userdetails",
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );

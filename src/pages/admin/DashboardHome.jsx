@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardChart from "./DashboardChart";
+import API from "../../API/Api";
 
 export default function DashboardHome() {
   const [users, setUsers] = useState([]);
@@ -17,9 +18,9 @@ export default function DashboardHome() {
     try {
 
       const [usersRes, messagesRes, adminsRes] = await Promise.all([
-        axios.get("http://localhost:3001/admin/users"),
-        axios.get("http://localhost:3001/admin/messages"),
-        axios.get("http://localhost:3001/admin/admins"),
+        API.get("/admin/users"),
+        API.get("/admin/messages"),
+        API.get("/admin/admins"),
       ]);
 
       setUsers(usersRes.data.users || []);

@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import profile from "../../../assets/images/icons8-user-100.png";
 import Swal from "sweetalert2";
+import API from "../../../API/Api";
 
 function EditProfile({goBack}) {
   const [bio, setBio] = useState("");
@@ -19,7 +20,6 @@ function EditProfile({goBack}) {
   const [showNameModal, setShowNameModal] = useState(false);
   const [name, setName] = useState("");
   const [savedName, setSavedName] = useState("");
-  
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -27,8 +27,8 @@ function EditProfile({goBack}) {
         setLoading(true);
         const token = localStorage.getItem("userToken");
 
-        const response = await axios.post(
-          "http://localhost:3001/user/userdetails",
+        const response = await API.post(
+          "/user/userdetails",
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -62,11 +62,11 @@ function EditProfile({goBack}) {
 
   const handledelete = async () => {
     try {
-        setLoading(true);
+      setLoading(true);
       const token = localStorage.getItem("userToken");
 
-      const response = await axios.post(
-        "http://localhost:3001/user/deleted",
+      const response = await API.post(
+        "/user/deleted",
         {},
         {
           headers: {
@@ -77,14 +77,14 @@ function EditProfile({goBack}) {
 
       if (response.data.success) {
         Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Image Deleted",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Image Deleted",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
 
         // Update UI immediately
         setUser((prev) => ({
@@ -98,10 +98,9 @@ function EditProfile({goBack}) {
       console.error("Error deleting image ❌", error);
 
       alert("Failed to delete image. Try again!");
-    }finally {
-        setLoading(false);
-      }
-    
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleuploadimg = async (file) => {
@@ -112,7 +111,7 @@ function EditProfile({goBack}) {
     data.append("upload_preset", "newuploads");
 
     try {
-       setLoading(true);
+      setLoading(true);
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
         { method: "POST", body: data },
@@ -121,8 +120,8 @@ function EditProfile({goBack}) {
       const result = await res.json();
       const token = localStorage.getItem("userToken");
       if (result.secure_url) {
-        const res = await axios.post(
-          "http://localhost:3001/user/upload",
+        const res = await API.post(
+          "/user/upload",
           { img: result.secure_url },
           {
             headers: {
@@ -133,24 +132,22 @@ function EditProfile({goBack}) {
         if (res.data.success == true) {
           setuploadshow(false);
           setShowModal(false);
-                Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Profile photo updated",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
-
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: "Profile photo updated",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
         }
       }
     } catch (error) {
       console.error("Image upload failed", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
- 
   };
 
   const handleFileSelect = (e) => {
@@ -160,10 +157,10 @@ function EditProfile({goBack}) {
 
   const handleSaveGender = async () => {
     try {
-        setLoading(true);
+      setLoading(true);
       const token = localStorage.getItem("userToken");
-      const res = await axios.post(
-        "http://localhost:3001/user/updateGender",
+      const res = await API.post(
+        "/user/updateGender",
         { gender },
         {
           headers: {
@@ -172,36 +169,35 @@ function EditProfile({goBack}) {
         },
       );
 
-    if (res.data.success) {
-  setSavedGender(gender);
+      if (res.data.success) {
+        setSavedGender(gender);
 
-
-  Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Profile photo updated",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
-}
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Profile photo updated",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+      }
 
       console.log(res.data);
     } catch (error) {
       console.log(error);
       alert("Error saving gender ❌");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveBio = async () => {
     try {
       const token = localStorage.getItem("userToken");
-  setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/updateBio",
+      setLoading(true);
+      const res = await API.post(
+        "/user/updateBio",
         { bio },
         {
           headers: {
@@ -212,31 +208,31 @@ function EditProfile({goBack}) {
 
       if (res.data.success) {
         setSavedBio(bio);
-     
-  Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Your bio was saved successfully",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Your bio was saved successfully",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       }
     } catch (error) {
       console.log(error);
       alert("Error saving bio ❌");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveName = async () => {
     try {
       const token = localStorage.getItem("userToken");
-  setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/updateName",
+      setLoading(true);
+      const res = await API.post(
+        "/user/updateName",
         { name },
         {
           headers: {
@@ -248,23 +244,23 @@ function EditProfile({goBack}) {
       if (res.data.success) {
         setSavedName(name);
         setShowNameModal(false);
-     
-  Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Name Updated",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Name Updated",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       }
     } catch (error) {
       console.log(error);
       alert("Error updating name ❌");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -279,18 +275,21 @@ function EditProfile({goBack}) {
 
       {/* Title */}
       <h1 className="text-lg sm:text-xl font-bold mb-8 sm:mb-10">
-  Edit Profile
-</h1>
+        Edit Profile
+      </h1>
 
       {/* Profile Card */}
+
    <div className="w-full bg-white text-black rounded-xl p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 shadow-lg">
+
         {/* Left Info */}
         <div className="flex items-center gap-4">
           <img
             src={userdetails.img || profile}
             alt="profile"
-          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
           />
+
 
          <div className="min-w-0">
   <h2 className="font-semibold text-sm sm:text-base truncate">
@@ -319,6 +318,7 @@ function EditProfile({goBack}) {
 >
   Change Photo
 </button>
+
       </div>
 
       {/* Form Section */}
@@ -330,17 +330,17 @@ function EditProfile({goBack}) {
             Bio
           </label>
 
-         <input
-  type="text"
-  value={bio}
-  onChange={(e) => {
-    if (e.target.value.length <= 250) {
-      setBio(e.target.value);
-    }
-  }}
-  placeholder="Bio (max 250 characters)"
-  className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
-/>
+          <input
+            type="text"
+            value={bio}
+            onChange={(e) => {
+              if (e.target.value.length <= 250) {
+                setBio(e.target.value);
+              }
+            }}
+            placeholder="Bio (max 250 characters)"
+            className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+          />
 
           {/* Character Counter */}
           <p
@@ -373,10 +373,10 @@ function EditProfile({goBack}) {
           </label>
 
           <select
-  value={gender}
-  onChange={(e) => setGender(e.target.value)}
-  className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
->
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+          >
             <option value="">Select Gender</option>
             <option value="Female">Female</option>
             <option value="Male">Male</option>
@@ -523,7 +523,6 @@ function EditProfile({goBack}) {
           <div className="chaotic-orbit"></div>
         </div>
       )}
-
     </div>
   );
 }

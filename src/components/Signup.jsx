@@ -5,6 +5,7 @@ import login from "../assets/images/login.jpg";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Googlelogin from "./auth/Googlelogin";
+import API from "../API/Api";
 
 const Signup = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -17,7 +18,7 @@ const Signup = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -37,8 +38,8 @@ const Signup = () => {
 
   const resendOtp = async () => {
     try {
-        setLoading(true);
-      await axios.post("http://localhost:3001/user/send-otp", { email });
+      setLoading(true);
+      await API.post("/user/send-otp", { email });
       setTimeLeft(60);
       setOtp("");
       otpRefs.current.forEach((input) => {
@@ -47,9 +48,9 @@ const Signup = () => {
       otpRefs.current[0]?.focus();
     } catch (error) {
       console.error(error);
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const validateForm = () => {
@@ -61,8 +62,7 @@ const Signup = () => {
 
     if (!username) newErrors.username = "Username is required";
     else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username))
-      newErrors.username =
-        "3-20 characters, letters, numbers or underscore";
+      newErrors.username = "3-20 characters, letters, numbers or underscore";
 
     if (!password) newErrors.password = "Password is required";
     else if (
@@ -79,15 +79,15 @@ const Signup = () => {
     if (!validateForm()) return;
 
     try {
-        setLoading(true);
-      await axios.post("http://localhost:3001/user/send-otp", { email });
+      setLoading(true);
+      await API.post("/user/send-otp", { email });
       setShowOtpModal(true);
       setTimeLeft(60);
     } catch (error) {
       console.error(error);
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const verifyotp = async () => {
@@ -95,17 +95,22 @@ const Signup = () => {
     if (timeLeft === 0) return alert("OTP expired");
 
     try {
-        setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/verify-otp",
-        { email, otp, password, name, username }
-      );
+      setLoading(true);
+      const res = await API.post("/user/verify-otp", {
+        email,
+        otp,
+        password,
+        name,
+        username,
+      });
 
       if (res.data.status === true) {
-        const response = await axios.post(
-          "http://localhost:3001/user/signup",
-          { email, password, username, name }
-        );
+        const response = await API.post("/user/signup", {
+          email,
+          password,
+          username,
+          name,
+        });
 
         if (response.data.success === true) navigate("/");
       }
@@ -114,9 +119,9 @@ const Signup = () => {
       setShowOtpModal(false);
     } catch (error) {
       alert(error.response?.data?.message || "Invalid OTP");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOtpChange = (e, index) => {
@@ -138,21 +143,19 @@ const Signup = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col lg:flex-row bg-white overflow-hidden">
-
       {/* LEFT IMAGE */}
-      <div className="hidden lg:flex lg:w-1/2 h-screen">
-        <img
-          className="h-full w-full object-cover"
-          src={login}
-          alt="signup"
-        />
+      <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 bg-gray-50 flex items-center">
+        <div className="w-full h-52 sm:h-64 md:h-72 lg:h-full rounded-2xl overflow-hidden shadow-md">
+          <img
+            src={login}
+            alt="signup"
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
       </div>
-
       {/* RIGHT FORM */}
       <div className="w-full lg:w-1/2 flex justify-center items-center py-10 px-4">
-
         <div className="w-full max-w-md text-black flex flex-col items-center">
-
           {/* Logo */}
           <img
             src={logo}
@@ -166,7 +169,6 @@ const Signup = () => {
 
           {/* INPUTS */}
           <div className="space-y-5 w-full">
-
             {/* EMAIL */}
             <div>
               <input
@@ -180,9 +182,7 @@ const Signup = () => {
                 className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-black outline-none"
               />
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.email}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
               )}
             </div>
 
@@ -206,9 +206,7 @@ const Signup = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
             </div>
 
@@ -234,12 +232,9 @@ const Signup = () => {
                 className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-black outline-none"
               />
               {errors.username && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.username}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.username}</p>
               )}
             </div>
-
           </div>
 
           {/* BUTTONS */}
@@ -260,7 +255,6 @@ const Signup = () => {
               </Link>
             </p>
           </div>
-
         </div>
       </div>
 
@@ -268,7 +262,6 @@ const Signup = () => {
       {showOtpModal && (
         <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="w-full max-w-md bg-black rounded-2xl p-6 sm:p-8 text-white shadow-xl">
-
             <h2 className="text-center text-xl font-semibold mb-6">
               OTP Verification
             </h2>
@@ -307,7 +300,6 @@ const Signup = () => {
             >
               Cancel
             </button>
-
           </div>
         </div>
       )}

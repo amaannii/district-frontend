@@ -2,21 +2,43 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PostCard from "../Components/PostCard";
 import profile from "../../../assets/images/icons8-profile-50.png";
+import API from "../../../API/Api";
 
 function Explore({ setSelectedUsername, setActive }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetchExplorePosts();
+    fetchuser()
   }, []);
+
+const fetchuser = async () => {
+  const token = localStorage.getItem("userToken");
+  try {
+    setLoading(true);
+
+    const response = await API.post(
+      "/user/userdetails",
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log(response.data.user.username);
+    
+    setUser(response.data.user.username); // ✅ store user in state
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchExplorePosts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:3001/user/posts/explore");
+      const res = await API.get("/user/posts/explore");
       console.log("Explore posts:", res.data);
       setPosts(res.data);
     } catch (error) {
@@ -28,27 +50,27 @@ function Explore({ setSelectedUsername, setActive }) {
 
   const fetchFullPost = async (postId) => {
     try {
-        setLoading(true);
+      setLoading(true);
       const token = localStorage.getItem("userToken");
-      const res = await axios.get(`http://localhost:3001/user/post/${postId}`, {
+      const res = await API.get(`/user/post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSelectedPost(res.data.post);
     } catch (err) {
       console.error(err);
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-   <div className="min-h-screen w-full bg-black text-white px-1 sm:px-3 md:px-6 py-3 overflow-y-auto scrollbar-hide overflow-x-hidden">
+    <div className="min-h-screen w-full bg-black text-white px-1 sm:px-3 md:px-6 py-3 overflow-y-auto scrollbar-hide overflow-x-hidden">
       {/* ===== Masonry Grid ===== */}
       <div className="columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-2 sm:gap-3">
         {posts.map((post, index) => (
           <div key={index} className="mb-2 sm:mb-3 break-inside-avoid group">
             <img
-              src={post.image||profile}
+              src={post.image || profile}
               alt="post"
               onClick={() => fetchFullPost(post._id)}
               className="w-full cursor-pointer rounded-md sm:rounded-lg
@@ -85,11 +107,12 @@ function Explore({ setSelectedUsername, setActive }) {
             </button>
 
             {/* PostCard */}
-           <div className="max-h-[85vh] overflow-y-auto scrollbar-hide px-2 sm:px-0">
+            <div className="max-h-[85vh] overflow-y-auto scrollbar-hide px-2 sm:px-0">
               <PostCard
                 data={selectedPost}
                 setSelectedUsername={setSelectedUsername}
                 setActive={setActive}
+                user={user}
               />
             </div>
           </div>

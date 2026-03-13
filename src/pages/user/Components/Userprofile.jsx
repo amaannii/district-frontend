@@ -2,8 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import PostCard from "../Components/PostCard";
 import { useNavigate } from "react-router-dom";
+import API from "../../../API/Api";
 
-function Userprofile({ selectedUsername }) {
+function Userprofile({ selectedUsername  }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,8 +41,8 @@ function Userprofile({ selectedUsername }) {
       try {
         const token = localStorage.getItem("userToken");
 
-        const response = await axios.post(
-          "http://localhost:3001/user/selecteduser",
+        const response = await API.post(
+          "/user/selecteduser",
           { username: usernameToFetch },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -49,8 +50,8 @@ function Userprofile({ selectedUsername }) {
         const user = response.data.user || response.data;
         setUserData(user);
 
-        const statusRes = await axios.get(
-          `http://localhost:3001/user/connection-status/${usernameToFetch}`,
+        const statusRes = await API.get(
+          `/user/connection-status/${usernameToFetch}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
 
@@ -73,7 +74,7 @@ function Userprofile({ selectedUsername }) {
     try {
       const token = localStorage.getItem("userToken");
 
-      const res = await axios.get(`http://localhost:3001/user/post/${postId}`, {
+      const res = await API.get(`/user/post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -87,8 +88,8 @@ function Userprofile({ selectedUsername }) {
     if (!userData) return;
     try {
       const token = localStorage.getItem("userToken");
-      const res = await axios.post(
-        "http://localhost:3001/user/request",
+      const res = await API.post(
+        "/user/request",
         { username: userData.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -102,8 +103,8 @@ function Userprofile({ selectedUsername }) {
     if (!userData) return;
     try {
       const token = localStorage.getItem("userToken");
-      await axios.post(
-        "http://localhost:3001/user/remove-connection",
+      await API.post(
+        "/user/remove-connection",
         { username: userData.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
