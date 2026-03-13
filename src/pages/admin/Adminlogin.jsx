@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../API/Api";
+import Swal from "sweetalert2";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export default function AdminLogin() {
   const handleSubmit =async (e) => {
     e.preventDefault();
       setLoading(true);
-   
+   try{
     const res =await API.post("/admin/admin-login", {
       email,
       password,
@@ -21,13 +22,43 @@ export default function AdminLogin() {
     
     
     if (res.data.success === true) {
+       
+              Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "success",
+                title: "login successful",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+              });
       localStorage.setItem("adminToken", res.data.token);
       localStorage.setItem("role", res.data.role);
 
       navigate("/admindashboard");
+
     } else {
-      alert("enter you correct email and password");
+      Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "error",
+                title: "Invalid credentials",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+              });
     }
+    } catch (error) {
+    Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "error",
+                title: "Invalid credentials",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+              });
+  }
         setLoading(false);
 
     // connect backend here
