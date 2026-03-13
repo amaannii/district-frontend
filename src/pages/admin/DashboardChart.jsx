@@ -10,7 +10,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function DashboardChart({ users, messages, admins }) {
   const data = {
-    labels: ["Users", "Messages", "Admins"],
+    labels: ["Users", "Active Users", "Admins"],
     datasets: [
       {
         data: [users.length, messages.length, admins.length],

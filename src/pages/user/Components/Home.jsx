@@ -5,6 +5,7 @@ import PostCard from "./PostCard";
 import axios from "axios";
 import Profile from "./Profile";
 import defaultProfile from "../../../assets/images/icons8-profile-50.png";
+import API from "../../../API/Api";
 
 function Home({ setSelectedUsername, setActive, openChat }) {
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -21,7 +22,6 @@ function Home({ setSelectedUsername, setActive, openChat }) {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  
 
   /* ================= INITIAL FETCH ================= */
   useEffect(() => {
@@ -31,13 +31,13 @@ function Home({ setSelectedUsername, setActive, openChat }) {
         const token = localStorage.getItem("userToken");
 
         const [feedRes, notesRes, imageRes] = await Promise.all([
-          axios.get("http://localhost:3001/user/feed", {
+          API.get("/user/feed", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3001/user/notes", {
+          API.get("/user/notes", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3001/user/image", {
+          API.get("/user/image", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -73,8 +73,8 @@ function Home({ setSelectedUsername, setActive, openChat }) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/note",
+      const res = await API.post(
+        "/user/note",
         { note },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -93,7 +93,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
     try {
       const token = localStorage.getItem("userToken");
       setLoading(true);
-      const res = await axios.delete("http://localhost:3001/user/note", {
+      const res = await API.delete("/user/note", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -110,11 +110,11 @@ function Home({ setSelectedUsername, setActive, openChat }) {
 
   /* ================= HOME VIEW ================= */
   return (
-   <div className="flex flex-col lg:flex-row w-full play-regular min-h-screen bg-black text-white">
+    <div className="flex flex-col lg:flex-row w-full play-regular min-h-screen bg-black text-white">
       <div className="flex-1 w-full max-w-xl sm:max-w-2xl mx-auto">
         {/* NOTES */}
         <div className="min-h-[120px] px-3 sm:px-6 border-b border-neutral-800">
-         <div className="flex gap-6 sm:gap-10 overflow-x-auto mt-4 pb-2 scrollbar-hide">
+          <div className="flex gap-6 sm:gap-10 overflow-x-auto mt-4 pb-2 scrollbar-hide">
             <div className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 <img
@@ -123,15 +123,14 @@ function Home({ setSelectedUsername, setActive, openChat }) {
                 />
               </div>
 
-                 {!myNote && (
-                  <button
-                    onClick={addMyNote}
-                    className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold cursor-pointer "
-                  >
-                    +
-                  </button>
-                )}
-
+              {!myNote && (
+                <button
+                  onClick={addMyNote}
+                  className="relative left-5 bottom-4 w-5 h-5 rounded-full bg-[#879F00] text-xs font-bold cursor-pointer "
+                >
+                  +
+                </button>
+              )}
 
               {myNote && (
                 <div
@@ -214,7 +213,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
         </div>
       )}
 
-    <div className="w-[300px] xl:w-[320px] hidden lg:block">
+      <div className="w-[300px] xl:w-[320px] hidden lg:block">
         <MiniChatBox openChat={openChat} />
       </div>
 
@@ -225,32 +224,29 @@ function Home({ setSelectedUsername, setActive, openChat }) {
       )}
       {/* DELETE NOTE MODAL */}
 
-{showDeleteModal && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-   <div className="bg-neutral-900 w-[90%] max-w-xs rounded-lg p-6 text-center">
-      <h3 className="text-lg font-semibold mb-4">
-        Delete your note?
-      </h3>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-neutral-900 w-[90%] max-w-xs rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold mb-4">Delete your note?</h3>
 
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={handleDeleteNote}
-          className="bg-red-600 px-4 py-2 rounded cursor-pointer"
-        >
-          Delete
-        </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleDeleteNote}
+                className="bg-red-600 px-4 py-2 rounded cursor-pointer"
+              >
+                Delete
+              </button>
 
-        <button
-          onClick={() => setShowDeleteModal(false)}
-          className="bg-neutral-700 px-4 py-2 rounded cursor-pointer"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-neutral-700 px-4 py-2 rounded cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

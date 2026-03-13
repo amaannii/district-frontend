@@ -9,10 +9,10 @@ import send from "../../../assets/images/icons8-sent-50.png";
 import socket from "../../../Socket";
 import profile from "../../../assets/images/icons8-profile-50.png";
 import Swal from "sweetalert2";
+import API from "../../../API/Api";
 
 function PostCard({
   setSelectedUsername,
-  setActivePage,
   data,
   user,
   setActive,
@@ -57,8 +57,8 @@ function PostCard({
     if (!token) return alert("Login required");
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/like-post",
+      const res = await API.post(
+        "/user/like-post",
         { postId: data._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -85,8 +85,8 @@ function PostCard({
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/add-comment",
+      const res = await API.post(
+        "/user/add-comment",
         { postId: data._id, text: commentText },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -112,8 +112,8 @@ function PostCard({
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/save-post",
+      const res = await API.post(
+        "/user/save-post",
         { postId: data._id, username: data.userId.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -133,8 +133,8 @@ function PostCard({
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/delete-comment",
+      const res = await API.post(
+        "/user/delete-comment",
         {
           postId: data._id,
           commentId: commentToDelete,
@@ -164,8 +164,8 @@ function PostCard({
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/send-post-to-chats",
+      const res = await API.post(
+        "/user/send-post-to-chats",
         { chatIds: selectedDistricts, postId: data._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -190,10 +190,15 @@ function PostCard({
   return (
     <div className="border-b border-neutral-800 mb-6 w-full max-w-xl sm:max-w-2xl mx-auto">
       {/* USER INFO */}
-     <div className="px-3 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
+      <div className="px-3 sm:px-6 py-3 flex items-center gap-3 cursor-pointer">
         <img
           onClick={() => {
-            setSelectedUserId(data.userId._id);
+            if (data.userId?.username?.toString() === user?.toString()) {
+              setActive("PROFILE");
+            } else {
+              setSelectedUsername(data.userId?.username);
+              setActive("UPROFILE");
+            }
           }}
           src={data.userId?.img || profile}
           className="w-8 h-8 rounded-full object-cover cursor-pointer"
@@ -201,8 +206,8 @@ function PostCard({
 
         <span
           onClick={() => {
-            if (data.userId?._id === currentUser?._id) {
-              setActivePage("PROFILE");
+            if (data.userId?.username?.toString() === user?.toString()) {
+              setActive("PROFILE");
             } else {
               setSelectedUsername(data.userId?.username);
               setActive("UPROFILE");
@@ -222,7 +227,7 @@ function PostCard({
       />
 
       {/* CAPTION */}
-     <div className="px-3 sm:px-6 py-2 text-gray-300 text-sm leading-relaxed">
+      <div className="px-3 sm:px-6 py-2 text-gray-300 text-sm leading-relaxed">
         <span className="font-semibold mr-2">{data.userId?.username}</span>
         {data.caption}
       </div>
@@ -310,7 +315,7 @@ function PostCard({
             />
             <button
               onClick={handleComment}
-              className="text-blue-500 font-semibold text-sm"
+              className="text-[#879F00] font-semibold text-sm"
             >
               send
             </button>

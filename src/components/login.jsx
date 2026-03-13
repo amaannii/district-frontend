@@ -5,6 +5,7 @@ import login from "../assets/images/login.jpg";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Googlelogin from "./auth/Googlelogin";
+import API from "../API/Api";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,10 +34,10 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post(
-        "http://localhost:3001/user/login",
-        { email, password }
-      );
+      const { data } = await API.post("/user/login", {
+        email,
+        password,
+      });
 
       if (data.success === true) {
         localStorage.setItem("userToken", data.token);
@@ -54,21 +55,20 @@ const Login = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen w-full bg-white">
-
       {/* LEFT IMAGE */}
-      <div className="hidden lg:flex lg:w-1/2">
-        <img
-          className="h-full w-full object-cover"
-          src={login}
-          alt="login"
-        />
-      </div>
+      <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 bg-gray-50">
+  <div className="w-full h-56 sm:h-64 md:h-72 lg:h-full overflow-hidden rounded-2xl shadow-md">
+    <img
+      src={login}
+      alt="login"
+      className="w-full h-full object-cover object-center"
+    />
+  </div>
+</div>
 
       {/* RIGHT FORM */}
       <div className="flex w-full lg:w-1/2 items-center justify-center px-4 py-10">
-
         <div className="w-full max-w-md">
-
           {/* LOGO */}
           <img
             src={logo}
@@ -77,7 +77,6 @@ const Login = () => {
           />
 
           <div className="space-y-6">
-
             {/* EMAIL */}
             <div className="relative">
               <input
@@ -103,9 +102,7 @@ const Login = () => {
                 Email
               </label>
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.email}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
               )}
             </div>
 
@@ -143,12 +140,9 @@ const Login = () => {
               </button>
 
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
             </div>
-
           </div>
 
           {/* FORGOT PASSWORD */}
@@ -174,12 +168,9 @@ const Login = () => {
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link to="/signup">
-              <span className="text-[#879F00] hover:underline">
-                Sign up
-              </span>
+              <span className="text-[#879F00] hover:underline">Sign up</span>
             </Link>
           </p>
-
         </div>
       </div>
       {loading && (

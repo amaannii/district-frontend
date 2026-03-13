@@ -4,6 +4,7 @@ import axios from "axios";
 import heart from "../../../assets/images/icons8-heart-24.png";
 import heartRed from "../../../assets/images/icons8-heart-24 (1).png";
 import commentIcon from "../../../assets/images/icons8-comment-50.png";
+import API from "../../../API/Api";
 
 const EMOJIS = [
   "😀",
@@ -44,97 +45,103 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const [commentText, setCommentText] = useState("");
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   /* ================= SOCKET ================= */
 
-  useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("userToken");
+useEffect(() => {
+  const fetchDetails = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("userToken");
 
-        const res = await axios.post(
-          "http://localhost:3001/user/userdetails",
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+      const res = await API.post(
+        "/user/userdetails",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-        const user = res.data.user;
-        setcurrentUser(user);
-      } catch (error) {
-        console.log("Error fetching notification settings ❌", error);
-      } finally {
-        setLoading(false);
-      }
+      const user = res.data.user;
+      setcurrentUser(user);
+    } catch (error) {
+      console.log("Error fetching notification settings ❌", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      const handleDelete = (messageId) => {
-        setMessages((prev) =>
-          prev.filter((m) => m._id === undefined || m._id !== messageId),
-        );
-      };
-
-      socket.on("messageDeleted", handleDelete);
-
-      return () => {
-        socket.off("messageDeleted", handleDelete);
-      };
-    };
-
-    fetchDetails();
+  const fetchMessages = async () => {
     if (!district) return;
 
-    setMessages([]);
+    try {
+      setMessages([]);
 
-    fetch(`http://localhost:3001/messages/${district}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formatted = data.messages.map((msg) => {
-          if (msg.post) {
-            return {
-              type: "post",
-              post: msg.post,
-              postOwner: msg.postOwner,
-              sender: msg.sender,
-              time: msg.createdAt,
-            };
-          }
+      const res = await API.get(`/messages/${district}`);
+      const data = res.data;
 
+      const formatted = data.messages.map((msg) => {
+        if (msg.post) {
           return {
-            _id: msg._id, // ✅ VERY IMPORTANT
-            type: msg.message?.type,
-            content: msg.message?.content,
-            name: msg.message?.name,
+            type: "post",
+            post: msg.post,
+            postOwner: msg.postOwner,
             sender: msg.sender,
             time: msg.createdAt,
           };
-        });
+        }
 
-        setMessages(formatted);
-      });
-    socket.emit("joinDistrict", district);
-
-    const receiveHandler = (msg) => {
-      setMessages((prev) => [
-        ...prev,
-        {
+        return {
           _id: msg._id,
-          ...msg.message,
+          type: msg.message?.type,
+          content: msg.message?.content,
+          name: msg.message?.name,
           sender: msg.sender,
           time: msg.createdAt,
-        },
-      ]);
-    };
+        };
+      });
 
-    socket.on("receiveMessage", receiveHandler);
+      setMessages(formatted);
+    } catch (error) {
+      console.log("Error fetching messages ❌", error);
+    }
+  };
 
-    return () => {
-      socket.off("receiveMessage", receiveHandler);
-      socket.emit("leaveDistrict", district);
-    };
-  }, [district, showComments, liked]);
+  fetchDetails();
+  fetchMessages();
+
+  if (!district) return;
+
+  socket.emit("joinDistrict", district);
+
+  const receiveHandler = (msg) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        _id: msg._id,
+        ...msg.message,
+        sender: msg.sender,
+        time: msg.createdAt,
+      },
+    ]);
+  };
+
+  const handleDelete = (messageId) => {
+    setMessages((prev) =>
+      prev.filter((m) => m._id === undefined || m._id !== messageId)
+    );
+  };
+
+  socket.on("receiveMessage", receiveHandler);
+  socket.on("messageDeleted", handleDelete);
+
+  return () => {
+    socket.off("receiveMessage", receiveHandler);
+    socket.off("messageDeleted", handleDelete);
+    socket.emit("leaveDistrict", district);
+  };
+}, [district, showComments, liked]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -284,8 +291,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       try {
         const token = localStorage.getItem("userToken");
         setLoading(true);
-        const res = await axios.post(
-          "http://localhost:3001/user/checkisliked",
+        const res = await API.post(
+          "/user/checkisliked",
           { postId: selectedPost.post._id },
           {
             headers: {
@@ -430,8 +437,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/like-post",
+      const res = await API.post(
+        "/user/like-post",
         { postId: selectedPost.post._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -452,8 +459,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/add-comment",
+      const res = await API.post(
+        "/user/add-comment",
         { postId: selectedPost.post._id, text: commentText },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -491,8 +498,8 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/save-post",
+      const res = await API.post(
+        "/user/save-post",
         {
           postId: selectedPost.post._id,
           username: selectedPost.postOwner?.username,
@@ -516,7 +523,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   /* ================= UI ================= */
 
   return (
-   <div className="flex flex-col h-[85vh] sm:h-[80vh] w-full bg-[#0f0f0f] rounded-none sm:rounded-xl p-2 sm:p-4 text-white">
+    <div className="flex flex-col h-[85vh] sm:h-[80vh] w-full bg-[#0f0f0f] rounded-none sm:rounded-xl p-2 sm:p-4 text-white">
       <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
         <button onClick={onBack}>←</button>
         <h2>{district}</h2>
@@ -600,7 +607,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
                   <img
                     src={msg.post.image}
-                   className="rounded-lg max-w-[70vw] sm:max-w-xs"
+                    className="rounded-lg max-w-[70vw] sm:max-w-xs"
                     alt="shared post"
                   />
 
@@ -628,7 +635,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
                         openImageMenuId === msg._id ? null : msg._id,
                       )
                     }
-                   className="max-w-[70vw] sm:max-w-xs md:max-w-sm rounded-lg cursor-pointer"
+                    className="max-w-[70vw] sm:max-w-xs md:max-w-sm rounded-lg cursor-pointer"
                     alt="chat"
                   />
 
@@ -709,7 +716,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         <div ref={messagesEndRef} />
       </div>
 
-     <div className="relative flex items-center gap-2 sm:gap-3 border-t border-gray-700 pt-2 sm:pt-3">
+      <div className="relative flex items-center gap-2 sm:gap-3 border-t border-gray-700 pt-2 sm:pt-3">
         {!recording ? (
           <>
             <button onClick={() => setShowEmojis(!showEmojis)}>😊</button>
@@ -751,7 +758,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       {showEmojis && (
         <div
           ref={emojiRef}
-         className="absolute bottom-14 left-2 sm:left-auto mb-10 bg-gray-800 p-3 rounded-lg w-[90%] sm:max-w-xs shadow-lg z-50"
+          className="absolute bottom-14 left-2 sm:left-auto mb-10 bg-gray-800 p-3 rounded-lg w-[90%] sm:max-w-xs shadow-lg z-50"
         >
           <div className="flex flex-wrap gap-2">
             {EMOJIS.map((emoji, index) => (
@@ -796,20 +803,30 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-           className="bg-[#0f0f0f] text-white overflow-y-auto scrollbar-hide rounded-xl w-[95%] sm:w-[90%] md:w-[500px] max-h-[90vh]"
+            className="bg-[#0f0f0f] text-white overflow-y-auto scrollbar-hide rounded-xl w-[95%] sm:w-[90%] md:w-[500px] max-h-[90vh]"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <div className="flex items-center gap-3">
+              <div
+                onClick={() => {
+                  if (
+                    selectedPost.postOwner?._id?.toString() ===
+                    currentUser?._id?.toString()
+                  ) {
+                    setActive("PROFILE");
+                  } else {
+                    setActive("UPROFILE");
+                    setSelectedUsername(selectedPost.postOwner.username);
+                  }
+                }}
+                className="flex items-center gap-3 cursor-pointer"
+              >
                 <img
                   src={selectedPost.postOwner?.avatar}
                   className="w-8 h-8 rounded-full"
                   alt=""
-                  onClick={() => {
-                    setActive("UPROFILE");
-                    setSelectedUsername(selectedPost.postOwner.username);
-                  }}
                 />
+
                 <span className="font-semibold">
                   {selectedPost.postOwner?.username}
                 </span>
@@ -916,6 +933,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
           {/* Add Comment */}
         </div>
       )}
+
       {loading && (
         <div className="fixed inset-0 flex justify-center items-center  z-50">
           <div className="chaotic-orbit"></div>

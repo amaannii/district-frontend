@@ -3,6 +3,7 @@ import logo from "../assets/images/logo.jpg";
 import lock from "../assets/images/Vector.png";
 import { useRef, useState } from "react";
 import axios from "axios";
+import API from "../API/Api";
 
 const ForgetPassword = () => {
   const [email, setemail] = useState("");
@@ -24,7 +25,7 @@ const ForgetPassword = () => {
   const handleSendotp = async () => {
     try {
         setLoading(true);
-      await axios.post("http://localhost:3001/user/send-otp", { email });
+      await API.post("/user/send-otp", { email });
       setShowSuccess(true);
     } catch (error) {
       console.error(error);
@@ -42,7 +43,7 @@ const ForgetPassword = () => {
 
     try {
         setLoading(true);
-      await axios.post("http://localhost:3001/user/verify-otp", {
+      await API.post("/user/verify-otp", {
         email,
         otp: otpValue,
       });
@@ -68,7 +69,7 @@ const ForgetPassword = () => {
 
     try {
         setLoading(true);
-      await axios.post("http://localhost:3001/user/reset-password", {
+      await API.post("/user/reset-password", {
         email,
         password: newPassword,
       });

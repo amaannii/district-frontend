@@ -3,6 +3,7 @@ import { MessageCircle, X, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import axios from "axios";
 import { ArrowLeft } from "lucide-react";
+import API from "../../API/Api";
 
 const districts = [
   "THIRUVANANTHAPURAM",
@@ -36,8 +37,8 @@ export default function ChatRoom() {
     if (!selectedDistrict) return;
 
     try {
-      const res = await axios.get(
-        `http://localhost:3001/messages/${selectedDistrict}`,
+      const res = await API.get(
+        `/messages/${selectedDistrict}`,
       );
 
       const formatted = res.data.messages
@@ -60,7 +61,7 @@ export default function ChatRoom() {
 
   const deleteMessage = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/admin/delete-message/${id}`);
+      await API.delete(`/admin/delete-message/${id}`);
 
       setMessages((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {

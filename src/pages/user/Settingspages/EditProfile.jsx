@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import profile from "../../../assets/images/icons8-user-100.png";
 import Swal from "sweetalert2";
+import API from "../../../API/Api";
 
 function EditProfile() {
   const [bio, setBio] = useState("");
@@ -19,7 +20,6 @@ function EditProfile() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [name, setName] = useState("");
   const [savedName, setSavedName] = useState("");
-  
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -27,8 +27,8 @@ function EditProfile() {
         setLoading(true);
         const token = localStorage.getItem("userToken");
 
-        const response = await axios.post(
-          "http://localhost:3001/user/userdetails",
+        const response = await API.post(
+          "/user/userdetails",
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -62,11 +62,11 @@ function EditProfile() {
 
   const handledelete = async () => {
     try {
-        setLoading(true);
+      setLoading(true);
       const token = localStorage.getItem("userToken");
 
-      const response = await axios.post(
-        "http://localhost:3001/user/deleted",
+      const response = await API.post(
+        "/user/deleted",
         {},
         {
           headers: {
@@ -77,14 +77,14 @@ function EditProfile() {
 
       if (response.data.success) {
         Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Image Deleted",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Image Deleted",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
 
         // Update UI immediately
         setUser((prev) => ({
@@ -98,10 +98,9 @@ function EditProfile() {
       console.error("Error deleting image ❌", error);
 
       alert("Failed to delete image. Try again!");
-    }finally {
-        setLoading(false);
-      }
-    
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleuploadimg = async (file) => {
@@ -112,7 +111,7 @@ function EditProfile() {
     data.append("upload_preset", "newuploads");
 
     try {
-       setLoading(true);
+      setLoading(true);
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dlxxxangl/image/upload",
         { method: "POST", body: data },
@@ -121,8 +120,8 @@ function EditProfile() {
       const result = await res.json();
       const token = localStorage.getItem("userToken");
       if (result.secure_url) {
-        const res = await axios.post(
-          "http://localhost:3001/user/upload",
+        const res = await API.post(
+          "/user/upload",
           { img: result.secure_url },
           {
             headers: {
@@ -133,24 +132,22 @@ function EditProfile() {
         if (res.data.success == true) {
           setuploadshow(false);
           setShowModal(false);
-                Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Profile photo updated",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
-
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: "Profile photo updated",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
         }
       }
     } catch (error) {
       console.error("Image upload failed", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
- 
   };
 
   const handleFileSelect = (e) => {
@@ -160,10 +157,10 @@ function EditProfile() {
 
   const handleSaveGender = async () => {
     try {
-        setLoading(true);
+      setLoading(true);
       const token = localStorage.getItem("userToken");
-      const res = await axios.post(
-        "http://localhost:3001/user/updateGender",
+      const res = await API.post(
+        "/user/updateGender",
         { gender },
         {
           headers: {
@@ -172,36 +169,35 @@ function EditProfile() {
         },
       );
 
-    if (res.data.success) {
-  setSavedGender(gender);
+      if (res.data.success) {
+        setSavedGender(gender);
 
-
-  Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Profile photo updated",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
-}
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Profile photo updated",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+      }
 
       console.log(res.data);
     } catch (error) {
       console.log(error);
       alert("Error saving gender ❌");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveBio = async () => {
     try {
       const token = localStorage.getItem("userToken");
-  setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/updateBio",
+      setLoading(true);
+      const res = await API.post(
+        "/user/updateBio",
         { bio },
         {
           headers: {
@@ -212,31 +208,31 @@ function EditProfile() {
 
       if (res.data.success) {
         setSavedBio(bio);
-     
-  Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Your bio was saved successfully",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Your bio was saved successfully",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       }
     } catch (error) {
       console.log(error);
       alert("Error saving bio ❌");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveName = async () => {
     try {
       const token = localStorage.getItem("userToken");
-  setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/updateName",
+      setLoading(true);
+      const res = await API.post(
+        "/user/updateName",
         { name },
         {
           headers: {
@@ -248,44 +244,46 @@ function EditProfile() {
       if (res.data.success) {
         setSavedName(name);
         setShowNameModal(false);
-     
-  Swal.fire({
-  toast: true,
-  position: "top-end",
-  icon: "success",
-  title: "Name Updated",
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: true,
-});
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Name Updated",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       }
     } catch (error) {
       console.log(error);
       alert("Error updating name ❌");
-    }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full max-w-xl text-white play-regular mx-auto px-4 sm:px-6">
       {/* Title */}
       <h1 className="text-lg sm:text-xl font-bold mb-8 sm:mb-10">
-  Edit Profile
-</h1>
+        Edit Profile
+      </h1>
 
       {/* Profile Card */}
-     <div className="text-black bg-white rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full shadow-lg">
+      <div className="text-black bg-white rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full shadow-lg">
         {/* Left Info */}
         <div className="flex items-center gap-4">
           <img
             src={userdetails.img || profile}
             alt="profile"
-          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
           />
 
           <div>
-           <h2 className="font-semibold text-sm sm:text-base">{userdetails.username}</h2>
+            <h2 className="font-semibold text-sm sm:text-base">
+              {userdetails.username}
+            </h2>
             <div className="flex items-center gap-2">
               <p className="text-gray-500 text-xs">{savedName}</p>
 
@@ -303,7 +301,7 @@ function EditProfile() {
         {/* Change Photo Button */}
         <button
           onClick={() => setShowModal(true)}
-         className="bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full sm:w-auto hover:bg-gray-800 transition"
+          className="bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full sm:w-auto hover:bg-gray-800 transition"
         >
           Change Photo
         </button>
@@ -318,17 +316,17 @@ function EditProfile() {
             Bio
           </label>
 
-         <input
-  type="text"
-  value={bio}
-  onChange={(e) => {
-    if (e.target.value.length <= 250) {
-      setBio(e.target.value);
-    }
-  }}
-  placeholder="Bio (max 250 characters)"
-  className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
-/>
+          <input
+            type="text"
+            value={bio}
+            onChange={(e) => {
+              if (e.target.value.length <= 250) {
+                setBio(e.target.value);
+              }
+            }}
+            placeholder="Bio (max 250 characters)"
+            className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+          />
 
           {/* Character Counter */}
           <p
@@ -361,10 +359,10 @@ function EditProfile() {
           </label>
 
           <select
-  value={gender}
-  onChange={(e) => setGender(e.target.value)}
-  className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
->
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="w-full px-4 sm:px-5 py-3 rounded-xl text-sm bg-black border border-gray-700 focus:outline-none focus:border-[#879F00]"
+          >
             <option value="">Select Gender</option>
             <option value="Female">Female</option>
             <option value="Male">Male</option>
@@ -511,7 +509,6 @@ function EditProfile() {
           <div className="chaotic-orbit"></div>
         </div>
       )}
-
     </div>
   );
 }

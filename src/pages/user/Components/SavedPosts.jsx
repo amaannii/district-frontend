@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PostCard from "./PostCard";
+import API from "../../../API/Api";
 
-function SavedPosts() {
+function SavedPosts({ setSelectedUsername, setActive }) {
   const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("userToken");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchSaved = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("http://localhost:3001/user/saved-posts", {
+        const res = await API.get("/user/saved-posts", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -26,7 +28,28 @@ function SavedPosts() {
     };
 
     fetchSaved();
+    fetchuser();
   }, [token]);
+
+  const fetchuser = async () => {
+    const token = localStorage.getItem("userToken");
+    try {
+      setLoading(true);
+
+      const response = await API.post(
+        "/user/userdetails",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      console.log(response.data.user.username);
+
+      setUser(response.data.user.username); // ✅ store user in state
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center py-10 px-4">
@@ -37,7 +60,13 @@ function SavedPosts() {
       ) : (
         <div className="w-full max-w-xl space-y-6">
           {posts.map((p) => (
-            <PostCard key={p._id} data={p} />
+            <PostCard
+              key={p._id}
+              data={p}
+              setSelectedUsername={setSelectedUsername}
+              setActive={setActive}
+              user={user}
+            />
           ))}
         </div>
       )}

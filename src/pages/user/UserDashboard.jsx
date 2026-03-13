@@ -38,7 +38,7 @@ function UserDashboard() {
         return <Explore  setSelectedUsername={setSelectedUsername}
             setActive={setActivePage} />;
       case "UPROFILE":
-        return <Userprofile selectedUsername={selectedUsername} />;
+        return <Userprofile    selectedUsername={selectedUsername} />;
 
       case "MESSAGES":
         return (

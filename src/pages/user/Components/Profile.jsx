@@ -9,6 +9,7 @@ import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../../../API/Api";
 
 function Profile({ setSelectedUsername, setActive, data, user }) {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const [like, setLike] = useState(0);
   const fileInputRef = useRef(null);
   const [showImageConfirm, setShowImageConfirm] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("userToken");
 
@@ -119,12 +120,11 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const fetchSavedPost = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        "http://localhost:3001/user/get-saved-posts",
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await API.get("/user/get-saved-posts", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      if (res.data) setSavedPost(res.data);
+      if (res.data) setSavedPost(res.data.reverse());
     } catch (err) {
       console.error(err);
     } finally {
@@ -153,7 +153,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const handleDeletePost = async (postId) => {
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:3001/user/delete-post/${postId}`, {
+      await API.delete(`/user/delete-post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -170,8 +170,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const handleUpdatePost = async () => {
     try {
       setLoading(true);
-      await axios.put(
-        `http://localhost:3001/user/update-post/${selectedPost._id}`,
+      await API.put(
+        `/user/update-post/${selectedPost._id}`,
         { caption: editedCaption },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -199,7 +199,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const fetchConnections = async (type) => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:3001/user/${type}`, {
+      const res = await API.get(`/user/${type}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -219,10 +219,9 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const handleUnsave = async () => {
     try {
       setLoading(true);
-      await axios.delete(
-        `http://localhost:3001/user/unsave/${selectedPost._id}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      await API.delete(`/user/unsave/${selectedPost._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setSaved(false);
       setSavedPost((prev) => prev.filter((p) => p._id !== selectedPost._id));
@@ -243,8 +242,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/save-post",
+      const res = await API.post(
+        "/user/save-post",
         { postId: selectedPost._id, username: userdetails.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -266,8 +265,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const handleLike = async () => {
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/like-post",
+      const res = await API.post(
+        "/user/like-post",
         { postId: selectedPost._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -289,8 +288,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/add-comment",
+      const res = await API.post(
+        "/user/add-comment",
         { postId: selectedPost._id, text: commentText },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -316,8 +315,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       // Allow post owner or comment owner to delete
       if (!isPostOwner && comment.username !== userdetails.username) return;
 
-      const res = await axios.post(
-        "http://localhost:3001/user/delete-comment",
+      const res = await API.post(
+        "/user/delete-comment",
         { postId: selectedPost._id, commentId },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -330,6 +329,17 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUserClick = () => {
+    if (selectedPost.postOwner?.username === userdetails.username) {
+      setActive("PROFILE"); // current user profile
+    } else {
+      setSelectedUsername(selectedPost.postOwner?.username);
+      setActive("UPROFILE"); // other user profile
+    }
+
+    setselectedPost(null); // close modal
   };
 
   /* ---------------- PROFILE IMAGE UPLOAD ---------------- */
@@ -349,8 +359,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
     if (result.secure_url) {
       setSelectedImage(result.secure_url);
-      await axios.post(
-        "http://localhost:3001/user/upload",
+      await API.post(
+        "/user/upload",
         { img: result.secure_url },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -370,8 +380,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:3001/user/send-post-to-chats",
+      const res = await API.post(
+        "/user/send-post-to-chats",
         {
           chatIds: selectedDistricts,
           postId: selectedPost._id, // ✅ FIXED
@@ -403,8 +413,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         const token = localStorage.getItem("userToken");
         console.log(selectedPost._id);
 
-        const res = await axios.post(
-          "http://localhost:3001/user/checkisliked",
+        const res = await API.post(
+          "/user/checkisliked",
           { postId: selectedPost._id },
           {
             headers: {
@@ -433,7 +443,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   return (
     <>
       <div className="flex min-h-screen w-full bg-black text-white">
-  <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-10 py-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-10 py-6">
           {/* SETTINGS */}
           <div className="flex justify-end mb-6">
             <img
@@ -479,7 +489,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               onChange={handleImageUpload}
               style={{ display: "none" }}
             />
-
 
             <div className="flex gap-10 mb-5">
               <div>
@@ -530,14 +539,17 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
           {/* GRID */}
           <div className="grid grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 max-w-5xl mx-auto mt-4">
-  {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
-    <div key={index} className="relative aspect-square overflow-hidden">
-      <img
-        src={item.image}
-        alt=""
-        className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
-        onClick={() => setselectedPost(item)}
-      />
+            {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
+              <div
+                key={index}
+                className="relative aspect-square overflow-hidden"
+              >
+                <img
+                  src={item.image}
+                  alt=""
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
+                  onClick={() => setselectedPost(item)}
+                />
 
                 {/* HEART / COMMENT / SHARE / SAVE ICONS overlay */}
                 <div className="absolute bottom-2 left-2 flex ">
@@ -586,7 +598,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       {/* POST MODAL */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div className="
+          <div
+            className="
 bg-[#0f0f0f]
 w-full
 h-full
@@ -598,27 +611,32 @@ md:flex-row
 rounded-none
 md:rounded-lg
 overflow-hidden
-">
+"
+          >
             {/* LEFT IMAGE */}
-          <div className="w-full md:w-1/2 bg-black">
+            <div className="w-full md:w-1/2 bg-black">
               <img
                 src={selectedPost.image}
                 alt="post"
-               className="w-full aspect-square object-cover"
+                className="w-full aspect-square object-cover"
               />
             </div>
 
             {/* RIGHT SIDE */}
-          <div className="w-full md:w-1/2 flex flex-col text-white h-full">
+            <div className="w-full md:w-1/2 flex flex-col text-white h-full">
               {/* HEADER */}
               <div className="flex justify-between items-center p-4 border-b border-neutral-800">
                 <div className="flex items-center gap-3">
                   <img
+                    onClick={handleUserClick}
                     src={userdetails.img}
                     alt="user"
-                    className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full"
+                    className="relative w-12 h-12 sm:w-10 sm:h-10 rounded-full"
                   />
-                  <span className="font-semibold text-sm ">
+                  <span
+                    onClick={handleUserClick}
+                    className="font-semibold text-sm cursor-pointer"
+                  >
                     {selectedPost.postOwner?.username || userdetails.username}
                   </span>
                 </div>
@@ -631,7 +649,7 @@ overflow-hidden
                           setIsEditing(true);
                           setEditedCaption(selectedPost.caption);
                         }}
-                         className=" cursor-pointer"
+                        className=" cursor-pointer"
                       >
                         Edit
                       </button>
@@ -647,8 +665,12 @@ overflow-hidden
                     </>
                   )}
 
-                  <button onClick={() => setselectedPost(null)}
-                     className="cursor-pointer">✕</button>
+                  <button
+                    onClick={() => setselectedPost(null)}
+                    className="cursor-pointer"
+                  >
+                    ✕
+                  </button>
                 </div>
               </div>
 
@@ -813,35 +835,31 @@ overflow-hidden
         </div>
       )}
       {showImageConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
+            <h2 className="text-lg font-semibold mb-4">Add Profile Photo?</h2>
 
-  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
-      <h2 className="text-lg font-semibold mb-4">
-        Add Profile Photo?
-      </h2>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => {
+                  setShowImageConfirm(false);
+                  fileInputRef.current?.click();
+                }}
+                className="bg-[#879F00] px-5 py-2 rounded text-sm cursor-pointer"
+              >
+                Yes
+              </button>
 
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={() => {
-            setShowImageConfirm(false);
-            fileInputRef.current?.click();
-          }}
-          className="bg-[#879F00] px-5 py-2 rounded text-sm cursor-pointer"
-        >
-          Yes
-        </button>
-
-        <button
-          onClick={() => setShowImageConfirm(false)}
-          className="bg-gray-600 px-5 py-2 rounded text-sm cursor-pointer"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <button
+                onClick={() => setShowImageConfirm(false)}
+                className="bg-gray-600 px-5 py-2 rounded text-sm cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showConnections && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -893,59 +911,74 @@ overflow-hidden
       )}
       {/* SHARE MODAL */}
       {showShare && (
-        <div className="fixed  inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-          <div className="bg-neutral-900 overflow-scroll scrollbar-hide p-5 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4 text-white">
-              Share Post
-            </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+          <div className="bg-neutral-900 rounded-lg w-full max-w-md max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="p-4 border-b border-neutral-700">
+              <h2 className="text-lg font-semibold text-white">Share Post</h2>
+            </div>
 
-            {[
-              "KASARGOD",
-              "KANNUR",
-              "ERNAKULAM",
-              "KOZHIKODE",
-              "IDUKKI",
-              "KOTTAYAM",
-              "WAYANAD",
-              "MALAPPURAM",
-              "PALAKKAD",
-              "THRISSUR",
-              "ALAPPUZHA",
-              "KOVALAM",
-              "PATHANAMTHITTA",
-              "THIRUVANANTHAPURAM",
-            ].map((district) => (
-              <div
-                key={district}
-                onClick={() => toggleDistrict(district)}
-                className={`p-3 cursor-pointer rounded text-sm
-                ${
-                  selectedDistricts.includes(district)
-                    ? "bg-[#879F00]"
-                    : "hover:bg-neutral-800"
-                }
-              `}
+            {/* Scrollable District List */}
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-1">
+              {[
+                "KASARGOD",
+                "KANNUR",
+                "ERNAKULAM",
+                "KOZHIKODE",
+                "IDUKKI",
+                "KOTTAYAM",
+                "WAYANAD",
+                "MALAPPURAM",
+                "PALAKKAD",
+                "THRISSUR",
+                "ALAPPUZHA",
+                "KOVALAM",
+                "PATHANAMTHITTA",
+                "THIRUVANANTHAPURAM",
+              ].map((district) => (
+                <div
+                  key={district}
+                  onClick={() => toggleDistrict(district)}
+                  className={`p-3 cursor-pointer rounded text-sm
+              ${
+                selectedDistricts.includes(district)
+                  ? "bg-[#879F00]"
+                  : "hover:bg-neutral-800"
+              }
+            `}
+                >
+                  {district}
+                </div>
+              ))}
+            </div>
+
+            {/* Fixed Buttons */}
+            <div className="p-4 border-t border-neutral-700">
+              <button
+                onClick={() => {
+                  handleSendPost(); // ✅ call function
+                  setShowShare(false);
+                  setShowAlert(true);
+
+                  setTimeout(() => {
+                    setShowAlert(false);
+                  }, 2000);
+                }}
+                className="w-full py-2 rounded bg-[#879F00]"
               >
-                {district}
-              </div>
-            ))}
+                Send
+              </button>
 
-            <button
-              onClick={handleSendPost}
-              className="mt-4 w-full py-2 rounded bg-[#879F00] cursor-pointer"
-            >
-              Send
-            </button>
-
-            <button
-              onClick={() => {
-                setShowShare(false);
-                setSelectedDistricts([]);
-              }}
-              className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500 cursor-pointer"
-            >
-              Cancel
-            </button>
+              <button
+                onClick={() => {
+                  setShowShare(false);
+                  setSelectedDistricts([]);
+                }}
+                className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

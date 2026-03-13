@@ -2,6 +2,7 @@ import { useState } from "react";
 import uploadIcon from "../../../assets/images/icons8-gallery-48.png";
 import Home from "./Home";
 import axios from "axios";
+import API from "../../../API/Api";
 
 function Create() {
   const [isOpen, setIsOpen] = useState(true);
@@ -41,8 +42,8 @@ function Create() {
       setLoading(true);
       const token = localStorage.getItem("userToken");
 
-      const response = await axios.post(
-        "http://localhost:3001/user/posting",
+      const response = await API.post(
+        "/user/posting",
         {
           image: post,
           caption: description,
