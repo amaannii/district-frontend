@@ -62,8 +62,8 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   const fetchUserDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(
-        "http://localhost:3001/user/userdetails",
+      const response = await API.post(
+        "/user/userdetails",
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
