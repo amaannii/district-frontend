@@ -69,7 +69,7 @@ const Signup = () => {
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)
     )
       newErrors.password =
-        "8+ chars with uppercase, lowercase, number & special char";
+        "8+ chars with uppercase, lowercase, number";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
