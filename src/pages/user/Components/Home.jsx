@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import MiniChatBox from "./MiniChatbox";
+import MiniChatBox from "./MiniChatBox";
 import Messages from "./Messages";
 import PostCard from "./PostCard";
 import axios from "axios";
