@@ -204,7 +204,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       });
 
       if (res.data.success) {
-        setConnectionList(res.data.users); // ✅ FIX HERE
+        setConnectionList(res.data.users);
         setConnectionType(type);
         setShowConnections(true);
       }
@@ -233,10 +233,9 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("userToken"); // ✅ ADD THIS
+    const token = localStorage.getItem("userToken");
     if (!token) return alert("Login required");
 
-    // 🔥 instantly toggle UI
     const newSavedState = !saved;
     setSaved(newSavedState);
 
@@ -249,12 +248,10 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       );
 
       if (!res.data.success) {
-        // rollback if something failed
         setSaved(!newSavedState);
       }
     } catch (err) {
       console.error(err);
-      // rollback on error
       setSaved(!newSavedState);
     } finally {
       setLoading(false);
@@ -312,7 +309,6 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       const comment = comments.find((c) => c._id === commentId);
       if (!comment) return;
 
-      // Allow post owner or comment owner to delete
       if (!isPostOwner && comment.username !== userdetails.username) return;
 
       const res = await API.post(
@@ -333,13 +329,13 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
   const handleUserClick = () => {
     if (selectedPost.postOwner?.username === userdetails.username) {
-      setActive("PROFILE"); // current user profile
+      setActive("PROFILE");
     } else {
       setSelectedUsername(selectedPost.postOwner?.username);
-      setActive("UPROFILE"); // other user profile
+      setActive("UPROFILE");
     }
 
-    setselectedPost(null); // close modal
+    setselectedPost(null);
   };
 
   /* ---------------- PROFILE IMAGE UPLOAD ---------------- */
@@ -384,7 +380,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
         "/user/send-post-to-chats",
         {
           chatIds: selectedDistricts,
-          postId: selectedPost._id, // ✅ FIXED
+          postId: selectedPost._id,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -406,7 +402,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
   useEffect(() => {
     const fetchLikeStatus = async () => {
-      if (!userdetails) return;
+      if (!userdetails || !selectedPost) return;
 
       try {
         setLoading(true);
@@ -443,22 +439,22 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
   return (
     <>
       <div className="flex min-h-screen w-full bg-black text-white">
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-10 py-6">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 md:px-10 py-4 sm:py-6">
           {/* SETTINGS */}
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-end mb-4 sm:mb-6">
             <img
-              className="h-6 cursor-pointer"
+              className="h-5 sm:h-6 cursor-pointer"
               src={settings}
               alt="settings"
               onClick={() => setActive("SETTINGS")}
             />
           </div>
 
-          {/* PROFILE HEADER */}
+          {/* PROFILE HEADER - RESPONSIVE */}
           <div className="flex flex-col items-center text-center">
             <div
               onClick={() => setShowImageConfirm(true)}
-              className="relative w-20 h-20 rounded-full  overflow-hidden mb-3 cursor-pointer group"
+              className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden mb-2 sm:mb-3 cursor-pointer group"
             >
               <img
                 src={
@@ -472,12 +468,22 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 className="w-full h-full object-cover"
                 onError={(e) => (e.target.src = profile)}
               />
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                <span className="text-white text-xs opacity-0 group-hover:opacity-100">
+                  Change
+                </span>
+              </div>
             </div>
-            <h1 className="text-xl font-semibold">{userdetails.username}</h1>
-            <p className="text-sm text-gray-400">{userdetails.name}</p>
+            
+            <h1 className="text-lg sm:text-xl font-semibold break-all max-w-[250px] sm:max-w-full">
+              {userdetails.username}
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400 break-all max-w-[250px] sm:max-w-full">
+              {userdetails.name}
+            </p>
 
             {userdetails.bio && (
-              <p className="text-sm text-gray-300 mt-2 text-center max-w-[350px]">
+              <p className="text-xs sm:text-sm text-gray-300 mt-2 text-center max-w-[280px] sm:max-w-[350px] px-4">
                 {userdetails.bio}
               </p>
             )}
@@ -490,36 +496,37 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               style={{ display: "none" }}
             />
 
-            <div className="flex gap-10 mb-5">
-              <div>
-                <p className="font-semibold">{posts.length}</p>
+            {/* STATS - RESPONSIVE */}
+            <div className="flex gap-6 sm:gap-10 my-4 sm:mb-5">
+              <div className="text-center">
+                <p className="font-semibold text-sm sm:text-base">{posts.length}</p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
               <div
-                className="cursor-pointer"
+                className="cursor-pointer text-center"
                 onClick={() => fetchConnections("connected")}
               >
-                <p className="font-semibold ">{connected}</p>
-                <p className="text-xs text-gray-400  ">connected</p>
+                <p className="font-semibold text-sm sm:text-base">{connected}</p>
+                <p className="text-xs text-gray-400">connected</p>
               </div>
               <div
-                className="cursor-pointer"
+                className="cursor-pointer text-center"
                 onClick={() => fetchConnections("connecting")}
               >
-                <p className="font-semibold">{connecting}</p>
+                <p className="font-semibold text-sm sm:text-base">{connecting}</p>
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
           </div>
 
-          {/* TABS */}
-          <div className="flex justify-center gap-10 border-t border-gray-700 mt-6 ">
+          {/* TABS - RESPONSIVE */}
+          <div className="flex justify-center gap-6 sm:gap-10 border-t border-gray-700 mt-4 sm:mt-6">
             <button
               onClick={() => setActiveTab("posts")}
-              className={`py-3 ${
+              className={`py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
                 activeTab === "posts"
-                  ? "border-t-2 border-white"
-                  : "text-gray-400 cursor-pointer"
+                  ? "border-t-2 border-white text-white"
+                  : "text-gray-400 hover:text-gray-300"
               }`}
             >
               POSTS
@@ -527,121 +534,156 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
             <button
               onClick={() => setActiveTab("saved")}
-              className={`py-3 ${
+              className={`py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
                 activeTab === "saved"
-                  ? "border-t-2 border-white"
-                  : "text-gray-400 cursor-pointer"
+                  ? "border-t-2 border-white text-white"
+                  : "text-gray-400 hover:text-gray-300"
               }`}
             >
               SAVED
             </button>
           </div>
 
-          {/* GRID */}
-          <div className="grid grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 max-w-5xl mx-auto mt-4">
+          {/* GRID - RESPONSIVE WITH OVERLAYS */}
+          <div className="grid grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 max-w-5xl mx-auto mt-3 sm:mt-4">
             {(activeTab === "posts" ? posts : savedPost).map((item, index) => (
               <div
                 key={index}
-                className="relative aspect-square overflow-hidden"
+                className="relative aspect-square overflow-hidden group"
               >
                 <img
                   src={item.image}
                   alt=""
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
+                  className="w-full h-full object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
                   onClick={() => setselectedPost(item)}
                 />
 
-                {/* HEART / COMMENT / SHARE / SAVE ICONS overlay */}
-                <div className="absolute bottom-2 left-2 flex ">
+                {/* OVERLAY ICONS - RESPONSIVE */}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="flex gap-2 sm:gap-3 items-center">
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={item.isLiked ? heartRed : heart}
+                        className="w-3 h-3 sm:w-4 sm:h-4 cursor-pointer filter brightness-0 invert"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setselectedPost(item);
+                          handleLike();
+                        }}
+                      />
+                      <span className="text-white text-xs">{item.likes || 0}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      <img
+                        src={commentIcon}
+                        className="w-3 h-3 sm:w-4 sm:h-4 cursor-pointer filter brightness-0 invert"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setselectedPost(item);
+                        }}
+                      />
+                      <span className="text-white text-xs">{item.comments?.length || 0}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* MOBILE BOTTOM ICONS */}
+                <div className="absolute bottom-1 left-1 flex gap-1 sm:hidden">
                   <img
                     src={item.isLiked ? heartRed : heart}
-                    className="w-5 cursor-pointer"
-                    onClick={() => {
+                    className="w-4 h-4"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setselectedPost(item);
                       handleLike();
                     }}
                   />
                   <img
                     src={commentIcon}
-                    className="w-5 cursor-pointer"
-                    onClick={() => setselectedPost(item)}
-                  />
-                  <img
-                    src={send}
-                    className="w-5 cursor-pointer"
-                    onClick={() => {
+                    className="w-4 h-4"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setselectedPost(item);
-                      setShowShare(true);
-                    }}
-                  />
-                  <img
-                    src={
-                      savedPost.some((p) => p._id === item._id)
-                        ? bookmarkFilled
-                        : bookmark
-                    }
-                    className="w-5 cursor-pointer"
-                    onClick={() => {
-                      setselectedPost(item);
-                      savedPost.some((p) => p._id === item._id)
-                        ? handleUnsave()
-                        : handleSave();
                     }}
                   />
                 </div>
               </div>
             ))}
           </div>
+
+          {/* EMPTY STATE */}
+          {(activeTab === "posts" ? posts.length === 0 : savedPost.length === 0) && (
+            <div className="flex flex-col items-center justify-center py-10 sm:py-16">
+              <p className="text-gray-500 text-sm sm:text-base">
+                No {activeTab === "posts" ? "posts" : "saved posts"} yet
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* POST MODAL */}
+      {/* POST MODAL - FULLY RESPONSIVE */}
       {selectedPost && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div
-            className="
-bg-[#0f0f0f]
-w-full
-h-full
-md:h-[95vh]
-md:max-w-5xl
-flex
-flex-col
-md:flex-row
-rounded-none
-md:rounded-lg
- overflow-hidden
-"
-          >
+
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-0 sm:p-4">
+          <div className="
+            bg-[#0f0f0f]
+            w-full
+            h-full
+            sm:h-[90vh]
+            sm:max-w-4xl
+            lg:max-w-5xl
+            flex
+            flex-col
+            sm:flex-row
+            rounded-none
+            sm:rounded-lg
+            overflow-hidden
+            relative
+          ">
+            {/* CLOSE BUTTON - MOBILE */}
+            <button
+              onClick={() => setselectedPost(null)}
+              className="absolute top-3 right-3 sm:hidden z-10 bg-black/50 rounded-full p-2"
+            >
+              <span className="text-white text-xl">✕</span>
+            </button>
+
             {/* LEFT IMAGE */}
-            <div className="w-full md:w-1/2 bg-black">
+            <div className="w-full sm:w-1/2 bg-black flex items-center justify-center">
               <img
                 src={selectedPost.image}
                 alt="post"
-                className="max-h-[70vh] md:max-h-full w-auto object-contain"
+
+                className="w-full h-full object-contain sm:object-cover max-h-[40vh] sm:max-h-full"
+
               />
             </div>
 
             {/* RIGHT SIDE */}
-        <div className="w-full md:w-1/2 flex flex-col text-white h-full md:h-[95vh]">
+
+            <div className="w-full sm:w-1/2 flex flex-col text-white h-full">
+
               {/* HEADER */}
-              <div className="flex justify-between items-center p-4 border-b border-neutral-800">
-                <div className="flex items-center gap-3">
+              <div className="flex justify-between items-center p-3 sm:p-4 border-b border-neutral-800">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <img
                     onClick={handleUserClick}
-                    src={userdetails.img}
+                    src={selectedPost.avatar || profile}
                     alt="user"
-                    className="relative w-12 h-12 sm:w-10 sm:h-10 rounded-full"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer"
+                    onError={(e) => (e.target.src = profile)}
                   />
                   <span
                     onClick={handleUserClick}
-                    className="font-semibold text-sm cursor-pointer"
+                    className="font-semibold text-xs sm:text-sm cursor-pointer hover:underline"
                   >
                     {selectedPost.postOwner?.username || userdetails.username}
                   </span>
                 </div>
 
-                <div className="flex gap-3 text-xs">
+                <div className="flex gap-2 sm:gap-3 text-xs">
                   {isPostOwner && !isEditing && (
                     <>
                       <button
@@ -649,7 +691,7 @@ md:rounded-lg
                           setIsEditing(true);
                           setEditedCaption(selectedPost.caption);
                         }}
-                        className=" cursor-pointer"
+                        className="text-gray-300 hover:text-white px-2 py-1 rounded"
                       >
                         Edit
                       </button>
@@ -658,7 +700,7 @@ md:rounded-lg
                         onClick={() =>
                           setConfirmModal({ show: true, type: "delete" })
                         }
-                        className="text-red-500 cursor-pointer"
+                        className="text-red-500 hover:text-red-400 px-2 py-1 rounded"
                       >
                         Delete
                       </button>
@@ -667,7 +709,7 @@ md:rounded-lg
 
                   <button
                     onClick={() => setselectedPost(null)}
-                    className="cursor-pointer"
+                    className="hidden sm:block text-gray-400 hover:text-white"
                   >
                     ✕
                   </button>
@@ -675,92 +717,101 @@ md:rounded-lg
               </div>
 
               {/* CAPTION / EDIT */}
-              <div className="px-4 py-3 text-sm border-b border-neutral-800">
+              <div className="px-3 sm:px-4 py-2 sm:py-3 text-sm border-b border-neutral-800">
                 {isEditing ? (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     <textarea
                       value={editedCaption}
                       onChange={(e) => setEditedCaption(e.target.value)}
-                      className="bg-neutral-800 p-2 rounded text-sm resize-none"
+                      className="bg-neutral-800 p-2 rounded text-xs sm:text-sm resize-none w-full"
                       rows={3}
+                      autoFocus
                     />
-                    <div className="flex gap-4 text-xs">
+                    <div className="flex gap-3 text-xs">
                       <button
                         onClick={handleUpdatePost}
-                        className="text-[#879F00] cursor-pointer"
+                        className="text-[#879F00] hover:text-[#9fb800] font-medium"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setIsEditing(false)}
-                        className="text-red-500 cursor-pointer"
+                        className="text-red-500 hover:text-red-400"
                       >
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <>
+                  <p className="text-xs sm:text-sm break-words">
                     <span className="font-semibold mr-2">
                       {selectedPost.postOwner?.username || userdetails.username}
                     </span>
                     {selectedPost.caption}
-                  </>
+                  </p>
                 )}
               </div>
 
-              {/* COMMENTS */}
-            <div className="flex-1 overflow-y-auto px-4 py-3">
-                {comments.map((c) => (
-                  <div
-                    key={c._id}
-                    className="flex justify-between items-start text-sm text-gray-300 mb-3"
-                  >
-                    <div>
-                      <span className="font-semibold mr-2">{c.username}</span>
-                      {c.text}
-                      <div className="text-xs text-gray-500">
-                        {new Date(c.createdAt).toLocaleString()}
-                      </div>
-                    </div>
 
-                    {(c.username === userdetails.username || isPostOwner) && (
-                      <button
-                        onClick={() => handleDeleteComment(c._id)}
-                        className="text-red-500 text-xs ml-3 cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                ))}
+              {/* COMMENTS - SCROLLABLE */}
+              <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 space-y-2 sm:space-y-3">
+                {comments.length === 0 ? (
+                  <p className="text-gray-500 text-xs sm:text-sm text-center py-4">
+                    No comments yet
+                  </p>
+                ) : (
+                  comments.map((c) => (
+                    <div
+                      key={c._id}
+                      className="flex justify-between items-start text-xs sm:text-sm"
+                    >
+                      <div className="flex-1">
+                        <span className="font-semibold mr-2">{c.username}</span>
+                        <span className="break-words">{c.text}</span>
+                        <div className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                          {new Date(c.createdAt).toLocaleString()}
+                        </div>
+
+                      </div>
+
+                      {(c.username === userdetails.username || isPostOwner) && (
+                        <button
+                          onClick={() => handleDeleteComment(c._id)}
+                          className="text-red-500 text-[10px] sm:text-xs ml-2 hover:text-red-400 flex-shrink-0"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* ACTION SECTION */}
-              <div className="border-t border-neutral-800 px-4 py-3">
+              <div className="border-t border-neutral-800 px-3 sm:px-4 py-2 sm:py-3">
                 <div className="flex justify-between items-center">
-                  <div className="flex gap-5 items-center text-xl">
+                  <div className="flex gap-4 sm:gap-5 items-center">
                     {/* LIKE */}
                     <div className="flex items-center gap-1">
                       <img
                         src={liked ? heartRed : heart}
-                        className="w-5 cursor-pointer"
+                        className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer hover:scale-110 transition-transform"
                         onClick={handleLike}
                       />
-                      <span>{likeCount}</span>
+                      <span className="text-xs sm:text-sm">{likeCount}</span>
                     </div>
 
                     {/* COMMENT */}
                     <img
                       src={commentIcon}
-                      className="w-5 cursor-pointer"
-                      onClick={() => {}}
+                      className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer hover:scale-110 transition-transform"
+                      onClick={() => document.getElementById('comment-input').focus()}
                     />
 
                     {/* SHARE */}
                     <img
                       src={send}
-                      className="w-5 cursor-pointer"
+                      className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer hover:scale-110 transition-transform"
                       onClick={() => setShowShare(true)}
                     />
                   </div>
@@ -770,7 +821,7 @@ md:rounded-lg
                     onClick={handleSave}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+                    className="w-5 h-5 sm:w-6 sm:h-6 cursor-pointer transition-all duration-200 hover:scale-110"
                     fill={saved ? "white" : "none"}
                     stroke="white"
                     strokeWidth="2"
@@ -780,17 +831,24 @@ md:rounded-lg
                 </div>
 
                 {/* ADD COMMENT */}
-                <div className="mt-2 flex gap-2">
+                <div className="mt-2 sm:mt-3 flex gap-2">
                   <input
+                    id="comment-input"
                     type="text"
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                     placeholder="Add a comment..."
-                    className="flex-1 bg-neutral-900 p-2 rounded text-sm"
+                    className="flex-1 bg-neutral-900 px-3 py-1.5 sm:py-2 rounded text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gray-600"
                   />
                   <button
                     onClick={handleComment}
-                    className="text-sm text-[#879F00] cursor-pointer"
+                    disabled={!commentText.trim()}
+                    className={`text-xs sm:text-sm px-3 py-1.5 sm:py-2 rounded ${
+                      commentText.trim() 
+                        ? 'text-[#879F00] hover:text-[#9fb800] cursor-pointer' 
+                        : 'text-gray-600 cursor-not-allowed'
+                    }`}
                   >
                     Post
                   </button>
@@ -801,15 +859,20 @@ md:rounded-lg
         </div>
       )}
 
-      {/* CONFIRM MODAL */}
+      {/* CONFIRM MODAL - RESPONSIVE */}
       {confirmModal.show && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[350px] p-6 rounded-xl text-center">
-            <h2 className="text-lg font-semibold mb-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0f0f0f] w-full max-w-[320px] sm:max-w-[350px] p-5 sm:p-6 rounded-xl text-center">
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
               {confirmModal.type === "delete" ? "Delete Post?" : "Update Post?"}
             </h2>
+            <p className="text-xs sm:text-sm text-gray-400 mb-4">
+              {confirmModal.type === "delete" 
+                ? "This action cannot be undone." 
+                : "Are you sure you want to update this post?"}
+            </p>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3 sm:gap-4">
               <button
                 onClick={async () => {
                   if (confirmModal.type === "delete") {
@@ -819,14 +882,14 @@ md:rounded-lg
                   }
                   setConfirmModal({ show: false, type: null });
                 }}
-                className="bg-red-600 px-5 py-2 rounded text-sm cursor-pointer"
+                className="bg-red-600 px-4 sm:px-5 py-1.5 sm:py-2 rounded text-xs sm:text-sm hover:bg-red-700 transition-colors"
               >
                 Confirm
               </button>
 
               <button
                 onClick={() => setConfirmModal({ show: false, type: null })}
-                className="bg-gray-600 px-5 py-2 rounded text-sm cursor-pointer"
+                className="bg-gray-600 px-4 sm:px-5 py-1.5 sm:py-2 rounded text-xs sm:text-sm hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>
@@ -834,25 +897,30 @@ md:rounded-lg
           </div>
         </div>
       )}
-      {showImageConfirm && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[320px] p-6 rounded-xl text-center">
-            <h2 className="text-lg font-semibold mb-4">Add Profile Photo?</h2>
 
-            <div className="flex justify-center gap-4">
+      {/* PROFILE IMAGE CONFIRM MODAL */}
+      {showImageConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0f0f0f] w-full max-w-[300px] sm:max-w-[320px] p-5 sm:p-6 rounded-xl text-center">
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Add Profile Photo?</h2>
+            <p className="text-xs sm:text-sm text-gray-400 mb-4">
+              Choose a photo to set as your profile picture
+            </p>
+
+            <div className="flex justify-center gap-3 sm:gap-4">
               <button
                 onClick={() => {
                   setShowImageConfirm(false);
                   fileInputRef.current?.click();
                 }}
-                className="bg-[#879F00] px-5 py-2 rounded text-sm cursor-pointer"
+                className="bg-[#879F00] px-4 sm:px-5 py-1.5 sm:py-2 rounded text-xs sm:text-sm hover:bg-[#9fb800] transition-colors"
               >
                 Yes
               </button>
 
               <button
                 onClick={() => setShowImageConfirm(false)}
-                className="bg-gray-600 px-5 py-2 rounded text-sm cursor-pointer"
+                className="bg-gray-600 px-4 sm:px-5 py-1.5 sm:py-2 rounded text-xs sm:text-sm hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>
@@ -861,112 +929,134 @@ md:rounded-lg
         </div>
       )}
 
+      {/* CONNECTIONS MODAL - RESPONSIVE */}
       {showConnections && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0f0f0f] w-[400px] max-h-[500px] rounded-xl p-5 overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold capitalize">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0f0f0f] w-full max-w-[350px] sm:max-w-[400px] max-h-[70vh] sm:max-h-[500px] rounded-xl p-4 sm:p-5 overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center mb-3 sm:mb-4 flex-shrink-0">
+              <h2 className="text-base sm:text-lg font-semibold capitalize">
                 {connectionType}
               </h2>
               <button
                 onClick={() => setShowConnections(false)}
-                className="text-gray-400 cursor-not-allowed"
+                className="text-gray-400 hover:text-white text-xl"
               >
                 ✕
               </button>
             </div>
 
-            {connectionList.length === 0 ? (
-              <p className="text-gray-400 text-sm text-center">
-                No {connectionType} yet
-              </p>
-            ) : (
-              connectionList.map((user) => (
-                <div
-                  key={user._id}
-                  className="flex items-center gap-3 py-2 border-b border-gray-800 cursor-pointer"
-                >
-                  <img
-                    src={user.img || profile}
-                    alt={user.username}
-                    className="w-10 h-10 rounded-full object-cover "
-                  />
-                  <div>
-                    <p
+            <div className="flex-1 overflow-y-auto">
+              {connectionList.length === 0 ? (
+                <p className="text-gray-400 text-xs sm:text-sm text-center py-8">
+                  No {connectionType} yet
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {connectionList.map((user) => (
+                    <div
+                      key={user._id}
+                      className="flex items-center gap-2 sm:gap-3 py-2 px-2 border-b border-gray-800 last:border-0 hover:bg-neutral-900 transition-colors rounded cursor-pointer"
                       onClick={() => {
                         setActive("UPROFILE");
                         setSelectedUsername(user.username);
+                        setShowConnections(false);
                       }}
-                      className="text-sm font-medium"
                     >
-                      {user.username}
-                    </p>
-                    <p className="text-xs text-gray-400">{user.name}</p>
-                  </div>
+                      <img
+                        src={user.img || profile}
+                        alt={user.username}
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+                        onError={(e) => (e.target.src = profile)}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium truncate">
+                          {user.username}
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-gray-400 truncate">
+                          {user.name}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}
-      {/* SHARE MODAL */}
+
+      {/* SHARE MODAL - RESPONSIVE */}
       {showShare && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-          <div className="bg-neutral-900 rounded-lg w-full max-w-md max-h-[80vh] flex flex-col">
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
+          <div className="bg-neutral-900 rounded-lg w-full max-w-[350px] sm:max-w-md max-h-[80vh] flex flex-col">
             {/* Header */}
-            <div className="p-4 border-b border-neutral-700">
-              <h2 className="text-lg font-semibold text-white">Share Post</h2>
+            <div className="p-3 sm:p-4 border-b border-neutral-700 flex justify-between items-center">
+              <h2 className="text-base sm:text-lg font-semibold text-white">Share Post</h2>
+              <button
+                onClick={() => {
+                  setShowShare(false);
+                  setSelectedDistricts([]);
+                }}
+                className="text-gray-400 hover:text-white text-xl"
+              >
+                ✕
+              </button>
             </div>
 
             {/* Scrollable District List */}
-            <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-1">
-              {[
-                "KASARGOD",
-                "KANNUR",
-                "ERNAKULAM",
-                "KOZHIKODE",
-                "IDUKKI",
-                "KOTTAYAM",
-                "WAYANAD",
-                "MALAPPURAM",
-                "PALAKKAD",
-                "THRISSUR",
-                "ALAPPUZHA",
-                "KOVALAM",
-                "PATHANAMTHITTA",
-                "THIRUVANANTHAPURAM",
-              ].map((district) => (
-                <div
-                  key={district}
-                  onClick={() => toggleDistrict(district)}
-                  className={`p-3 cursor-pointer rounded text-sm
-              ${
-                selectedDistricts.includes(district)
-                  ? "bg-[#879F00]"
-                  : "hover:bg-neutral-800"
-              }
-            `}
-                >
-                  {district}
-                </div>
-              ))}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
+                Select districts to share with:
+              </p>
+              <div className="space-y-1">
+                {[
+                  "KASARGOD",
+                  "KANNUR",
+                  "ERNAKULAM",
+                  "KOZHIKODE",
+                  "IDUKKI",
+                  "KOTTAYAM",
+                  "WAYANAD",
+                  "MALAPPURAM",
+                  "PALAKKAD",
+                  "THRISSUR",
+                  "ALAPPUZHA",
+                  "KOVALAM",
+                  "PATHANAMTHITTA",
+                  "THIRUVANANTHAPURAM",
+                ].map((district) => (
+                  <div
+                    key={district}
+                    onClick={() => toggleDistrict(district)}
+                    className={`p-2 sm:p-3 cursor-pointer rounded text-xs sm:text-sm transition-colors
+                      ${
+                        selectedDistricts.includes(district)
+                          ? "bg-[#879F00] text-white"
+                          : "hover:bg-neutral-800 text-gray-300"
+                      }
+                    `}
+                  >
+                    {district}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Fixed Buttons */}
-            <div className="p-4 border-t border-neutral-700">
+            <div className="p-3 sm:p-4 border-t border-neutral-700 space-y-2">
               <button
                 onClick={() => {
-                  handleSendPost(); // ✅ call function
+                  handleSendPost();
                   setShowShare(false);
-                  setShowAlert(true);
-
-                  setTimeout(() => {
-                    setShowAlert(false);
-                  }, 2000);
                 }}
-                className="w-full py-2 rounded bg-[#879F00]"
+                disabled={!selectedDistricts.length}
+                className={`w-full py-2 rounded text-xs sm:text-sm transition-colors ${
+                  selectedDistricts.length
+                    ? 'bg-[#879F00] hover:bg-[#9fb800] cursor-pointer'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
               >
-                Send
+                Send to {selectedDistricts.length} {selectedDistricts.length === 1 ? 'district' : 'districts'}
               </button>
 
               <button
@@ -974,7 +1064,7 @@ md:rounded-lg
                   setShowShare(false);
                   setSelectedDistricts([]);
                 }}
-                className="mt-2 w-full py-2 rounded bg-gray-600 hover:bg-gray-500"
+                className="w-full py-2 rounded text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 transition-colors"
               >
                 Cancel
               </button>
@@ -982,8 +1072,10 @@ md:rounded-lg
           </div>
         </div>
       )}
+
+      {/* LOADING SPINNER */}
       {loading && (
-        <div className="fixed inset-0 flex justify-center items-center z-50">
+        <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
           <div className="chaotic-orbit"></div>
         </div>
       )}
