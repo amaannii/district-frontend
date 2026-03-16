@@ -625,6 +625,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
       {/* POST MODAL - FULLY RESPONSIVE */}
       {selectedPost && (
+
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-0 sm:p-4">
           <div className="
             bg-[#0f0f0f]
@@ -654,12 +655,16 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
               <img
                 src={selectedPost.image}
                 alt="post"
+
                 className="w-full h-full object-contain sm:object-cover max-h-[40vh] sm:max-h-full"
+
               />
             </div>
 
             {/* RIGHT SIDE */}
+
             <div className="w-full sm:w-1/2 flex flex-col text-white h-full">
+
               {/* HEADER */}
               <div className="flex justify-between items-center p-3 sm:p-4 border-b border-neutral-800">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -747,6 +752,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 )}
               </div>
 
+
               {/* COMMENTS - SCROLLABLE */}
               <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 space-y-2 sm:space-y-3">
                 {comments.length === 0 ? (
@@ -765,6 +771,7 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                         <div className="text-[10px] sm:text-xs text-gray-500 mt-1">
                           {new Date(c.createdAt).toLocaleString()}
                         </div>
+
                       </div>
 
                       {(c.username === userdetails.username || isPostOwner) && (
