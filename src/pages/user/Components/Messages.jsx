@@ -75,11 +75,11 @@ function Messages({ selectedDistrict, setSelectedDistrict, setSelectedUsername, 
   return (
     <div className="flex h-screen w-full bg-gradient-to-b from-black to-neutral-900 text-white">
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#879F00]/30 scrollbar-track-transparent px-3 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-24 md:pb-6">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#879F00]/30 scrollbar-track-transparent sm:px-6 md:px-8 pt-4 sm:pt-6 md:pb-6">
         
         {/* Selected District Header */}
         {selectedDistrict && (
-          <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-sm -mx-3 sm:-mx-6 md:-mx-8 px-3 sm:px-6 md:px-8 py-3 sm:py-4 mb-4 border-b border-neutral-800/50">
+          <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-sm  sm:-mx-6 md:-mx-8 px-3 sm:px-6 md:px-8 py-3 sm:py-4 mb-4 border-b border-neutral-800/50">
             <div className="flex items-center gap-3 sm:gap-4">
               <button
                 onClick={() => setSelectedDistrict(null)}

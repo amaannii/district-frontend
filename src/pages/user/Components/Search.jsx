@@ -10,7 +10,6 @@ import bookmark from "../../../assets/images/icons8-bookmark-30.png";
 import bookmarkFilled from "../../../assets/images/icons8-bookmark-30 (1).png";
 import PostCard from "../Components/PostCard";
 import profile from "../../../assets/images/icons8-profile-50.png";
-import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
 function Search() {
@@ -26,6 +25,8 @@ function Search() {
   const [connecting, setconnecting] = useState(false);
   const [requested, setrequested] = useState(false);
   const [showMobileProfile, setShowMobileProfile] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("recentUsers");
@@ -52,6 +53,14 @@ function Search() {
 
     fetchUsers();
   }, []);
+
+  const showNotification = (message, type = "success") => {
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+  };
 
   const fetchFullPost = async (postId) => {
     if (!postId) return;
@@ -140,15 +149,7 @@ function Search() {
 
       if (response.data.success) {
         setrequested(true);
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Request Send Successfully",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+        showNotification("Request sent successfuly", "success");
       }
     } catch (error) {
       console.error(error.response?.data || error.message);
@@ -167,7 +168,7 @@ function Search() {
         { username: selectedUser.username },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-
+      showNotification("Remove connection ", "error");
       setconnecting(false);
       setrequested(false);
       setShowRemoveModal(false);
@@ -202,9 +203,7 @@ function Search() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-            >
-            
-            </svg>
+            ></svg>
           </div>
 
           <div className="flex justify-between items-center mt-3 sm:mt-4">
@@ -244,7 +243,6 @@ function Search() {
                           onError={(e) => (e.target.src = profile)}
                         />
                       </div>
-
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm sm:text-base truncate">
@@ -262,8 +260,18 @@ function Search() {
                       className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 text-sm transition-all"
                       title="Remove from recent"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   )}
@@ -272,8 +280,18 @@ function Search() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-center">
-              <svg className="w-12 h-12 text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-12 h-12 text-gray-600 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
               <p className="text-gray-500 text-sm">
                 {search ? "No users found" : "No recent searches"}
@@ -320,11 +338,22 @@ function Search() {
                   <div className="flex gap-4 sm:gap-6 mb-5">
                     {[
                       { label: "Posts", value: selectedUser.post?.length || 0 },
-                      { label: "Connected", value: selectedUser.connectedCount || 0 },
-                      { label: "Connecting", value: selectedUser.connectingCount || 0 },
+                      {
+                        label: "Connected",
+                        value: selectedUser.connectedCount || 0,
+                      },
+                      {
+                        label: "Connecting",
+                        value: selectedUser.connectingCount || 0,
+                      },
                     ].map((stat, idx) => (
-                      <div key={idx} className="rounded-lg px-4 py-2 min-w-[80px]">
-                        <p className="text-lg font-bold text-[#879F00]">{stat.value}</p>
+                      <div
+                        key={idx}
+                        className="rounded-lg px-4 py-2 min-w-[80px]"
+                      >
+                        <p className="text-lg font-bold text-[#879F00]">
+                          {stat.value}
+                        </p>
                         <p className="text-xs text-gray-200">{stat.label}</p>
                       </div>
                     ))}
@@ -340,15 +369,19 @@ function Search() {
                       }
                     }}
                     className={`relative group overflow-hidden px-8 py-2.5 rounded-lg font-medium transition-all transform hover:scale-105 active:scale-95 ${
-                      connecting 
-                        ? "bg-[#4a5218] hover:bg-[#5a6820]" 
-                        : requested 
-                        ? "bg-gray-700 hover:bg-gray-700" 
-                        : "bg-[#879F00] hover:bg-[#9fb800]"
+                      connecting
+                        ? "bg-[#4a5218] hover:bg-[#5a6820]"
+                        : requested
+                          ? "bg-gray-700 hover:bg-gray-700"
+                          : "bg-[#879F00] hover:bg-[#9fb800]"
                     }`}
                   >
                     <span className="relative z-10">
-                      {connecting ? "Connected" : requested ? "Requested" : "Connect"}
+                      {connecting
+                        ? "Connected"
+                        : requested
+                          ? "Requested"
+                          : "Connect"}
                     </span>
                   </button>
                 </div>
@@ -378,9 +411,24 @@ function Search() {
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          className="w-8 h-8 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                       </div>
                     </div>
@@ -388,8 +436,18 @@ function Search() {
                 </div>
               ) : (
                 <div className="bg-neutral-800/30 rounded-xl p-8 text-center">
-                  <svg className="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <svg
+                    className="w-12 h-12 text-gray-600 mx-auto mb-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
                   </svg>
                   <p className="text-gray-400">No posts available</p>
                 </div>
@@ -399,11 +457,23 @@ function Search() {
         ) : (
           <div className="w-full h-full flex items-center justify-center p-6">
             <div className="text-center">
-              <svg className="w-16 h-16 text-gray-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-16 h-16 text-gray-700 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
               <p className="text-gray-500 text-lg">Search and select a user</p>
-              <p className="text-gray-600 text-sm mt-2">to view their profile</p>
+              <p className="text-gray-600 text-sm mt-2">
+                to view their profile
+              </p>
             </div>
           </div>
         )}
@@ -423,8 +493,18 @@ function Search() {
                 }}
                 className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -443,7 +523,9 @@ function Search() {
               </div>
 
               <h2 className="text-xl font-bold mb-1">{selectedUser.name}</h2>
-              <p className="text-sm text-[#879F00] mb-3">@{selectedUser.username}</p>
+              <p className="text-sm text-[#879F00] mb-3">
+                @{selectedUser.username}
+              </p>
 
               {selectedUser.bio && (
                 <p className="text-gray-400 text-sm max-w-md mb-4 px-4">
@@ -454,15 +536,21 @@ function Search() {
               {/* Stats */}
               <div className="flex gap-4 mb-5">
                 <div className="bg-neutral-800/50 rounded-lg px-4 py-2 min-w-[70px]">
-                  <p className="text-lg font-bold text-[#879F00]">{selectedUser.post?.length || 0}</p>
+                  <p className="text-lg font-bold text-[#879F00]">
+                    {selectedUser.post?.length || 0}
+                  </p>
                   <p className="text-xs text-gray-400">Posts</p>
                 </div>
                 <div className="bg-neutral-800/50 rounded-lg px-4 py-2 min-w-[70px]">
-                  <p className="text-lg font-bold text-[#879F00]">{selectedUser.connectedCount || 0}</p>
+                  <p className="text-lg font-bold text-[#879F00]">
+                    {selectedUser.connectedCount || 0}
+                  </p>
                   <p className="text-xs text-gray-400">Connected</p>
                 </div>
                 <div className="bg-neutral-800/50 rounded-lg px-4 py-2 min-w-[70px]">
-                  <p className="text-lg font-bold text-[#879F00]">{selectedUser.connectingCount || 0}</p>
+                  <p className="text-lg font-bold text-[#879F00]">
+                    {selectedUser.connectingCount || 0}
+                  </p>
                   <p className="text-xs text-gray-400">Connecting</p>
                 </div>
               </div>
@@ -477,11 +565,11 @@ function Search() {
                   }
                 }}
                 className={`w-[160px] py-2.5 rounded-lg font-medium transition-all ${
-                  connecting 
-                    ? "bg-[#4a5218] hover:bg-[#5a6820]" 
-                    : requested 
-                    ? "bg-gray-600 hover:bg-gray-700" 
-                    : "bg-[#879F00] hover:bg-[#9fb800]"
+                  connecting
+                    ? "bg-[#4a5218] hover:bg-[#5a6820]"
+                    : requested
+                      ? "bg-gray-600 hover:bg-gray-700"
+                      : "bg-[#879F00] hover:bg-[#9fb800]"
                 }`}
               >
                 {connecting ? "Connected" : requested ? "Requested" : "Connect"}
@@ -489,7 +577,9 @@ function Search() {
 
               {/* Posts Grid */}
               <div className="w-full mt-6">
-                <h3 className="text-left text-sm font-semibold text-gray-400 mb-3">Posts</h3>
+                <h3 className="text-left text-sm font-semibold text-gray-400 mb-3">
+                  Posts
+                </h3>
                 {selectedUser.post && selectedUser.post.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2">
                     {selectedUser.post.map((post, index) => (
@@ -510,7 +600,9 @@ function Search() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm text-center py-8">No posts available</p>
+                  <p className="text-gray-500 text-sm text-center py-8">
+                    No posts available
+                  </p>
                 )}
               </div>
             </div>
@@ -523,11 +615,21 @@ function Search() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4 animate-fadeIn">
           <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
             <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-6 h-6 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </div>
-            
+
             <h3 className="text-lg font-semibold mb-2 text-white">
               {connecting ? "Remove Connection?" : "Remove Request?"}
             </h3>
@@ -593,6 +695,41 @@ function Search() {
         </div>
       )}
 
+      {showAlert && (
+        <div className="fixed top-5 right-5 z-50 animate-slideInRight">
+          <div
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-2xl flex items-center gap-2 ${
+              alertMessage.includes("Failed") || alertMessage.includes("error")
+                ? "bg-red-600"
+                : alertMessage.includes("warning")
+                  ? "bg-yellow-600"
+                  : "bg-[#879F00]"
+            }`}
+          >
+            {!alertMessage.includes("Failed") &&
+              !alertMessage.includes("error") &&
+              !alertMessage.includes("warning") && (
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            <span className="text-white text-xs sm:text-sm font-medium">
+              {alertMessage}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* CSS Animations */}
       <style jsx>{`
         @keyframes fadeIn {
@@ -605,28 +742,28 @@ function Search() {
             transform: scale(1);
           }
         }
-        
+
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out;
         }
-        
+
         .scrollbar-thin::-webkit-scrollbar {
           width: 4px;
         }
-        
+
         .scrollbar-thin::-webkit-scrollbar-track {
           background: transparent;
         }
-        
+
         .scrollbar-thin::-webkit-scrollbar-thumb {
           background: rgba(135, 159, 0, 0.3);
           border-radius: 20px;
         }
-        
+
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
           background: rgba(135, 159, 0, 0.5);
         }
-        
+
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

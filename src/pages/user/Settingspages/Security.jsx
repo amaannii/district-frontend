@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useRef } from "react";
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
 function Security({goBack}) {
@@ -25,6 +24,8 @@ function Security({goBack}) {
   const [canResend, setCanResend] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     if (!showSuccess) return;
@@ -68,6 +69,14 @@ function Security({goBack}) {
 
     fetchUser();
   }, []);
+
+    const showNotification = (message, type = "success") => {
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+  };
 
   const handleVerifyOtp = async () => {
     const otpValue = otp.join("");
@@ -122,15 +131,7 @@ function Security({goBack}) {
       );
 
       if (res.data.success) {
-          Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Password Changed Successfully",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+        showNotification("Password changed successfuly", "success");
         setShowSuccessPopup(true);
         setIsOtpVerified(false);
         setOpenPasswordModal(false);
@@ -600,6 +601,41 @@ function Security({goBack}) {
           <div className="chaotic-orbit"></div>
         </div>
       )}
+          {showAlert && (
+        <div className="fixed top-5 right-5 z-50 animate-slideInRight">
+          <div
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-2xl flex items-center gap-2 ${
+              alertMessage.includes("Failed") || alertMessage.includes("error")
+                ? "bg-red-600"
+                : alertMessage.includes("warning")
+                  ? "bg-yellow-600"
+                  : "bg-[#879F00]"
+            }`}
+          >
+            {!alertMessage.includes("Failed") &&
+              !alertMessage.includes("error") &&
+              !alertMessage.includes("warning") && (
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            <span className="text-white text-xs sm:text-sm font-medium">
+              {alertMessage}
+            </span>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

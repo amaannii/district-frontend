@@ -1,10 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import profile from "../../../assets/images/icons8-user-100.png";
-import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
-function EditProfile({goBack}) {
+function EditProfile() {
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -20,6 +19,8 @@ function EditProfile({goBack}) {
   const [showNameModal, setShowNameModal] = useState(false);
   const [name, setName] = useState("");
   const [savedName, setSavedName] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -60,6 +61,14 @@ function EditProfile({goBack}) {
     fetchUserDetails();
   }, []);
 
+    const showNotification = (message, type = "success") => {
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+  };
+
   const handledelete = async () => {
     try {
       setLoading(true);
@@ -76,15 +85,7 @@ function EditProfile({goBack}) {
       );
 
       if (response.data.success) {
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Image Deleted",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+        showNotification("Image deleted", "error");
 
         // Update UI immediately
         setUser((prev) => ({
@@ -132,15 +133,7 @@ function EditProfile({goBack}) {
         if (res.data.success == true) {
           setuploadshow(false);
           setShowModal(false);
-          Swal.fire({
-            toast: true,
-            position: "top-end",
-            icon: "success",
-            title: "Profile photo updated",
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-          });
+          showNotification("Profile photo updated", "success");
         }
       }
     } catch (error) {
@@ -172,15 +165,7 @@ function EditProfile({goBack}) {
       if (res.data.success) {
         setSavedGender(gender);
 
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Profile photo updated",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+       showNotification("Profile photo updated", "success");
       }
 
       console.log(res.data);
@@ -209,15 +194,7 @@ function EditProfile({goBack}) {
       if (res.data.success) {
         setSavedBio(bio);
 
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Your bio was saved successfully",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+      showNotification("Your bio was saved successfuly", "success");
       }
     } catch (error) {
       console.log(error);
@@ -245,15 +222,7 @@ function EditProfile({goBack}) {
         setSavedName(name);
         setShowNameModal(false);
 
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Name Updated",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+       showNotification("Name updated", "success");
       }
     } catch (error) {
       console.log(error);
@@ -264,24 +233,14 @@ function EditProfile({goBack}) {
   };
 
   return (
-   <div className="w-full max-w-2xl xl:max-w-3xl mx-auto text-white play-regular px-4 sm:px-6">
-       {/* Back Button (Mobile Only) */}
-  <button
-    onClick={goBack}
-    className="md:hidden mb-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20"
-  >
-    ← Back
-  </button>
-
+    <div className="w-full max-w-xl text-white play-regular mx-auto px-4 sm:px-6">
       {/* Title */}
       <h1 className="text-lg sm:text-xl font-bold mb-8 sm:mb-10">
         Edit Profile
       </h1>
 
       {/* Profile Card */}
-
-   <div className="w-full bg-white text-black rounded-xl p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 shadow-lg">
-
+      <div className="text-black bg-white rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full shadow-lg">
         {/* Left Info */}
         <div className="flex items-center gap-4">
           <img
@@ -290,39 +249,35 @@ function EditProfile({goBack}) {
             className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
           />
 
+          <div>
+            <h2 className="font-semibold text-sm sm:text-base">
+              {userdetails.username}
+            </h2>
+            <div className="flex items-center gap-2">
+              <p className="text-gray-500 text-xs">{savedName}</p>
 
-         <div className="min-w-0">
-  <h2 className="font-semibold text-sm sm:text-base truncate">
-    {userdetails.username}
-  </h2>
-
-  <div className="flex items-center gap-2 min-w-0">
-    <p className="text-gray-500 text-xs truncate">
-      {savedName}
-    </p>
-
-    <button
-      onClick={() => setShowNameModal(true)}
-      className="text-gray-400 hover:text-black transition flex-shrink-0"
-    >
-      🖊️
-    </button>
-  </div>
-</div>
+              {/* Pen Button */}
+              <button
+                onClick={() => setShowNameModal(true)}
+                className="text-gray-400 hover:text-black transition"
+              >
+                🖊️
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Change Photo Button */}
-       <button
-  onClick={() => setShowModal(true)}
-  className="flex-shrink-0 bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full lg:w-auto hover:bg-gray-800 transition"
->
-  Change Photo
-</button>
-
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-black text-white px-4 sm:px-5 py-2 rounded-lg text-sm w-full sm:w-auto hover:bg-gray-800 transition"
+        >
+          Change Photo
+        </button>
       </div>
 
       {/* Form Section */}
-     <div className="mt-8 w-full max-w-xl flex flex-col gap-6">
+      <div className="mt-6 sm:mt-8 w-full flex flex-col gap-6">
         {/* Bio */}
         {/* Bio */}
         <div>
@@ -523,6 +478,41 @@ function EditProfile({goBack}) {
           <div className="chaotic-orbit"></div>
         </div>
       )}
+          {showAlert && (
+        <div className="fixed top-5 right-5 z-50 animate-slideInRight">
+          <div
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-2xl flex items-center gap-2 ${
+              alertMessage.includes("Failed") || alertMessage.includes("error")
+                ? "bg-red-600"
+                : alertMessage.includes("warning")
+                  ? "bg-yellow-600"
+                  : "bg-[#879F00]"
+            }`}
+          >
+            {!alertMessage.includes("Failed") &&
+              !alertMessage.includes("error") &&
+              !alertMessage.includes("warning") && (
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            <span className="text-white text-xs sm:text-sm font-medium">
+              {alertMessage}
+            </span>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

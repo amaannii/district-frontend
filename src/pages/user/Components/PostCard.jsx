@@ -6,7 +6,6 @@ import commentIcon from "../../../assets/images/icons8-comment-50.png";
 import send from "../../../assets/images/icons8-sent-50.png";
 import socket from "../../../Socket";
 import profile from "../../../assets/images/icons8-profile-50.png";
-import Swal from "sweetalert2";
 import API from "../../../API/Api";
 
 function PostCard({
@@ -17,7 +16,7 @@ function PostCard({
   setSelectedUserId,
 }) {
   const token = localStorage.getItem("userToken");
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  // const currentUser = JSON.parse(token);
 
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -71,7 +70,7 @@ function PostCard({
 
         socket.emit("likePost", {
           postId: data._id,
-          user: currentUser?.username,
+          user: user,
         });
 
         if (res.data.isLiked) {
@@ -177,7 +176,7 @@ function PostCard({
       }
     } catch (err) {
       console.error(err);
-      showNotification("Failed to delete comment", "error");
+      showNotification("Failed to delete others comment", "error");
     } finally {
       setLoading(false);
     }
@@ -208,7 +207,7 @@ function PostCard({
         socket.emit("sharePost", {
           postId: data._id,
           districts: selectedDistricts,
-          sender: currentUser?.username,
+          sender: user,
         });
 
         setSelectedDistricts([]);
@@ -262,8 +261,8 @@ function PostCard({
 
   // Check if current user can delete comment
   const canDeleteComment = (comment) => {
-    return comment.username === currentUser?.username || 
-           data.userId?.username === currentUser?.username;
+    return comment.username === user || 
+           data.userId?.username === user;
   };
 
   return (
@@ -295,16 +294,6 @@ function PostCard({
             {formatDate(data.createdAt)}
           </p>
         </div>
-
-        <button className="text-gray-400 hover:text-white transition-colors">
-          <svg
-            className="w-4 h-4 sm:w-5 sm:h-5"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-          </svg>
-        </button>
       </div>
 
       {/* IMAGE WITH LOADING STATE */}

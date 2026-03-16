@@ -7,19 +7,7 @@ import commentIcon from "../../../assets/images/icons8-comment-50.png";
 import API from "../../../API/Api";
 
 const EMOJIS = [
-  "😀",
-  "😂",
-  "😍",
-  "🥰",
-  "😎",
-  "🤔",
-  "😢",
-  "😡",
-  "👍",
-  "🙏",
-  "🔥",
-  "🎉",
-  "❤️",
+  "😀", "😂", "😍", "🥰", "😎", "🤔", "😢", "😡", "👍", "🙏", "🔥", "🎉", "❤️",
 ];
 
 function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
@@ -46,102 +34,125 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const inputRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   /* ================= SOCKET ================= */
 
-useEffect(() => {
-  const fetchDetails = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("userToken");
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("userToken");
 
-      const res = await API.post(
-        "/user/userdetails",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        const res = await API.post(
+          "/user/userdetails",
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-      const user = res.data.user;
-      setcurrentUser(user);
-    } catch (error) {
-      console.log("Error fetching notification settings ❌", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const user = res.data.user;
+        setcurrentUser(user);
+      } catch (error) {
+        console.log("Error fetching notification settings ❌", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchMessages = async () => {
-    if (!district) return;
+    const fetchMessages = async () => {
+      if (!district) return;
 
-    try {
-      setMessages([]);
+      try {
+        setMessages([]);
 
-      const res = await API.get(`/messages/${district}`);
-      const data = res.data;
+        const res = await API.get(`/messages/${district}`);
+        const data = res.data;
 
-      const formatted = data.messages.map((msg) => {
-        if (msg.post) {
+        const formatted = data.messages.map((msg) => {
+          if (msg.post) {
+            return {
+              type: "post",
+              post: msg.post,
+              postOwner: msg.postOwner,
+              sender: msg.sender,
+              time: msg.createdAt,
+            };
+          }
+
           return {
-            type: "post",
-            post: msg.post,
-            postOwner: msg.postOwner,
+            _id: msg._id,
+            type: msg.message?.type,
+            content: msg.message?.content,
+            name: msg.message?.name,
             sender: msg.sender,
             time: msg.createdAt,
           };
-        }
+        });
 
-        return {
+        setMessages(formatted);
+      } catch (error) {
+        console.log("Error fetching messages ❌", error);
+      }
+    };
+
+    fetchDetails();
+    fetchMessages();
+
+    if (!district) return;
+
+    socket.emit("joinDistrict", district);
+
+    const receiveHandler = (msg) => {
+      setMessages((prev) => [
+        ...prev,
+        {
           _id: msg._id,
-          type: msg.message?.type,
-          content: msg.message?.content,
-          name: msg.message?.name,
+          ...msg.message,
           sender: msg.sender,
           time: msg.createdAt,
-        };
-      });
+        },
+      ]);
+    };
 
-      setMessages(formatted);
-    } catch (error) {
-      console.log("Error fetching messages ❌", error);
-    }
-  };
+    const handleDelete = (messageId) => {
+      setMessages((prev) =>
+        prev.filter((m) => m._id === undefined || m._id !== messageId)
+      );
+    };
 
-  fetchDetails();
-  fetchMessages();
+    socket.on("receiveMessage", receiveHandler);
+    socket.on("messageDeleted", handleDelete);
 
-  if (!district) return;
+    return () => {
+      socket.off("receiveMessage", receiveHandler);
+      socket.off("messageDeleted", handleDelete);
+      socket.emit("leaveDistrict", district);
+    };
+  }, [district, showComments, liked]);
 
-  socket.emit("joinDistrict", district);
+  // Keyboard visibility detection
+  useEffect(() => {
+    const handleResize = () => {
+      // On mobile, when keyboard opens, viewport height decreases
+      const isKeyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
+      setKeyboardVisible(isKeyboardOpen);
+      
+      if (isKeyboardOpen) {
+        // Scroll to bottom when keyboard opens
+        setTimeout(scrollToBottom, 100);
+      }
+    };
 
-  const receiveHandler = (msg) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        _id: msg._id,
-        ...msg.message,
-        sender: msg.sender,
-        time: msg.createdAt,
-      },
-    ]);
-  };
-
-  const handleDelete = (messageId) => {
-    setMessages((prev) =>
-      prev.filter((m) => m._id === undefined || m._id !== messageId)
-    );
-  };
-
-  socket.on("receiveMessage", receiveHandler);
-  socket.on("messageDeleted", handleDelete);
-
-  return () => {
-    socket.off("receiveMessage", receiveHandler);
-    socket.off("messageDeleted", handleDelete);
-    socket.emit("leaveDistrict", district);
-  };
-}, [district, showComments, liked]);
+    window.visualViewport?.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -167,7 +178,9 @@ useEffect(() => {
   /* ================= SEND TEXT ================= */
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView();
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   const sendMessage = () => {
@@ -180,11 +193,19 @@ useEffect(() => {
         type: "text",
         content: message,
       },
-
       sender: currentUser.name, // 🔥 important
     });
 
     setMessage("");
+    scrollToBottom();
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   /* ================= EMOJI ================= */
@@ -192,6 +213,10 @@ useEffect(() => {
   const sendEmoji = (emoji) => {
     setMessage((prev) => prev + emoji);
     setShowEmojis(false);
+    // Keep input focused after emoji selection
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   /* ================= IMAGE ================= */
@@ -238,6 +263,8 @@ useEffect(() => {
         },
         sender: currentUser?.name,
       });
+      
+      scrollToBottom();
     } catch (error) {
       console.error("Upload error:", error);
     } finally {
@@ -278,12 +305,15 @@ useEffect(() => {
         },
         sender: currentUser?.name,
       });
+      
+      scrollToBottom();
     } catch (error) {
       console.error("Document upload error:", error);
     } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!selectedPost?.post?._id) return;
@@ -318,16 +348,21 @@ useEffect(() => {
   /* ================= AUDIO ================= */
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    mediaRecorderRef.current = new MediaRecorder(stream);
-    audioChunksRef.current = [];
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
 
-    mediaRecorderRef.current.ondataavailable = (e) =>
-      audioChunksRef.current.push(e.data);
+      mediaRecorderRef.current.ondataavailable = (e) =>
+        audioChunksRef.current.push(e.data);
 
-    mediaRecorderRef.current.start();
-    setRecording(true);
+      mediaRecorderRef.current.start();
+      setRecording(true);
+    } catch (error) {
+      console.error("Recording error:", error);
+      alert("Microphone access denied");
+    }
   };
 
   const cancelRecording = () => {
@@ -370,6 +405,7 @@ useEffect(() => {
         });
 
         setRecording(false);
+        scrollToBottom();
       } catch (error) {
         console.error("Audio upload error:", error);
       } finally {
@@ -387,10 +423,12 @@ useEffect(() => {
     });
 
     setMessages((prev) => prev.filter((m) => m._id !== id));
+    setOpenMenuId(null);
   };
 
   const downloadImage = async (url) => {
     try {
+      setLoading(true);
       const response = await fetch(url);
       const blob = await response.blob();
 
@@ -398,7 +436,7 @@ useEffect(() => {
       const a = document.createElement("a");
 
       a.href = blobUrl;
-      a.download = "image.jpg"; // you can customize
+      a.download = "image.jpg";
       document.body.appendChild(a);
       a.click();
 
@@ -413,6 +451,7 @@ useEffect(() => {
 
   const downloadDocument = async (url, name) => {
     try {
+      setLoading(true);
       const response = await fetch(url);
       const blob = await response.blob();
 
@@ -452,7 +491,7 @@ useEffect(() => {
   };
 
   const handleComment = async () => {
-    const token = localStorage.getItem("userToken"); // ✅ ADD THIS
+    const token = localStorage.getItem("userToken");
 
     if (!token) return alert("Login required");
     if (!commentText.trim()) return;
@@ -489,10 +528,9 @@ useEffect(() => {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("userToken"); // ✅ ADD THIS
+    const token = localStorage.getItem("userToken");
     if (!token) return alert("Login required");
 
-    // 🔥 instantly toggle UI
     const newSavedState = !saved;
     setSaved(newSavedState);
 
@@ -508,12 +546,10 @@ useEffect(() => {
       );
 
       if (!res.data.success) {
-        // rollback if something failed
         setSaved(!newSavedState);
       }
     } catch (err) {
       console.error(err);
-      // rollback on error
       setSaved(!newSavedState);
     } finally {
       setLoading(false);
@@ -523,111 +559,143 @@ useEffect(() => {
   /* ================= UI ================= */
 
   return (
-    <div className="flex flex-col h-[85vh] sm:h-[80vh] w-full bg-[#0f0f0f] rounded-none sm:rounded-xl p-2 sm:p-4 text-white">
-      <div className="flex items-center gap-3 mb-4 border-b border-gray-700 pb-3">
-        <button onClick={onBack}>←</button>
-        <h2>{district}</h2>
+    <div 
+      ref={chatContainerRef}
+      className={`flex flex-col h-[calc(100vh-120px)] sm:h-[80vh] w-full bg-[#0f0f0f] rounded-none sm:rounded-xl text-white ${
+        keyboardVisible ? 'pb-0' : 'pb-2 sm:pb-4'
+      }`}
+    >
+      {/* Header - Fixed at top */}
+      <div className="flex items-center gap-3 px-3 sm:px-4 py-3 border-b border-gray-700 sticky top-0 bg-[#0f0f0f] z-10">
+        <button 
+          onClick={onBack} 
+          className="text-lg sm:text-xl hover:bg-gray-800 p-1 rounded-full"
+        >
+          ←
+        </button>
+        <h2 className="text-base sm:text-lg font-semibold truncate">{district}</h2>
       </div>
 
-      <div className="flex-1 overflow-scroll scrollbar-hide space-y-3 flex flex-col px-1 sm:px-2">
+      {/* Messages Container - Scrollable */}
+      <div 
+        className="flex-1 overflow-y-auto scrollbar-hide px-2 sm:px-4 py-3 space-y-3"
+        style={{ 
+          paddingBottom: keyboardVisible ? '80px' : '20px',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
         {messages.map((msg, i) => {
           const isMe = msg.sender === currentUser?.name;
 
           return (
             <div
               key={i}
-              className={`relative group flex flex-col ${isMe ? "items-end" : "items-start"}`}
+              className={`relative group flex flex-col ${
+                isMe ? "items-end" : "items-start"
+              }`}
             >
+              {/* Three dots menu for own messages */}
               {isMe && (
-                <div className="absolute -right-6 top-5">
+                <div className="absolute -right-2 top-5 z-20">
                   <button
                     onClick={() =>
                       setOpenMenuId(openMenuId === msg._id ? null : msg._id)
                     }
-                    className="text-gray-400 relative right-6 hover:text-white font-bold px-2 opacity-0 group-hover:opacity-100 "
+                    className="text-gray-400 hover:text-white font-bold px-2 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     ⋮
                   </button>
                 </div>
               )}
+
+              {/* Dropdown Menu */}
               {isMe && openMenuId === msg._id && (
                 <div
                   ref={menuRef}
-                  className="absolute right-0 mt-6 w-40 bg-[#1f1f1f] rounded-xl shadow-lg z-50 overflow-hidden"
+                  className="absolute right-0 mt-8 w-36 sm:w-40 bg-[#1f1f1f] rounded-xl shadow-lg z-30 overflow-hidden text-sm"
                 >
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(msg.content || "");
-                      setOpenMenuId(null);
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-700 "
-                  >
-                    Copy
-                  </button>
+                  {msg.type !== "post" && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(msg.content || "");
+                        setOpenMenuId(null);
+                      }}
+                      className="w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-700"
+                    >
+                      Copy
+                    </button>
+                  )}
 
-                  <button
-                    onClick={() => {
-                      console.log("Forward clicked");
-                      setOpenMenuId(null);
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-700"
-                  >
-                    Forward
-                  </button>
+                  {msg.type !== "post" && (
+                    <button
+                      onClick={() => {
+                        // Forward functionality
+                        setOpenMenuId(null);
+                      }}
+                      className="w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-700"
+                    >
+                      Forward
+                    </button>
+                  )}
 
                   {msg.sender === currentUser?.name && (
                     <button
                       onClick={() => deleteMessage(msg._id)}
-                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700"
+                      className="w-full text-left px-3 sm:px-4 py-2 text-red-500 hover:bg-gray-700"
                     >
                       Unsend
                     </button>
                   )}
                 </div>
               )}
-              <span className="text-xs text-gray-400 mb-1">
+
+              <span className="text-[10px] sm:text-xs text-gray-400 mb-1 px-1">
                 {isMe ? "You" : msg.sender}
               </span>
 
+              {/* Post Message */}
               {msg.type === "post" && (
                 <div
                   onClick={() => setSelectedPost(msg)}
-                  className="bg-white text-black rounded-lg p-2 max-w-lg cursor-pointer hover:opacity-90 transition"
+                  className="bg-white text-black rounded-lg p-2 max-w-[250px] sm:max-w-sm cursor-pointer hover:opacity-90 transition"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <img
                       src={msg.postOwner?.avatar}
-                      className="w-6 h-6 rounded-full"
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full"
                       alt=""
                     />
-                    <span className="text-xs font-semibold">
+                    <span className="text-[10px] sm:text-xs font-semibold">
                       {msg.postOwner?.username}
                     </span>
                   </div>
 
                   <img
                     src={msg.post.image}
-                    className="rounded-lg max-w-[70vw] sm:max-w-xs"
+                    className="rounded-lg max-w-[200px] sm:max-w-xs"
                     alt="shared post"
                   />
 
                   {msg.post.caption && (
-                    <p className="text-xs mt-1">{msg.post.caption}</p>
+                    <p className="text-[10px] sm:text-xs mt-1 truncate">{msg.post.caption}</p>
                   )}
                 </div>
               )}
 
+              {/* Text Message */}
               {msg.type === "text" && (
                 <div
-                  className={`px-4 py-2 rounded-lg max-w-xs ${
+                  className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg max-w-[250px] sm:max-w-xs text-sm sm:text-base break-words ${
                     isMe ? "bg-[#879F00] text-white" : "bg-white text-black"
                   }`}
                 >
                   {msg.content}
                 </div>
               )}
+
+              {/* Image Message */}
               {msg.type === "image" && (
-                <div className="relative">
+                <div className="relative max-w-[200px] sm:max-w-sm">
                   <img
                     src={msg.content}
                     onClick={() =>
@@ -635,12 +703,12 @@ useEffect(() => {
                         openImageMenuId === msg._id ? null : msg._id,
                       )
                     }
-                    className="max-w-[70vw] sm:max-w-xs md:max-w-sm rounded-lg cursor-pointer"
+                    className="w-full rounded-lg cursor-pointer"
                     alt="chat"
                   />
 
                   {openImageMenuId === msg._id && (
-                    <div className="absolute right-0 mt-2 w-32 bg-[#1f1f1f] rounded-xl shadow-lg z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-32 bg-[#1f1f1f] rounded-xl shadow-lg z-30 overflow-hidden text-sm">
                       <button
                         onClick={() => {
                           downloadImage(msg.content);
@@ -651,12 +719,11 @@ useEffect(() => {
                         Download
                       </button>
 
-                      {/* 🔥 NEW UNSEND BUTTON */}
                       {msg.sender === currentUser?.name && (
                         <button
                           onClick={() => {
-                            deleteMessage(msg._id); // delete from DB + UI
-                            setOpenImageMenuId(null); // close menu
+                            deleteMessage(msg._id);
+                            setOpenImageMenuId(null);
                           }}
                           className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700"
                         >
@@ -675,28 +742,30 @@ useEffect(() => {
                 </div>
               )}
 
+              {/* Audio Message */}
               {msg.type === "audio" && (
-                <audio controls>
+                <audio controls className="max-w-[200px] sm:max-w-xs h-8 sm:h-10">
                   <source src={msg.content} type="audio/webm" />
                 </audio>
               )}
 
+              {/* Document Message */}
               {msg.type === "document" && (
                 <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg max-w-xs ${
+                  className={`flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-3 rounded-lg max-w-[250px] sm:max-w-xs ${
                     isMe ? "bg-[#879F00] text-white" : "bg-gray-800 text-white"
                   }`}
                 >
-                  <div className="text-3xl">📄</div>
+                  <div className="text-2xl sm:text-3xl">📄</div>
 
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-sm font-semibold truncate">
+                    <span className="text-xs sm:text-sm font-semibold truncate">
                       {msg.name}
                     </span>
 
                     <button
                       onClick={() => downloadDocument(msg.content, msg.name)}
-                      className="text-xs underline opacity-80"
+                      className="text-[10px] sm:text-xs underline opacity-80 text-left"
                     >
                       Download
                     </button>
@@ -704,7 +773,8 @@ useEffect(() => {
                 </div>
               )}
 
-              <span className="text-gray-400 text-xs mt-1">
+              {/* Timestamp */}
+              <span className="text-gray-400 text-[8px] sm:text-xs mt-1 px-1">
                 {new Date(msg.time).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -716,56 +786,96 @@ useEffect(() => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="relative flex items-center gap-2 sm:gap-3 border-t border-gray-700 pt-2 sm:pt-3">
-        {!recording ? (
-          <>
-            <button onClick={() => setShowEmojis(!showEmojis)}>😊</button>
-
-            <button onClick={() => fileInputRef.current.click()}>🖼️</button>
-            <input ref={fileInputRef} type="file" hidden onChange={sendImage} />
-
-            <button onClick={() => docInputRef.current.click()}>📎</button>
-            <input
-              ref={docInputRef}
-              type="file"
-              hidden
-              onChange={sendDocument}
-            />
-
-            <input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={`Message ${district}`}
-              className="flex-1 px-3 sm:px-4 py-2 rounded-full bg-gray-800 text-sm sm:text-base"
-            />
-
-            {message ? (
-              <button onClick={sendMessage} className="text-[#879F00]">
-                Send
+      {/* Input Area - Fixed at bottom with keyboard handling */}
+      <div 
+        className={`border-t border-gray-700 bg-[#0f0f0f] transition-all duration-200 ${
+          keyboardVisible ? 'pb-1' : 'pb-2 sm:pb-3'
+        }`}
+      >
+        <div className="relative flex items-center gap-1 sm:gap-2 pt-2 px-2 sm:px-3">
+          {!recording ? (
+            <>
+              {/* Emoji Button */}
+              <button 
+                onClick={() => setShowEmojis(!showEmojis)} 
+                className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
+              >
+                😊
               </button>
-            ) : (
-              <button onClick={startRecording}>🎤</button>
-            )}
-          </>
-        ) : (
-          <div className="flex justify-between w-full bg-gray-800 px-4 py-2 rounded-full">
-            <button onClick={cancelRecording}>✖</button>
-            <span>🔴 Recording...</span>
-            <button onClick={sendRecording}>➤</button>
-          </div>
-        )}
+
+              {/* Image Button */}
+              <button 
+                onClick={() => fileInputRef.current.click()} 
+                className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
+              >
+                🖼️
+              </button>
+              <input ref={fileInputRef} type="file" hidden onChange={sendImage} accept="image/*" />
+
+              {/* Document Button */}
+              <button 
+                onClick={() => docInputRef.current.click()} 
+                className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
+              >
+                📎
+              </button>
+              <input
+                ref={docInputRef}
+                type="file"
+                hidden
+                onChange={sendDocument}
+              />
+
+              {/* Text Input */}
+              <input
+                ref={inputRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={`Message ${district}`}
+                className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-800 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-[#879F00]"
+              />
+
+              {/* Send/Record Button */}
+              {message ? (
+                <button 
+                  onClick={sendMessage} 
+                  className="text-[#879F00] text-sm sm:text-base font-semibold px-2 sm:px-3 py-1.5 hover:bg-gray-800 rounded-full"
+                >
+                  Send
+                </button>
+              ) : (
+                <button 
+                  onClick={startRecording} 
+                  className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
+                >
+                  🎤
+                </button>
+              )}
+            </>
+          ) : (
+            <div className="flex justify-between items-center w-full bg-gray-800 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full">
+              <button onClick={cancelRecording} className="text-red-500 text-lg">✖</button>
+              <span className="text-xs sm:text-sm">🔴 Recording...</span>
+              <button onClick={sendRecording} className="text-[#879F00] text-lg">➤</button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Emoji Picker */}
       {showEmojis && (
         <div
           ref={emojiRef}
-          className="absolute bottom-14 left-2 sm:left-auto mb-10 bg-gray-800 p-3 rounded-lg w-[90%] sm:max-w-xs shadow-lg z-50"
+          className="absolute bottom-20 left-2 right-2 sm:left-auto sm:right-4 bg-gray-800 p-3 rounded-lg shadow-lg z-50"
+          style={{ maxWidth: '300px', margin: '0 auto' }}
         >
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 justify-center">
             {EMOJIS.map((emoji, index) => (
               <button
                 key={index}
                 onClick={() => sendEmoji(emoji)}
-                className="text-xl hover:scale-125 transition"
+                className="text-xl sm:text-2xl hover:scale-125 transition p-1"
               >
                 {emoji}
               </button>
@@ -773,40 +883,19 @@ useEffect(() => {
           </div>
         </div>
       )}
-      {showPopup && (
-        <div className="fixed inset-0  bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-[#1c1c1c] rounded-xl p-6 w-72 text-center space-y-4">
-            <h3 className="text-lg font-semibold">Message Options</h3>
 
-            {selectedMessage?.sender === currentUser?.name && (
-              <button
-                onClick={deleteMessage}
-                className="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg"
-              >
-                Unsend
-              </button>
-            )}
-
-            <button
-              onClick={() => setShowPopup(false)}
-              className="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Post Modal */}
       {selectedPost && (
         <div
           onClick={() => setSelectedPost(null)}
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#0f0f0f] text-white overflow-y-auto scrollbar-hide rounded-xl w-[95%] sm:w-[90%] md:w-[500px] max-h-[90vh]"
+            className="bg-[#0f0f0f] text-white overflow-y-auto scrollbar-hide w-full sm:w-[90%] md:w-[500px] max-h-[90vh] rounded-t-xl sm:rounded-xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-700 sticky top-0 bg-[#0f0f0f] z-10">
               <div
                 onClick={() => {
                   if (
@@ -819,20 +908,19 @@ useEffect(() => {
                     setSelectedUsername(selectedPost.postOwner.username);
                   }
                 }}
-                className="flex items-center gap-3 cursor-pointer"
+                className="flex items-center gap-2 sm:gap-3 cursor-pointer"
               >
                 <img
                   src={selectedPost.postOwner?.avatar}
-                  className="w-8 h-8 rounded-full"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
                   alt=""
                 />
-
-                <span className="font-semibold">
+                <span className="text-sm sm:text-base font-semibold">
                   {selectedPost.postOwner?.username}
                 </span>
               </div>
 
-              <button onClick={() => setSelectedPost(null)} className="text-xl">
+              <button onClick={() => setSelectedPost(null)} className="text-xl p-1">
                 ✖
               </button>
             </div>
@@ -840,35 +928,36 @@ useEffect(() => {
             {/* Image */}
             <img
               src={selectedPost.post.image}
-              className="w-full max-h-[90vh] object-cover"
+              className="w-full max-h-[50vh] object-contain bg-black"
               alt="post"
             />
 
             {/* Action Row */}
-            <div className="flex items-center justify-between px-4 pt-3">
-              <div className="flex items-center gap-5">
-                {/* ❤️ Like */}
-
+            <div className="flex items-center justify-between px-3 sm:px-4 pt-3">
+              <div className="flex items-center gap-4 sm:gap-5">
+                {/* Like */}
                 <img
                   src={liked ? heartRed : heart}
                   alt="like"
-                  className="w-6 h-6 cursor-pointer hover:scale-110 transition"
+                  className="w-5 h-5 sm:w-6 sm:h-6 cursor-pointer hover:scale-110 transition"
                   onClick={handleLike}
                 />
 
-                {/* 💬 Comment */}
+                {/* Comment */}
                 <img
                   src={commentIcon}
                   alt="comment"
-                  className="w-6 h-6 cursor-pointer hover:scale-110 transition"
+                  className="w-5 h-5 sm:w-6 sm:h-6 cursor-pointer hover:scale-110 transition"
                   onClick={() => setShowComments((prev) => !prev)}
                 />
               </div>
+              
+              {/* Save */}
               <svg
                 onClick={handleSave}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                className="w-6 h-6 cursor-pointer transition-all duration-200 hover:scale-110"
+                className="w-5 h-5 sm:w-6 sm:h-6 cursor-pointer transition-all duration-200 hover:scale-110"
                 fill={saved ? "white" : "none"}
                 stroke="white"
                 strokeWidth="2"
@@ -878,16 +967,18 @@ useEffect(() => {
             </div>
 
             {/* Like Count */}
-            <div className="px-4 pt-2 text-sm font-semibold">
+            <div className="px-3 sm:px-4 pt-2 text-xs sm:text-sm font-semibold">
               {like || 0} likes
             </div>
-            <div className="px-4 pt-2 text-xs text-gray-400">
-              {selectedPost.post.comments.length || 0} comments
+            
+            {/* Comment Count */}
+            <div className="px-3 sm:px-4 pt-1 text-[10px] sm:text-xs text-gray-400">
+              {selectedPost.post.comments?.length || 0} comments
             </div>
 
             {/* Caption */}
-            <div className="px-4 pt-1 text-sm">
-              <span className="font-semibold ">
+            <div className="px-3 sm:px-4 pt-2 text-xs sm:text-sm">
+              <span className="font-semibold">
                 {selectedPost.postOwner?.username}
               </span>{" "}
               {selectedPost.post.caption}
@@ -895,10 +986,10 @@ useEffect(() => {
 
             {/* Comments Section */}
             {showComments && (
-              <div className="px-4 pt-3 max-h-40 overflow-scroll scrollbar-hide space-y-2">
+              <div className="px-3 sm:px-4 pt-3 max-h-40 overflow-y-auto scrollbar-hide space-y-2">
                 {selectedPost.post.comments?.length > 0 ? (
                   selectedPost.post.comments.map((comment) => (
-                    <div key={comment._id} className="text-sm">
+                    <div key={comment._id} className="text-xs sm:text-sm">
                       <span className="font-semibold">
                         {comment.user?.toString() ===
                         currentUser?._id?.toString()
@@ -912,17 +1003,18 @@ useEffect(() => {
                   <p className="text-xs text-gray-400">No comments yet</p>
                 )}
 
-                {/* Input */}
+                {/* Comment Input */}
                 <div className="flex items-center border-t border-gray-700 mt-3 pt-2">
                   <input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                     placeholder="Add a comment..."
-                    className="flex-1 bg-transparent outline-none text-sm"
+                    className="flex-1 bg-transparent outline-none text-xs sm:text-sm"
                   />
                   <button
                     onClick={handleComment}
-                    className="text-[#879F00] text-sm font-semibold"
+                    className="text-[#879F00] text-xs sm:text-sm font-semibold ml-2"
                   >
                     Post
                   </button>
@@ -930,12 +1022,12 @@ useEffect(() => {
               </div>
             )}
           </div>
-          {/* Add Comment */}
         </div>
       )}
 
+      {/* Loading Overlay */}
       {loading && (
-        <div className="fixed inset-0 flex justify-center items-center  z-50">
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="chaotic-orbit"></div>
         </div>
       )}
