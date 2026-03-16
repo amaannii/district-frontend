@@ -10,12 +10,28 @@ function Notification() {
   const [confirmed, setconfirmed] = useState(0);
   const [loading, setloading] = useState(false);
 
+  // Check if notifications have been viewed today
+  const hasViewedToday = () => {
+    const lastViewed = localStorage.getItem("notificationsLastViewed");
+    if (!lastViewed) return false;
+    
+    const today = new Date().toDateString();
+    return lastViewed === today;
+  };
+
   useEffect(() => {
-    const stored = localStorage.getItem("recentNotifications");
-    if (stored) {
-      setNotifications(JSON.parse(stored));
+    // Only load from localStorage if not viewed today
+    if (!hasViewedToday()) {
+      const stored = localStorage.getItem("recentNotifications");
+      if (stored) {
+        setNotifications(JSON.parse(stored));
+      }
+    } else {
+      // Clear notifications if already viewed today
+      setNotifications([]);
     }
   }, []);
+
   useEffect(() => {
     fetchNotifications();
   }, [deleted, confirmed]);
@@ -33,17 +49,29 @@ function Notification() {
       });
 
       if (res.data.success) {
-        setNotifications(res.data.request);
-        localStorage.setItem(
-          "recentNotifications",
-          JSON.stringify(res.data.request),
-        );
+        // Only set notifications if not viewed today
+        if (!hasViewedToday()) {
+          setNotifications(res.data.request);
+          localStorage.setItem(
+            "recentNotifications",
+            JSON.stringify(res.data.request)
+          );
+        } else {
+          setNotifications([]);
+        }
       }
     } catch (err) {
       console.error("Fetch notifications failed:", err);
     } finally {
       setloading(false);
     }
+  };
+
+  // 🔹 Mark notifications as viewed
+  const markAsViewed = () => {
+    const today = new Date().toDateString();
+    localStorage.setItem("notificationsLastViewed", today);
+    setNotifications([]); // Clear notifications from state
   };
 
   // 🔹 Confirm request
@@ -60,7 +88,7 @@ function Notification() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (response.data.success === true) {
@@ -70,8 +98,6 @@ function Notification() {
       console.error(err);
     } finally {
       setloading(false);
-
-      console.error(err);
     }
   };
 
@@ -86,11 +112,11 @@ function Notification() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
+      
       if (response.data.success == true) {
         setdeleted(deleted + 1);
-        alert("deleted");
       } else {
         alert("deleted failed");
       }
@@ -164,25 +190,46 @@ function Notification() {
   return (
     <div className="min-h-screen bg-black text-white flex justify-center overflow-x-hidden">
       {/* Container */}
-      <div
-        className="
-  w-full
-  max-w-md sm:max-w-xl lg:max-w-2xl
-  px-4 sm:px-6 md:px-8
-  pt-8 sm:pt-10
-  pb-24 md:pb-10
-"
-      >
-        <h1 className="text-lg sm:text-xl md:text-2xl font-semibold mb-6">
-          Notifications
-        </h1>
+      <div className="w-full max-w-md sm:max-w-xl lg:max-w-2xl px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-24 md:pb-10">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold">
+            Notifications
+          </h1>
+          
+          {/* Only show "Mark as Read" button if there are notifications */}
+          {notifications.length > 0 && (
+            <button
+              onClick={markAsViewed}
+              className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors duration-200"
+            >
+              Mark as read
+            </button>
+          )}
+        </div>
 
         {notifications.length === 0 ? (
-          <p className="text-gray-400 text-xs sm:text-sm">No notifications</p>
+          <div className="text-center py-8">
+            <p className="text-gray-400 text-xs sm:text-sm">
+              {hasViewedToday() 
+                ? "You've already viewed today's notifications. Check back tomorrow!" 
+                : "No notifications"}
+            </p>
+          </div>
         ) : (
-          notifications.map((item) => (
-            <NotificationItem key={item._id} item={item} />
-          ))
+          <>
+            {notifications.map((item) => (
+              <NotificationItem key={item._id} item={item} />
+            ))}
+            
+            {/* Auto-mark as viewed when user has seen all notifications */}
+            {notifications.length > 0 && (
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-500">
+                  These notifications will only be shown once today
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
