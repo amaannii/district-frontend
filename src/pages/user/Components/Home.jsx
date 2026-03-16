@@ -402,7 +402,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
       )}
 
       {/* CSS Animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

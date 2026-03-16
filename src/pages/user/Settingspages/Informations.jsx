@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
+
 import API from "../../../API/Api";
 
 
@@ -20,6 +20,8 @@ function Informations({goBack}) {
   const [month, setMonth] = useState("December");
   const [day, setDay] = useState("30");
   const [year, setYear] = useState("2001");
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -62,6 +64,13 @@ function Informations({goBack}) {
     fetchContacts();
   }, [showAddModal, ShowEditModal]);
 
+    const showNotification = (message, type = "success") => {
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+  };
   // Save contact number
   const handleSaveContact = async () => {
     try {
@@ -157,15 +166,7 @@ function Informations({goBack}) {
         },
       );
 
-      Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "success",
-      title: "Birthday Saved",
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
+     showNotification(" Birthday saved", "success");
       setMonth(res.data.birthday.month);
       setDay(res.data.birthday.day);
       setYear(res.data.birthday.year);
@@ -573,6 +574,41 @@ function Informations({goBack}) {
           <div className="chaotic-orbit"></div>
         </div>
       )}
+          {showAlert && (
+        <div className="fixed top-5 right-5 z-50 animate-slideInRight">
+          <div
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-2xl flex items-center gap-2 ${
+              alertMessage.includes("Failed") || alertMessage.includes("error")
+                ? "bg-red-600"
+                : alertMessage.includes("warning")
+                  ? "bg-yellow-600"
+                  : "bg-[#879F00]"
+            }`}
+          >
+            {!alertMessage.includes("Failed") &&
+              !alertMessage.includes("error") &&
+              !alertMessage.includes("warning") && (
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            <span className="text-white text-xs sm:text-sm font-medium">
+              {alertMessage}
+            </span>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
