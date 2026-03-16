@@ -122,91 +122,91 @@ function Home({ setSelectedUsername, setActive, openChat }) {
       {/* MAIN CONTENT */}
       <div className="flex-1 w-full max-w-xl sm:max-w-2xl mx-auto ">
         {/* NOTES SECTION - ENHANCED */}
-        <div className="min-h-[100px] sm:min-h-[140px] mt-18 py-5 gap-10 border-b border-neutral-800/50 ">
-          <div className="flex items-center justify-between mb-2 px-1">
-            <h2 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider">
-              Notes
-            </h2>
-            {myNote && (
-              <button
-                onClick={handleUpdateNote}
-                className="text-[10px] sm:text-xs text-[#879F00] hover:text-[#9fb800] transition-colors"
-              >
-                Edit
-              </button>
-            )}
-          </div>
+       <div className="min-h-[100px] sm:min-h-[140px] mt-22 sm:mt-6 gap-10 border-b border-neutral-800/50 ">
+  <div className="flex items-center justify-between mb-2 px-1">
+    <h2 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider">
+      Notes
+    </h2>
+    {myNote && (
+      <button
+        onClick={handleUpdateNote}
+        className="text-[10px] sm:text-xs text-[#879F00] hover:text-[#9fb800] transition-colors"
+      >
+        Edit
+      </button>
+    )}
+  </div>
 
-          <div className="flex flex-nowrap gap-4 sm:gap-6 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide snap-x">
-            {/* MY NOTE CARD */}
-            <div className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0 snap-start group">
-              <div className="relative">
-                <div className="w-15 h-15 sm:w-16 sm:h-16 rounded-full ring-2 ring-[#879F00] ring-offset-2 ring-offset-black overflow-hidden">
-                  <img
-                    src={image || defaultProfile}
-                    alt="Your profile"
-                    className="w-full h-full object-cover transition-transform duration-300"
-                  />
-                </div>
-                
-                {!myNote ? (
-                  <button
-                    onClick={() => setShowAddNoteModal(true)}
-                    className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#879F00] hover:bg-[#9fb800] text-white font-bold flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                ) : (
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                    <span className="bg-[#879F00] text-white text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
-                      {myNote.length > 10 ? `${myNote.substring(0, 10)}...` : myNote}
-                    </span>
-                  </div>
-                )}
-              </div>
-              
-              <p className="text-[10px] sm:text-xs text-gray-400 mt-3 sm:mt-4 font-medium">
-                You
-              </p>
-            </div>
-
-            {/* CONNECTED NOTES */}
-            {notes
-              .filter((n) => n.note && n.note.trim() !== "")
-              .map((n) => (
-                <div
-                  key={n._id}
-                  className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0 snap-start group cursor-pointer"
-                  onClick={() => {
-                    setSelectedUsername(n.username);
-                    setActive("UPROFILE");
-                  }}
-                >
-                  <div className="relative">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full ring-2 ring-[#879F00]/50 ring-offset-2 ring-offset-black overflow-hidden">
-                      <img 
-                        src={n.img || defaultProfile} 
-                        alt={n.username}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        onError={(e) => (e.target.src = defaultProfile)}
-                      />
-                    </div>
-                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                      <span className="bg-[#879F00] text-white text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
-                        {n.note.length > 10 ? `${n.note.substring(0, 10)}...` : n.note}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <p className="text-[10px] sm:text-xs text-gray-300 mt-3 sm:mt-4 font-medium truncate max-w-[70px] sm:max-w-[85px]">
-                    {n.username}
-                  </p>
-                </div>
-              ))}
-          </div>
+  <div className="flex flex-nowrap gap-4 sm:gap-6 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide snap-x">
+    {/* MY NOTE CARD */}
+    <div className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0 snap-start group">
+      <div className="relative">
+        <div className="w-15 h-15 sm:w-16 sm:h-16 rounded-full ring-2 ring-[#879F00] ring-offset-2 ring-offset-black overflow-hidden">
+          <img
+            src={image || defaultProfile}
+            alt="Your profile"
+            className="w-full h-full object-cover transition-transform duration-300"
+          />
         </div>
+        
+        {!myNote ? (
+          <button
+            onClick={() => setShowAddNoteModal(true)}
+            className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#879F00] hover:bg-[#9fb800] text-white font-bold flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        ) : (
+          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+            <span className="bg-[#879F00] text-white text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
+              {myNote.length > 10 ? `${myNote.substring(0, 10)}...` : myNote}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      <p className="text-[10px] sm:text-xs text-gray-400 mt-3 sm:mt-4 font-medium">
+        You
+      </p>
+    </div>
+
+    {/* CONNECTED NOTES */}
+    {notes
+      .filter((n) => n.note && n.note.trim() !== "")
+      .map((n) => (
+        <div
+          key={n._id}
+          className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0 snap-start group cursor-pointer"
+          onClick={() => {
+            setSelectedUsername(n.username);
+            setActive("UPROFILE");
+          }}
+        >
+          <div className="relative">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full ring-2 ring-[#879F00]/50 ring-offset-2 ring-offset-black overflow-hidden">
+              <img 
+                src={n.img || defaultProfile} 
+                alt={n.username}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                onError={(e) => (e.target.src = defaultProfile)}
+              />
+            </div>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+              <span className="bg-[#879F00] text-white text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
+                {n.note.length > 10 ? `${n.note.substring(0, 10)}...` : n.note}
+              </span>
+            </div>
+          </div>
+          
+          <p className="text-[10px] sm:text-xs text-gray-300 mt-3 sm:mt-4 font-medium truncate max-w-[70px] sm:max-w-[85px]">
+            {n.username}
+          </p>
+        </div>
+      ))}
+  </div>
+</div>
 
         {/* POSTS SECTION */}
         <div className="overflow-y-auto scrollbar-hide h-[calc(100vh-200px)] sm:h-[calc(100vh-220px)] pb-10">
