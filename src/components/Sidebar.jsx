@@ -21,7 +21,9 @@ function Sidebar({ active, setActive }) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-4 mb-10">
-          {!collapsed && <img src={logoo} alt="logo" className="w-[120px]" />}
+          {!collapsed && (
+            <img src={logoo} alt="logo" className="w-[120px]" />
+          )}
 
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -32,78 +34,48 @@ function Sidebar({ active, setActive }) {
         </div>
 
         <div className="flex flex-col gap-2 px-3 crusor-pointer">
-          <SidebarItem
-            icon={home}
-            text="HOME"
-            {...{ collapsed, active, setActive }}
-          />
-          <SidebarItem
-            icon={search}
-            text="SEARCH"
-            {...{ collapsed, active, setActive }}
-          />
-          <SidebarItem
-            icon={explore}
-            text="EXPLORE"
-            {...{ collapsed, active, setActive }}
-          />
-          <SidebarItem
-            icon={message}
-            text="MESSAGES"
-            {...{ collapsed, active, setActive }}
-          />
-          <SidebarItem
-            icon={notification}
-            text="NOTIFICATION"
-            {...{ collapsed, active, setActive }}
-          />
-          <SidebarItem
-            icon={create}
-            text="CREATE"
-            {...{ collapsed, active, setActive }}
-          />
-          <SidebarItem
-            icon={profile}
-            text="PROFILE"
-            {...{ collapsed, active, setActive }}
-          />
+          <SidebarItem icon={home} text="HOME" {...{ collapsed, active, setActive }} />
+          <SidebarItem icon={search} text="SEARCH" {...{ collapsed, active, setActive }} />
+          <SidebarItem icon={explore} text="EXPLORE" {...{ collapsed, active, setActive }} />
+          <SidebarItem icon={message} text="MESSAGES" {...{ collapsed, active, setActive }} />
+          <SidebarItem icon={notification} text="NOTIFICATION" {...{ collapsed, active, setActive }} />
+          <SidebarItem icon={create} text="CREATE" {...{ collapsed, active, setActive }} />
+          <SidebarItem icon={profile} text="PROFILE" {...{ collapsed, active, setActive }} />
         </div>
 
         <div className="mt-auto px-3 pt-4">
-          <SidebarItem
-            icon={more}
-            text="MORE"
-            {...{ collapsed, active, setActive }}
-          />
+          <SidebarItem icon={more} text="MORE" {...{ collapsed, active, setActive }} />
         </div>
       </aside>
 
       {/* ===== Mobile Top Bar ===== */}
-      {/* ===== Mobile Top Bar ===== */}
-      {active === "HOME" && (
-        <div className="md:hidden fixed top-0 left-0 right-0 bg-black border-b border-gray-800 flex justify-between items-center px-4 py-3 z-50">
-          {/* District Logo */}
-          <img src={logoo} alt="district logo" className="w-[110px]" />
+    {/* ===== Mobile Top Bar ===== */}
+{active === "HOME" && (
+  <div className="md:hidden fixed top-0 left-0 right-0 bg-black border-b border-gray-800 flex justify-between items-center px-4 py-3 z-50">
 
-          {/* Message Icon Top Right */}
-          <button onClick={() => setActive("MESSAGES")}>
-            <img src={message} alt="message" className="w-6 h-6" />
-          </button>
-        </div>
-      )}
+    {/* District Logo */}
+    <img src={logoo} alt="district logo" className="w-[110px]" />
+
+    {/* Message Icon Top Right */}
+    <button onClick={() => setActive("MESSAGES")}>
+      <img src={message} alt="message" className="w-6 h-6" />
+    </button>
+
+  </div>
+)}
+
+   
 
       {/* ===== Mobile Bottom Navbar ===== */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 flex justify-around items-center py-2 z-50">
+
         <MobileItem icon={home} text="HOME" {...{ active, setActive }} />
         <MobileItem icon={search} text="SEARCH" {...{ active, setActive }} />
         <MobileItem icon={explore} text="EXPLORE" {...{ active, setActive }} />
         <MobileItem icon={create} text="CREATE" {...{ active, setActive }} />
-        <MobileItem
-          icon={notification}
-          text="NOTIFICATION"
-          {...{ active, setActive }}
-        />
+        <MobileItem icon={notification} text="NOTIFICATION" {...{ active, setActive }} />
         <MobileItem icon={profile} text="PROFILE" {...{ active, setActive }} />
+
       </div>
     </>
   );

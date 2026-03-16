@@ -529,7 +529,7 @@ useEffect(() => {
         <h2>{district}</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 flex flex-col px-1 sm:px-2">
+      <div className="flex-1 overflow-scroll scrollbar-hide space-y-3 flex flex-col px-1 sm:px-2">
         {messages.map((msg, i) => {
           const isMe = msg.sender === currentUser?.name;
 
