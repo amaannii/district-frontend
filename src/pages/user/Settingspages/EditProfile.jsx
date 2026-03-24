@@ -19,8 +19,8 @@ function EditProfile() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [name, setName] = useState("");
   const [savedName, setSavedName] = useState("");
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -61,7 +61,7 @@ function EditProfile() {
     fetchUserDetails();
   }, []);
 
-    const showNotification = (message, type = "success") => {
+  const showNotification = (message, type = "success") => {
     setAlertMessage(message);
     setShowAlert(true);
     setTimeout(() => {
@@ -130,7 +130,12 @@ function EditProfile() {
             },
           },
         );
-        if (res.data.success == true) {
+        if (res.data.success === true) {
+          setuserdetails((prev) => ({
+            ...prev,
+            img: result.secure_url, // ✅ update UI instantly
+          }));
+
           setuploadshow(false);
           setShowModal(false);
           showNotification("Profile photo updated", "success");
@@ -165,7 +170,7 @@ function EditProfile() {
       if (res.data.success) {
         setSavedGender(gender);
 
-       showNotification("Profile photo updated", "success");
+        showNotification("Profile photo updated", "success");
       }
 
       console.log(res.data);
@@ -194,7 +199,7 @@ function EditProfile() {
       if (res.data.success) {
         setSavedBio(bio);
 
-      showNotification("Your bio was saved successfuly", "success");
+        showNotification("Your bio was saved successfuly", "success");
       }
     } catch (error) {
       console.log(error);
@@ -222,7 +227,7 @@ function EditProfile() {
         setSavedName(name);
         setShowNameModal(false);
 
-       showNotification("Name updated", "success");
+        showNotification("Name updated", "success");
       }
     } catch (error) {
       console.log(error);
@@ -478,7 +483,7 @@ function EditProfile() {
           <div className="chaotic-orbit"></div>
         </div>
       )}
-          {showAlert && (
+      {showAlert && (
         <div className="fixed top-5 right-5 z-50 animate-slideInRight">
           <div
             className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-2xl flex items-center gap-2 ${
@@ -512,7 +517,6 @@ function EditProfile() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
