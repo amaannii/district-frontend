@@ -474,8 +474,12 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                 onError={(e) => (e.target.src = profile)}
               />
             </div>
-            <h1 className="text-lg sm:text-xl font-semibold">{userdetails.username}</h1>
-            <p className="text-xs sm:text-sm text-gray-400">{userdetails.name}</p>
+            <h1 className="text-lg sm:text-xl font-semibold">
+              {userdetails.username}
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400">
+              {userdetails.name}
+            </p>
 
             {userdetails.bio && (
               <p className="text-xs sm:text-sm text-gray-300 mt-1 sm:mt-2 text-center max-w-[300px] sm:max-w-[350px] px-2">
@@ -493,21 +497,27 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
 
             <div className="flex gap-6 sm:gap-10 mt-3 sm:mt-4 mb-4 sm:mb-5">
               <div>
-                <p className="font-semibold text-sm sm:text-base">{posts.length}</p>
+                <p className="font-semibold text-sm sm:text-base">
+                  {posts.length}
+                </p>
                 <p className="text-xs text-gray-400">posts</p>
               </div>
               <div
                 className="cursor-pointer"
                 onClick={() => fetchConnections("connected")}
               >
-                <p className="font-semibold text-sm sm:text-base">{connected}</p>
+                <p className="font-semibold text-sm sm:text-base">
+                  {connected}
+                </p>
                 <p className="text-xs text-gray-400">connected</p>
               </div>
               <div
                 className="cursor-pointer"
                 onClick={() => fetchConnections("connecting")}
               >
-                <p className="font-semibold text-sm sm:text-base">{connecting}</p>
+                <p className="font-semibold text-sm sm:text-base">
+                  {connecting}
+                </p>
                 <p className="text-xs text-gray-400">connecting</p>
               </div>
             </div>
@@ -841,7 +851,13 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
       {showImageConfirm && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-[#0f0f0f] w-[90%] sm:w-[320px] p-4 sm:p-6 rounded-xl text-center">
-            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Add Profile Photo?</h2>
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+              {userdetails?.img &&
+              userdetails.img !== "null" &&
+              userdetails.img.trim() !== ""
+                ? "Change Profile Photo?"
+                : "Add Profile Photo?"}
+            </h2>
 
             <div className="flex justify-center gap-3 sm:gap-4">
               <button
@@ -906,7 +922,9 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
                     >
                       {user.username}
                     </p>
-                    <p className="text-[10px] sm:text-xs text-gray-400">{user.name}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-400">
+                      {user.name}
+                    </p>
                   </div>
                 </div>
               ))
@@ -921,7 +939,9 @@ function Profile({ setSelectedUsername, setActive, data, user }) {
           <div className="bg-neutral-900 rounded-lg w-full max-w-md max-h-[80vh] flex flex-col">
             {/* Header */}
             <div className="p-3 sm:p-4 border-b border-neutral-700">
-              <h2 className="text-base sm:text-lg font-semibold text-white">Share Post</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-white">
+                Share Post
+              </h2>
             </div>
 
             {/* Scrollable District List */}
