@@ -227,7 +227,7 @@ function Chatroom() {
             onClick={sendText}
             className="bg-black text-white px-4 py-1 rounded-full text-sm"
           >
-            Send
+             Send
           </button>
         </div>
       </div>

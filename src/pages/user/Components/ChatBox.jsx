@@ -208,7 +208,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         type: "text",
         content: message,
       },
-      sender:currentUsername, // 🔥 important
+      sender: currentUsername, // 🔥 important
     });
 
     setMessage("");
@@ -872,9 +872,22 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
               {message ? (
                 <button
                   onClick={sendMessage}
-                  className="text-[#879F00] text-sm sm:text-base font-semibold px-2 sm:px-3 py-1.5 hover:bg-gray-800 rounded-full"
+                  className="rounded-full p-2 transition-all duration-200 hover:bg-gray-800 active:scale-95"
                 >
-                  Send
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#879F00"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
                 </button>
               ) : (
                 <button
