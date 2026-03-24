@@ -27,7 +27,7 @@ function PostCard({
   const [showShare, setShowShare] = useState(false);
 
   // Delete modal state
-  const [commentToDelete, setCommentToDelete] = useState(null);
+  const [commentToDelete, setCommentToDelete] = useState(false);
   const [selectedDistricts, setSelectedDistricts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -41,6 +41,7 @@ function PostCard({
     setLikeCount(data.likes || 0);
     setLiked(data.isLiked || false);
     setSaved(data.isSaved || false);
+     setCommentToDelete(false);
   }, [data]);
 
   const toggleDistrict = (district) => {
@@ -172,7 +173,7 @@ function PostCard({
           commentId: commentToDelete,
         });
 
-        setCommentToDelete(null);
+        setCommentToDelete(false);
       }
     } catch (err) {
       console.error(err);
@@ -260,10 +261,12 @@ function PostCard({
   };
 
   // Check if current user can delete comment
-  const canDeleteComment = (comment) => {
-    return comment.username === user || 
-           data.userId?.username === user;
-  };
+const canDeleteComment = (comment) => {
+  return (
+    comment.username?.toString() === user?.toString() ||
+    data.userId?.username?.toString() === user?.toString()
+  );
+};
 
   return (
     <div className="border border-neutral-800/50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 w-full max-w-xl sm:max-w-2xl mx-auto bg-gradient-to-b from-neutral-900/50 to-black overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
@@ -414,10 +417,10 @@ function PostCard({
                     </div>
 
                     {/* DELETE COMMENT BUTTON - FIXED */}
-                    {canDeleteComment(c) && (
+                    {c.username?.toString() === user?.toString() && (
                       <button
                         onClick={() => setCommentToDelete(c._id)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400 text-xs sm:text-sm"
+                        className=" text-red-500 hover:text-red-400 text-xs sm:text-sm"
                         title="Delete comment"
                       >
                         <svg
@@ -472,7 +475,7 @@ function PostCard({
       )}
 
       {/* DELETE COMMENT MODAL */}
-      {commentToDelete && (
+   {commentToDelete  && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-neutral-900 p-5 sm:p-6 rounded-xl w-full max-w-sm border border-neutral-800 shadow-2xl">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
@@ -501,7 +504,7 @@ function PostCard({
 
             <div className="flex gap-3">
               <button
-                onClick={() => setCommentToDelete(null)}
+                onClick={() => setCommentToDelete(false)}
                 className="flex-1 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors text-sm sm:text-base"
               >
                 Cancel
