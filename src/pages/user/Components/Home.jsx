@@ -141,7 +141,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
     {/* MY NOTE CARD */}
     <div className="flex flex-col items-center w-[70px] sm:w-[85px] shrink-0 snap-start group">
       <div className="relative">
-        <div className="w-15 h-15 sm:w-16 sm:h-16 rounded-full ring-2 ring-[#879F00] ring-offset-2 ring-offset-black overflow-hidden">
+        <div className="w-15 h-15 sm:w-16 sm:h-16 rounded-full  overflow-hidden">
           <img
             src={image || defaultProfile}
             alt="Your profile"
@@ -152,7 +152,7 @@ function Home({ setSelectedUsername, setActive, openChat }) {
         {!myNote ? (
           <button
             onClick={() => setShowAddNoteModal(true)}
-            className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#879F00] hover:bg-[#9fb800] text-white font-bold flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
+            className="absolute -bottom-0 -right-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#879F00] hover:bg-[#9fb800] text-white font-bold flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

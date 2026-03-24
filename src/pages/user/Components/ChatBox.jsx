@@ -7,7 +7,19 @@ import commentIcon from "../../../assets/images/icons8-comment-50.png";
 import API from "../../../API/Api";
 
 const EMOJIS = [
-  "😀", "😂", "😍", "🥰", "😎", "🤔", "😢", "😡", "👍", "🙏", "🔥", "🎉", "❤️",
+  "😀",
+  "😂",
+  "😍",
+  "🥰",
+  "😎",
+  "🤔",
+  "😢",
+  "😡",
+  "👍",
+  "🙏",
+  "🔥",
+  "🎉",
+  "❤️",
 ];
 
 function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
@@ -37,7 +49,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const inputRef = useRef(null);
   const chatContainerRef = useRef(null);
-  const [currentUsername,setcurrentusername]=useState()
+  const [currentUsername, setcurrentusername] = useState();
 
   /* ================= SOCKET ================= */
 
@@ -52,12 +64,12 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
 
         const user = res.data.user;
         setcurrentUser(user);
-        setcurrentusername(user.username)
+        setcurrentusername(user.username);
       } catch (error) {
         console.log("Error fetching notification settings ❌", error);
       } finally {
@@ -122,7 +134,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
     const handleDelete = (messageId) => {
       setMessages((prev) =>
-        prev.filter((m) => m._id === undefined || m._id !== messageId)
+        prev.filter((m) => m._id === undefined || m._id !== messageId),
       );
     };
 
@@ -140,19 +152,20 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   useEffect(() => {
     const handleResize = () => {
       // On mobile, when keyboard opens, viewport height decreases
-      const isKeyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
+      const isKeyboardOpen =
+        window.visualViewport.height < window.innerHeight * 0.8;
       setKeyboardVisible(isKeyboardOpen);
-      
+
       if (isKeyboardOpen) {
         // Scroll to bottom when keyboard opens
         setTimeout(scrollToBottom, 100);
       }
     };
 
-    window.visualViewport?.addEventListener('resize', handleResize);
-    
+    window.visualViewport?.addEventListener("resize", handleResize);
+
     return () => {
-      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -195,7 +208,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         type: "text",
         content: message,
       },
-      sender: currentUser.name, // 🔥 important
+      sender:currentUsername, // 🔥 important
     });
 
     setMessage("");
@@ -204,7 +217,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
   // Handle Enter key press
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -263,9 +276,9 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
           type: "image",
           content: result.secure_url,
         },
-        sender: currentUser?.name,
+        sender: currentUsername,
       });
-      
+
       scrollToBottom();
     } catch (error) {
       console.error("Upload error:", error);
@@ -305,9 +318,9 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
           content: result.secure_url,
           name: file.name,
         },
-        sender: currentUser?.name,
+        sender: currentUsername,
       });
-      
+
       scrollToBottom();
     } catch (error) {
       console.error("Document upload error:", error);
@@ -315,7 +328,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!selectedPost?.post?._id) return;
@@ -403,7 +416,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
             type: "audio",
             content: result.secure_url,
           },
-          sender: currentUser.name,
+          sender: currentUsername,
         });
 
         setRecording(false);
@@ -561,37 +574,39 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   /* ================= UI ================= */
 
   return (
-    <div 
+    <div
       ref={chatContainerRef}
       className={`flex flex-col h-[calc(100vh-120px)] sm:h-[80vh] w-full bg-[#0f0f0f] rounded-none sm:rounded-xl text-white ${
-        keyboardVisible ? 'pb-0' : 'pb-2 sm:pb-4'
+        keyboardVisible ? "pb-0" : "pb-2 sm:pb-4"
       }`}
     >
       {/* Header - Fixed at top */}
       <div className="flex items-center gap-3 px-3 sm:px-4 py-3 border-b border-gray-700 sticky top-0 bg-[#0f0f0f] z-10">
-        <button 
-          onClick={onBack} 
+        <button
+          onClick={onBack}
           className="text-lg sm:text-xl hover:bg-gray-800 p-1 rounded-full"
         >
           ←
         </button>
-        <h2 className="text-base sm:text-lg font-semibold truncate">{district}</h2>
+        <h2 className="text-base sm:text-lg font-semibold truncate">
+          {district}
+        </h2>
       </div>
 
       {/* Messages Container - Scrollable */}
-      <div 
+      <div
         className="flex-1 overflow-y-auto scrollbar-hide px-2 sm:px-4 py-3 space-y-3"
-        style={{ 
-          paddingBottom: keyboardVisible ? '80px' : '20px',
-          WebkitOverflowScrolling: 'touch'
+        style={{
+          paddingBottom: keyboardVisible ? "80px" : "20px",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         {messages.map((msg, i) => {
           console.log(msg.senter);
-          
-const isMe =
-  msg.sender?.toString().trim().toLowerCase() ===
-  currentUsername?.toString().trim().toLowerCase();
+
+          const isMe =
+            msg.sender?.toString().trim().toLowerCase() ===
+            currentUsername?.toString().trim().toLowerCase();
 
           return (
             <div
@@ -644,7 +659,7 @@ const isMe =
                     </button>
                   )}
 
-                  {msg.sender === currentUser?.name && (
+                  {msg.sender === currentUsername && (
                     <button
                       onClick={() => deleteMessage(msg._id)}
                       className="w-full text-left px-3 sm:px-4 py-2 text-red-500 hover:bg-gray-700"
@@ -683,7 +698,9 @@ const isMe =
                   />
 
                   {msg.post.caption && (
-                    <p className="text-[10px] sm:text-xs mt-1 truncate">{msg.post.caption}</p>
+                    <p className="text-[10px] sm:text-xs mt-1 truncate">
+                      {msg.post.caption}
+                    </p>
                   )}
                 </div>
               )}
@@ -725,7 +742,7 @@ const isMe =
                         Download
                       </button>
 
-                      {msg.sender === currentUser?.name && (
+                      {msg.sender === currentUsername && (
                         <button
                           onClick={() => {
                             deleteMessage(msg._id);
@@ -750,7 +767,10 @@ const isMe =
 
               {/* Audio Message */}
               {msg.type === "audio" && (
-                <audio controls className="max-w-[200px] sm:max-w-xs h-8 sm:h-10">
+                <audio
+                  controls
+                  className="max-w-[200px] sm:max-w-xs h-8 sm:h-10"
+                >
                   <source src={msg.content} type="audio/webm" />
                 </audio>
               )}
@@ -793,34 +813,40 @@ const isMe =
       </div>
 
       {/* Input Area - Fixed at bottom with keyboard handling */}
-      <div 
+      <div
         className={`border-t border-gray-700 bg-[#0f0f0f] transition-all duration-200 ${
-          keyboardVisible ? 'pb-1' : 'pb-2 sm:pb-3'
+          keyboardVisible ? "pb-1" : "pb-2 sm:pb-3"
         }`}
       >
         <div className="relative flex items-center gap-1 sm:gap-2 pt-2 px-2 sm:px-3">
           {!recording ? (
             <>
               {/* Emoji Button */}
-              <button 
-                onClick={() => setShowEmojis(!showEmojis)} 
+              <button
+                onClick={() => setShowEmojis(!showEmojis)}
                 className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
               >
                 😊
               </button>
 
               {/* Image Button */}
-              <button 
-                onClick={() => fileInputRef.current.click()} 
+              <button
+                onClick={() => fileInputRef.current.click()}
                 className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
               >
                 🖼️
               </button>
-              <input ref={fileInputRef} type="file" hidden onChange={sendImage} accept="image/*" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                hidden
+                onChange={sendImage}
+                accept="image/*"
+              />
 
               {/* Document Button */}
-              <button 
-                onClick={() => docInputRef.current.click()} 
+              <button
+                onClick={() => docInputRef.current.click()}
                 className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
               >
                 📎
@@ -844,15 +870,15 @@ const isMe =
 
               {/* Send/Record Button */}
               {message ? (
-                <button 
-                  onClick={sendMessage} 
+                <button
+                  onClick={sendMessage}
                   className="text-[#879F00] text-sm sm:text-base font-semibold px-2 sm:px-3 py-1.5 hover:bg-gray-800 rounded-full"
                 >
                   Send
                 </button>
               ) : (
-                <button 
-                  onClick={startRecording} 
+                <button
+                  onClick={startRecording}
                   className="text-lg sm:text-xl p-1.5 sm:p-2 hover:bg-gray-800 rounded-full"
                 >
                   🎤
@@ -861,9 +887,19 @@ const isMe =
             </>
           ) : (
             <div className="flex justify-between items-center w-full bg-gray-800 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full">
-              <button onClick={cancelRecording} className="text-red-500 text-lg">✖</button>
+              <button
+                onClick={cancelRecording}
+                className="text-red-500 text-lg"
+              >
+                ✖
+              </button>
               <span className="text-xs sm:text-sm">🔴 Recording...</span>
-              <button onClick={sendRecording} className="text-[#879F00] text-lg">➤</button>
+              <button
+                onClick={sendRecording}
+                className="text-[#879F00] text-lg"
+              >
+                ➤
+              </button>
             </div>
           )}
         </div>
@@ -874,7 +910,7 @@ const isMe =
         <div
           ref={emojiRef}
           className="absolute bottom-20 left-2 right-2 sm:left-auto sm:right-4 bg-gray-800 p-3 rounded-lg shadow-lg z-50"
-          style={{ maxWidth: '300px', margin: '0 auto' }}
+          style={{ maxWidth: "300px", margin: "0 auto" }}
         >
           <div className="flex flex-wrap gap-2 justify-center">
             {EMOJIS.map((emoji, index) => (
@@ -926,7 +962,10 @@ const isMe =
                 </span>
               </div>
 
-              <button onClick={() => setSelectedPost(null)} className="text-xl p-1">
+              <button
+                onClick={() => setSelectedPost(null)}
+                className="text-xl p-1"
+              >
                 ✖
               </button>
             </div>
@@ -957,7 +996,7 @@ const isMe =
                   onClick={() => setShowComments((prev) => !prev)}
                 />
               </div>
-              
+
               {/* Save */}
               <svg
                 onClick={handleSave}
@@ -976,7 +1015,7 @@ const isMe =
             <div className="px-3 sm:px-4 pt-2 text-xs sm:text-sm font-semibold">
               {like || 0} likes
             </div>
-            
+
             {/* Comment Count */}
             <div className="px-3 sm:px-4 pt-1 text-[10px] sm:text-xs text-gray-400">
               {selectedPost.post.comments?.length || 0} comments
@@ -1014,7 +1053,7 @@ const isMe =
                   <input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleComment()}
+                    onKeyPress={(e) => e.key === "Enter" && handleComment()}
                     placeholder="Add a comment..."
                     className="flex-1 bg-transparent outline-none text-xs sm:text-sm"
                   />
