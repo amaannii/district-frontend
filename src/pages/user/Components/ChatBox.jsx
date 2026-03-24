@@ -37,6 +37,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const inputRef = useRef(null);
   const chatContainerRef = useRef(null);
+  const [currentUsername,setcurrentusername]=useState()
 
   /* ================= SOCKET ================= */
 
@@ -56,6 +57,7 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
 
         const user = res.data.user;
         setcurrentUser(user);
+        setcurrentusername(user.username)
       } catch (error) {
         console.log("Error fetching notification settings ❌", error);
       } finally {
@@ -585,7 +587,11 @@ function ChatBox({ district, onBack, setSelectedUsername, setActive }) {
         }}
       >
         {messages.map((msg, i) => {
-          const isMe = msg.sender === currentUser?.name;
+          console.log(msg.senter);
+          
+const isMe =
+  msg.sender?.toString().trim().toLowerCase() ===
+  currentUsername?.toString().trim().toLowerCase();
 
           return (
             <div
