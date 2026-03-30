@@ -690,7 +690,7 @@ function Search() {
 
       {/* LOADING OVERLAY */}
       {loading && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/60 z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm">
           <div className="chaotic-orbit"></div>
         </div>
       )}
